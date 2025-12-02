@@ -21,7 +21,9 @@ jobs:
       - name: Set up Environment
         uses: actions/setup-java@v4 
         with:
-          node-version: '20' # Specify the version you need
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
           
       - name: Install dependencies
         run: mvn install 
