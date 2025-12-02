@@ -1,0 +1,30 @@
+name: CI Testing Pipeline
+
+on:
+  # Triggers the workflow on push or pull request events 
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  
+  workflow_dispatch:
+
+jobs:
+  test:
+    # Defines the type of machine the job will run on
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Environment
+        uses: actions/setup-java@v4 
+        with:
+          node-version: '20' # Specify the version you need
+          
+      - name: Install dependencies
+        run: mvn install 
+        
+      - name: Run Tests
+        run: mvn test 
