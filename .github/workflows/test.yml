@@ -29,7 +29,14 @@ jobs:
         run: chmod +x gradlew
           
       - name: Install dependencies
+<<<<<<< HEAD
         run: ./gradlew assemble 
         
       - name: Run Tests
         run: ./gradlew test 
+=======
+        run: ./gradlew assemble
+        
+      - name: Run Tests
+        run: ./gradlew test
+>>>>>>> 7ea2c256cc031ae625ada269a8fec726da88e157
