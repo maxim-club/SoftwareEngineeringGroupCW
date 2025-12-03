@@ -33,5 +33,3 @@ jobs:
         
       - name: Run Tests
         run: ./gradlew test 
-      - n        run: ./gradlew test
->>>>>>> 7ea2c256cc031ae625ada269a8fec726da88e157
