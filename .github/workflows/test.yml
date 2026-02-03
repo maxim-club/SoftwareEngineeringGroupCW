@@ -32,4 +32,7 @@ jobs:
         run: ./gradlew assemble 
         
       - name: Run Tests
-        run: ./gradlew test 
+        run: ./gradlew test
+        env: 
+            BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
+            BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
