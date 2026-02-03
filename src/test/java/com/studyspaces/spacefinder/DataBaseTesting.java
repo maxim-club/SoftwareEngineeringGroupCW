@@ -1,7 +1,7 @@
 package com.studyspaces.spacefinder;
-
 import com.studyspaces.spacefinder.BasicDBReadWrite;
 import org.junit.jupiter.api.Test;
+
 import org.bson.Document;
 import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,15 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import java.io.InputStream;
 import java.util.Properties;
 import java.io.FileNotFoundException;
-
-
+//Testing to check if database works. Feel free to use this code as a guide to connecting to the DB.
 class DataBaseTesting{
 	private BasicDBReadWrite client;
 
 
 	@BeforeEach
-    void setUp() throws Exception { // Ask maxim for help with connectiong to DB
-        
+    void setUp() throws Exception {         
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             
@@ -64,5 +62,13 @@ class DataBaseTesting{
 		Document fetchedDoc = client.GetDocument("Room Data", "room", "-1");
 		assertEquals(testDoc.get("name"), fetchedDoc.get("name"));
 	}
+	@Test
+	void deleteDataFromDataBase(){
+		client.Connect("Data");
+		int result = client.DeleteDocument("Room Data", "room", "-1");
 
+		assertEquals(result, 1);
+
+
+	}
 }
