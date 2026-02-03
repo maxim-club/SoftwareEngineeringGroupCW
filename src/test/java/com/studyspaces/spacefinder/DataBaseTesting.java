@@ -30,7 +30,9 @@ class DataBaseTesting{
             String password = props.getProperty("db.password");
 			*/
 
-			Dotenv dotenv = Dotenv.load();
+			Dotenv dotenv = Dotenv.configure()
+				.ignoreIfMissing()
+				.load();
 		
 			String username = dotenv.get("BOT_USERNAME");
 			String password = dotenv.get("BOT_PASSWORD");
