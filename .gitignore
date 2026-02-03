@@ -39,3 +39,4 @@ out/
 
 #prevents sensitive local config files
 application.properties
+.env
