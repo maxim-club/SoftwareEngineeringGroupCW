@@ -2,6 +2,8 @@ package com.studyspaces.spacefinder;
 import com.studyspaces.spacefinder.BasicDBReadWrite;
 import org.junit.jupiter.api.Test;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import org.bson.Document;
 import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,7 +20,7 @@ class DataBaseTesting{
     void setUp() throws Exception {         
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-            
+			/*
             if (input == null) {
                 throw new FileNotFoundException("application.properties not found. Check src/test/resources.");
             }
@@ -26,6 +28,13 @@ class DataBaseTesting{
 
             String username = props.getProperty("db.username");
             String password = props.getProperty("db.password");
+			*/
+
+			Dotenv dotenv = Dotenv.load();
+		
+			String username = dotenv.get("BOT_USERNAME");
+			String password = dotenv.get("BOT_PASSWORD");
+
             
             if (username == null || password == null) {
                 throw new IllegalStateException("db.username or db.password is missing in application.properties.");
