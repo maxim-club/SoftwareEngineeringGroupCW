@@ -43,6 +43,17 @@ public class BasicDBReadWrite{
 			return 0;
 		}
 	}
+	//Deletes a socument if the field value in DB is == to value
+	public int DeleteDocument(String collectionName, String field, String value){
+		if(connectionStatus){
+			MongoCollection<Document> collection = database.getCollection(collectionName);
+			collection.deleteOne(eq(field, value));
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+	
 
 
 
