@@ -55,13 +55,20 @@ public class BasicDBReadWrite{
 	}
 	
 
-
-
-	public Document GetDocument(String collectionName, String field, String value){
-		
+	public Document GetFirstDocument(String collectionName, String field, String value){
 		
 		MongoCollection<Document> collection = database.getCollection(collectionName);
 		Document result = collection.find(eq(field, value)).first();
+		return result;
+	}
+
+	
+
+	public Document[] GetDocuments(String collectionName, String field, String value){
+		
+		
+		MongoCollection<Document> collection = database.getCollection(collectionName);
+		Document[] result = collection.find(eq(field, value));
 		return result;
 		
 	}
