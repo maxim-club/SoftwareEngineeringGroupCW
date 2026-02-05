@@ -19,12 +19,11 @@ import com.studyspaces.StudySpaceProfile;
 
 //	This class is for handling the interface between Room data database and backend code
 //	This contains a map of (int)ava Space ID
-	public Document GetDocument(String collectionName, String field, String value){
 
-public class StudySpaceProfileManager(){
+public class StudySpaceProfileManager{
 
 	//this will be the same in all instances of profile manager
-	static public Map<String, StudySpaceProfile> studySpaces = new Map<int, StudySpaceProfile>();
+	static public HashMap<String, StudySpaceProfile> studySpaces = new HashMap<String, StudySpaceProfile>();
 
 	Dotenv dotenv = Dotenv.configure()
 		.ignoreIfMissing()
@@ -39,11 +38,9 @@ public class StudySpaceProfileManager(){
 
 	private BasicDBReadWrite client = new BasicDBReadWrite(username, password);
 
-	
-
 
 	public String[] fetchFromDB(String field, Object value){ //Find all instances of the field having value in database and return a list of java space ids to access them 
-		Document[] documents = new Array<Document>();
+		Document[] documents = new ArrayList<Document>();
 
 		try{
 			client.Connect("Data");
@@ -52,7 +49,7 @@ public class StudySpaceProfileManager(){
 			throw e;
 		}
 		
-		String[] ids = new Array<String>();
+		String[] ids = new ArrayList<String>();
 
 		//get the keys as string and add to the studySpaces map
 		for(Document doc : documents){
