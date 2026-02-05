@@ -65,8 +65,21 @@ public class StudySpaceProfileManager(){
 	}
 	
 	//With this function you can retrieve the study space profile using the ID.
-	public StudySpaceProfile get(Strind id){
-		return this.studySpaces.get(id);
+	public StudySpaceProfile Get(String id){
+		StudySpaceProfile room = this.studySpaces.get(id);
+
+		if(room != null){
+			return this.studySpaces.get(id);
+		}else{
+			//search the DB
+			
+			String[] fetchedIds = this.fetchFromDB("_id", new ObjectID(id));
+			if(fetchedIds.length() == 0){
+				return null;
+			}else{
+				return this.studySpaces.get(id);
+			}
+		}
 	}
 
 
