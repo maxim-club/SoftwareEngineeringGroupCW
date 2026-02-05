@@ -12,7 +12,6 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-package com.studyspaces;
 import com.studyspaces.StudySpaceProfile;
 
 
@@ -21,22 +20,36 @@ import com.studyspaces.StudySpaceProfile;
 //	This contains a map of (int)ava Space ID
 
 public class StudySpaceProfileManager{
-
-	//this will be the same in all instances of profile manager
+	
+	private BasicDBReadWrite client;
 	static public HashMap<String, StudySpaceProfile> studySpaces = new HashMap<String, StudySpaceProfile>();
 
-	Dotenv dotenv = Dotenv.configure()
-		.ignoreIfMissing()
-		.load();
+	
+	public StudySpaceProfileManager() throws Exception{
+		//this will be the same in all instances of profile manager
+			
+		String username;
+		String password;
 
-	String username = dotenv.get("BOT_USERNAME");
-	String password = dotenv.get("BOT_PASSWORD");
+		try{
 
-	if (username == null || password == null) {
-		throw new IllegalStateException("db.username or db.password is missing in application.properties.");
-	}
+			Dotenv dotenv = Dotenv.configure()
+				.ignoreIfMissing()
+				.load();
 
-	private BasicDBReadWrite client = new BasicDBReadWrite(username, password);
+			String username = dotenv.get("BOT_USERNAME");
+			String password = dotenv.get("BOT_PASSWORD");
+
+			if (username == null || password == null) {
+				throw new IllegalStateException("db.username or db.password is missing in application.properties.");
+			}
+			}catch (IllegalStateException e){
+				throw e;
+			}
+
+			client = new BasicDBReadWrite(username, password);
+		}
+
 
 
 	public String[] fetchFromDB(String field, Object value){ //Find all instances of the field having value in database and return a list of java space ids to access them 
@@ -45,7 +58,7 @@ public class StudySpaceProfileManager{
 		try{
 			client.Connect("Data");
 			documents = this.client.GetDocuments("Room Data", field, value);
-		}catch (Exception e){
+		}catch(Exception e){
 			throw e;
 		}
 		

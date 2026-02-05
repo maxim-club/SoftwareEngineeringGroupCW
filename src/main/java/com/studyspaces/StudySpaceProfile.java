@@ -16,11 +16,18 @@ import org.bson.types.ObjectId;
 //	This class is for a single room profile.
 //	It holds the data fetched from the database related to a single room.
 
-public class StudySpaceProfile(ObjectId, id, Document doc){
+public class StudySpaceProfile{	
+	public ObjectId mongoID; //This is the database ID that this room is linked to
 
-	public ObjectId mongoID = id; //This is the database ID that this room is linked to
+	public Document doc; //This is a BSON document which basically contains all data. Its like a Map with a String key.
+	
 
-	public Document doc = doc; //This is a BSON document which basically contains all data. Its like a Map with a String key.
+
+	public StudySpaceProfile(ObjectId id, Document doc){
+
+		this.mongoID = id; 
+		this.doc = doc; 
+	}
 	
 
 	public void Add(String key, Object value){ //Add the object to the JSON with the key as key
@@ -45,8 +52,9 @@ public class StudySpaceProfile(ObjectId, id, Document doc){
 	}
 
 	public int Remove(String key){ //remove the key and value pair
+		
 		try{
-			val = this.doc.remove(key);
+			this.doc.remove(key);
 		}catch(Exception e){
 			throw e;
 			return 0;

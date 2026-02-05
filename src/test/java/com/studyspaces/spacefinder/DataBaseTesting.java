@@ -20,16 +20,7 @@ class DataBaseTesting{
     void setUp() throws Exception {         
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
-			/*
-            if (input == null) {
-                throw new FileNotFoundException("application.properties not found. Check src/test/resources.");
-            }
-            props.load(input);
-
-            String username = props.getProperty("db.username");
-            String password = props.getProperty("db.password");
-			*/
-
+			
 			Dotenv dotenv = Dotenv.configure()
 				.ignoreIfMissing()
 				.load();
