@@ -48,7 +48,7 @@ Methods
 
 | name | parameters | return type | description|
 | ---  |       ---  |        ---  |        --- |
-| fetchFromDB| String field, Object value | String[] | Finds all instances of a room where field value == search value and stores in its own map. Returns a list of IDs|
+| fetchFromDB| String field, Object value | String[] | Finds all instances of a room where field value == search value and stores in its own map. Returns a list of IDs that are related to the rooms.|
 | Get | String id | StudySpaceProfile | get the studyspace profile from the map and then return it. Will search if not in current map|
 
 
