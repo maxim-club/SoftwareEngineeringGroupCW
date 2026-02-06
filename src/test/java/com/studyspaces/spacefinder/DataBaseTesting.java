@@ -48,7 +48,8 @@ class DataBaseTesting{
 		Document testDoc = new Document()
 			.append("room", "-1")
 			.append("name", "test")
-			.append("utilities", Arrays.asList("sockets", "food"));
+			.append("utilities", Arrays.asList("sockets", "food"))
+			.append("id", "-1");
 
 		int res = client.InsertDocument("Room Data", testDoc);
 		assertEquals(1, res);
@@ -60,8 +61,9 @@ class DataBaseTesting{
 		Document testDoc = new Document()
 			.append("room", "-1")
 			.append("name", "test")
-			.append("utilities", Arrays.asList("sockets", "food"));
-		Document fetchedDoc = client.GetDocument("Room Data", "room", "-1");
+			.append("utilities", Arrays.asList("sockets", "food"))
+			.append("id", "-1");
+		Document fetchedDoc = client.GetDocuments("Room Data", "room", "-1").get(0);
 		assertEquals(testDoc.get("name"), fetchedDoc.get("name"));
 	}
 	@Test
