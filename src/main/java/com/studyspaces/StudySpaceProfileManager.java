@@ -1,18 +1,25 @@
-import org.bson.Document;
+package com.studyspaces;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.InputStream;
 import java.util.Properties;
 import java.io.FileNotFoundException;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
+
+import org.bson.Document;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.studyspaces.StudySpaceProfile;
+import com.studyspaces.spacefinder.BasicDBReadWrite;
+
 
 
 
@@ -22,7 +29,7 @@ import com.studyspaces.StudySpaceProfile;
 public class StudySpaceProfileManager{
 	
 	private BasicDBReadWrite client;
-	static public HashMap<String, StudySpaceProfile> studySpaces = new HashMap<String, StudySpaceProfile>();
+	static private HashMap<String, StudySpaceProfile> studySpaces = new HashMap<String, StudySpaceProfile>();
 
 	
 	public StudySpaceProfileManager() throws Exception{
@@ -37,8 +44,8 @@ public class StudySpaceProfileManager{
 				.ignoreIfMissing()
 				.load();
 
-			String username = dotenv.get("BOT_USERNAME");
-			String password = dotenv.get("BOT_PASSWORD");
+			username = dotenv.get("BOT_USERNAME");
+			password = dotenv.get("BOT_PASSWORD");
 
 			if (username == null || password == null) {
 				throw new IllegalStateException("db.username or db.password is missing in application.properties.");
@@ -51,9 +58,10 @@ public class StudySpaceProfileManager{
 		}
 
 
-
-	public String[] fetchFromDB(String field, Object value){ //Find all instances of the field having value in database and return a list of java space ids to access them 
-		Document[] documents = new ArrayList<Document>();
+//Find all instances of the field having value in database and return list of them 
+	public ArrayList<StudySpaceProfile> fetch(String field, Object value){ 
+		ArrayList<Document> documents = new ArrayList<Document>();
+		System.out.println("Fetching: " + field + " , " +value+ " (" + value.getClass().getSimpleName() + ")");
 
 		try{
 			client.Connect("Data");
@@ -62,44 +70,74 @@ public class StudySpaceProfileManager{
 			throw e;
 		}
 		
-		String[] ids = new ArrayList<String>();
+		ArrayList<StudySpaceProfile> profiles = new ArrayList<>();
 
 		//get the keys as string and add to the studySpaces map
 		for(Document doc : documents){
-			ObjectId id = doc.get("_id");
-			this.studySpaces.append(id.toString(), new StudySpaceProfile(id, doc));
-			ids.append(id.toString());
+			Object idObj = doc.get("id");
+
+			if (idObj == null) {
+				System.err.println("Warning: document missing 'id' field, skipping: " + doc);
+				continue; // skip this document
+			}
+
+			String id = idObj.toString();
+
+			StudySpaceProfile profile = new StudySpaceProfile(id, doc); 
+			this.studySpaces.put(id, profile); //cache
+														  
+			profiles.add(profile);
 		}
 
-		return ids;
+		return profiles;
 	}
 	
 	//With this function you can retrieve the study space profile using the ID.
 	public StudySpaceProfile Get(String id){
+
 		StudySpaceProfile room = this.studySpaces.get(id);
 
-		if(room != null){
+		if(room != null){	// exists in the map and is in database
 			return this.studySpaces.get(id);
+
 		}else{
-			//search the DB
-			
-			String[] fetchedIds = this.fetchFromDB("_id", new ObjectID(id));
-			if(fetchedIds.length() == 0){
+			ArrayList<StudySpaceProfile> fetchedProfiles = this.fetch("id", id);
+
+			if(fetchedProfiles.size() == 0){ //not in database
 				return null;
-			}else{
-				return this.studySpaces.get(id);
 			}
+			StudySpaceProfile profile = fetchedProfiles.get(0);
+			studySpaces.put(id, profile);   // cache it
+			return profile;
+			
 		}
 	}
 
+//With this function you can write the profile back to the database by selecting with id.
+	public int write(String id){
+		StudySpaceProfile target = this.studySpaces.get(id);
+
+		if (target == null){
+			System.out.println("Profile with id " + id + " is not currently in memory. Not written");
+			return 0;
+		}
+
+		try{
+			client.Connect("Data");
+			
+			client.replaceDocumentById("Room Data", id, target.doc);
+
+			//remove from cache
+			//
+
+			return 1;
+
+		}catch(Exception e){
+			throw e;
+		}
 
 
 
-
-
-
-
-
-
+	}
 
 }
