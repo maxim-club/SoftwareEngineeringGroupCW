@@ -1,3 +1,5 @@
+package com.studyspaces;
+
 import org.bson.Document;
 
 import java.util.Arrays;
@@ -17,31 +19,30 @@ import org.bson.types.ObjectId;
 //	It holds the data fetched from the database related to a single room.
 
 public class StudySpaceProfile{	
-	public ObjectId mongoID; //This is the database ID that this room is linked to
+	public String id; //This is the database ID as a string that this room is linked to
 
 	public Document doc; //This is a BSON document which basically contains all data. Its like a Map with a String key.
 	
 
 
-	public StudySpaceProfile(ObjectId id, Document doc){
+	public StudySpaceProfile(String id, Document doc){
 
-		this.mongoID = id; 
+		this.id = id; 
 		this.doc = doc; 
 	}
 	
 
-	public void Add(String key, Object value){ //Add the object to the JSON with the key as key
+	public int Add(String key, Object value){ //Add the object to the JSON with the key as key
 		try{
 			this.doc.append(key, value);
 		}catch (Exception e){
 			throw e;
-			return 0;
 		}
 		return 1;
 	}
 
 	public Object Get(String key){ //fetch the value with the key
-		val = null;
+		Object val = null;
 		try{
 			val = this.doc.get(key);
 		}catch(Exception e){
@@ -57,7 +58,6 @@ public class StudySpaceProfile{
 			this.doc.remove(key);
 		}catch(Exception e){
 			throw e;
-			return 0;
 		}
 		return 1;
 	}
@@ -67,7 +67,6 @@ public class StudySpaceProfile{
 			this.doc.put(key, value);
 		}catch (Exception e){
 			throw e;
-			return 0;
 		}
 		return 1;		
 	}
