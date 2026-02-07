@@ -20,7 +20,7 @@ import org.bson.types.ObjectId;
 import com.studyspaces.StudySpaceProfile;
 import com.studyspaces.spacefinder.BasicDBReadWrite;
 
-
+//TODO. Add specific function like get all rooms from one building to avoid more interaction with mongoDB from outside this class.
 
 
 //	This class is for handling the interface between Room data database and backend code
@@ -143,5 +143,45 @@ public class StudySpaceProfileManager{
 
 
 	}
+	//put a profile inside. Will add to cache and will write to memory
+	public StudySpaceProfile create(StudySpaceProfile profile){
 
+	}
+
+	//replace the profile in cache. will make that entry dirty.
+	public void update(StudySpaceProfile profile){
+	
+	}
+	
+	//delete from cache AND DATABASE
+	public void delete(String id){
+
+	}
+
+	// Cache focused methods:
+	
+	//Remove everything from cache and write back any dirty entries
+	public void clearCache(){
+
+	}
+	
+	//Forcibly remove an item in cache. DOESN'T WRITE BACK TO DB
+	public void evict(String id){
+
+	}
+
+	//Fetch this item from database again
+	public StudySpaceProfile refresh(String id){
+
+	}	
+
+	//check if item exists in cache
+	public boolean isCached(String id){
+
+	}
+	
+	//return the number of items in cache.
+	public int getCacheSize(){
+
+	}
 }
