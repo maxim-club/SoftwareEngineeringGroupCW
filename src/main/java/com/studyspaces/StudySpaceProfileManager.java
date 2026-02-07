@@ -58,10 +58,10 @@ public class StudySpaceProfileManager{
 		}
 
 
-//Find all instances of the field having value in database and return list of them 
+//Find all instances of the field having value in database and return list of them. Will also cache in memory 
 	public ArrayList<StudySpaceProfile> fetch(String field, Object value){ 
 		ArrayList<Document> documents = new ArrayList<Document>();
-		System.out.println("Fetching: " + field + " , " +value+ " (" + value.getClass().getSimpleName() + ")");
+		//System.out.println("Fetching: " + field + " , " +value+ " (" + value.getClass().getSimpleName() + ")");
 
 		try{
 			client.Connect("Data");
@@ -125,12 +125,16 @@ public class StudySpaceProfileManager{
 		try{
 			client.Connect("Data");
 			
-			client.replaceDocumentById("Room Data", id, target.doc);
+			int res = client.replaceDocumentById("Room Data", id, target.doc);
 
 			//remove from cache
-			//
-
-			return 1;
+			if (res == 1){ //it successfully wrote to DB
+				this.studySpaces.remove(id);	
+				return 1;
+			}else{
+				System.err.println("Error, study space with ID " + id + " has not been written to DB!");
+				return 0;
+			}
 
 		}catch(Exception e){
 			throw e;

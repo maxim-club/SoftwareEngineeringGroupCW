@@ -32,43 +32,35 @@ public class StudySpaceProfile{
 	}
 	
 
-	public int Add(String key, Object value){ //Add the object to the JSON with the key as key
-		try{
-			this.doc.append(key, value);
-		}catch (Exception e){
-			throw e;
+	public Document Add(String key, Object value){ //Add the object to the JSON with the key as key
+		if (key == null) {
+			throw new IllegalArgumentException("Key cannot be null");
 		}
-		return 1;
+		return this.doc.append(key, value);
 	}
 
-	public Object Get(String key){ //fetch the value with the key
-		Object val = null;
-		try{
-			val = this.doc.get(key);
-		}catch(Exception e){
-			throw e;
+	//fetch value that has this key
+	public Object Get(String key){
+		if (key == null) {
+			throw new IllegalArgumentException("Key cannot be null");
 		}
-		
-		return val;
+
+		return this.doc.get(key);
 	}
 
-	public int Remove(String key){ //remove the key and value pair
-		
-		try{
-			this.doc.remove(key);
-		}catch(Exception e){
-			throw e;
+	public Object Remove(String key){ //remove the key and value pair
+		if (key == null) {
+			throw new IllegalArgumentException("Key cannot be null");
 		}
-		return 1;
+		return this.doc.remove(key);
 	}
 	
-	public int Update(String key, Object value){ //Like the Add function but you replace the value.
-		try{
-			this.doc.put(key, value);
-		}catch (Exception e){
-			throw e;
+	public Object Update(String key, Object value){ //Like the Add function but you replace the value.
+		if (key == null) {
+			throw new IllegalArgumentException("Key cannot be null");
 		}
-		return 1;		
+		return this.doc.put(key, value);
+	
 	}
 
 	public String toJson(){	//Return the contents of document as a single string.
