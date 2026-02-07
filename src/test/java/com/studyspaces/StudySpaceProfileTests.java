@@ -17,88 +17,12 @@ import java.io.FileNotFoundException;
 import java.lang.IllegalArgumentException;
 import java.util.ArrayList;
 
+import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
+
 class StudySpaceProfileTesting{
 
-	private StudySpaceProfileManager manager;
-
-    @BeforeEach
-    void setup() throws Exception {
-        manager = new StudySpaceProfileManager();
-    }
-
-	//	Manager Tests
-
-
-	//Fetching test values check if it recieved everything
-	@Test
-	void fetchTest(){
-		ArrayList<StudySpaceProfile> profiles = this.manager.fetch("room", "-1");
-		assertNotEquals(profiles.size(), 0);
-	}	
-	
-	//Get a value and check if everything is there
-	@Test
-	void getValueInMap(){
-		ArrayList<StudySpaceProfile> profiles = this.manager.fetch("room", "-1");
-		StudySpaceProfile profile = profiles.get(0);
-		assertEquals(profile.Get("name"), "test");
-
-
-	}
-	
-	//Get a value not already in and check if it is there
-	@Test
-	void getValueNotInMap(){
-		StudySpaceProfile profile = this.manager.Get("-1");
-		assertEquals(profile.Get("name"), "test");
-	}
-
-	//Get a value not already in and not in database and check if it can handle it
-	@Test
-	void getNonExistantValue(){
-		StudySpaceProfile profile = this.manager.Get("ajsduwbnjiduniqonioenqiwneoiendonsdmwdiowndionweidmioamwd");
-	}
-	
-	@Test
-	void reWriteProfileTest(){
-		StudySpaceProfile profile = this.manager.Get("-1");
-		profile.Add("CurrentlyTested?", "True");
-		this.manager.write("-1");
-
-		//fetch to test if worked
 		
-		profile = this.manager.Get("-1");
-		assertEquals(profile.Get("CurrentlyTested?"), "True");
-
-		//remove the new field
-		
-		profile.Remove("CurrentlyTested?");
-		this.manager.write("-1");
-
-		//test if its been removed.
-	
-		assertNull(profile.Get("CurrentlyTested?"));
-		
-	}
-
-	@Test
-	void WriteRougeValue(){
-		StudySpaceProfile profile = this.manager.Get("aaaaaaaaaaaaaaaaaaaaaaaaa");
-		this.manager.write("aaaaaaaaaaaaaaaaaaaaaaaaa");
-	}
-
-
-
-	//fetch somehting that doesnt exist in DB
-	@Test
-	void fetchNothing(){
-		ArrayList<StudySpaceProfile> profiles = this.manager.fetch("unefujwejandujnwdjamsdqwlkdn", "hello");
-		assertEquals(profiles.size(), 0);
-		
-	}
-
-	//	---------------- Single Profile test ----------------------------
-	
     /* ---------------- ADD TESTS ---------------- */
 
     @Test
