@@ -23,6 +23,8 @@ class StudySpaceProfileManagerTest {
     void setup() throws Exception {
         manager = new StudySpaceProfileManager();
 
+		manager = Mockito.spy(new StudySpaceProfileManager());
+
         mockClient = mock(BasicDBReadWrite.class);
 
         // Inject mock client using reflection
@@ -167,4 +169,201 @@ class StudySpaceProfileManagerTest {
         assertEquals(0, result);
         assertNotNull(manager.Get("room1")); // still cached
     }
+
+	
+    /* ---------------- CREATE ---------------- */
+
+    @Test
+    void createCachesProfileAndWritesSuccessfully() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+
+        doReturn(1).when(manager).write("room1");
+
+        int result = manager.create(profile);
+
+        assertEquals(1, result);
+        assertTrue(manager.isCached("room1"));
+        assertFalse(profile.dirty);
+    }
+
+    @Test
+    void createReturnsZeroIfAlreadyCached() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+
+        manager.create(profile);
+
+        int result = manager.create(profile);
+
+        assertEquals(0, result);
+    }
+
+    /* ---------------- UPDATE ---------------- */
+
+    @Test
+    void updateMarksDirtyAndWritesSuccessfully() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+
+        doReturn(1).when(manager).write("room1");
+
+        int result = manager.update(profile);
+
+        assertEquals(1, result);
+        assertFalse(profile.dirty);
+        assertTrue(manager.isCached("room1"));
+    }
+
+    /* ---------------- DELETE ---------------- */
+
+    @Test
+    void deleteRemovesFromCacheOnSuccess() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+
+        manager.update(profile);
+
+        when(mockClient.DeleteDocument("Room Data", "id", "room1"))
+                .thenReturn(1);
+
+        int result = manager.delete("room1");
+
+        assertEquals(1, result);
+        assertFalse(manager.isCached("room1"));
+    }
+
+    @Test
+    void deleteFailureDoesNotRemoveFromCache() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+
+        manager.update(profile);
+
+        when(mockClient.DeleteDocument("Room Data", "id", "room1"))
+                .thenReturn(0);
+
+        int result = manager.delete("room1");
+
+        assertEquals(0, result);
+        assertTrue(manager.isCached("room1"));
+    }
+
+    /* ---------------- EVICT_WRITE ---------------- */
+
+    @Test
+    void evictWriteWritesDirtyProfileAndRemovesIt() throws Exception {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+        profile.dirty = true;
+
+        manager.update(profile);
+
+        doReturn(1).when(manager).write("room1");
+
+        int result = manager.evict_write("room1");
+
+        assertEquals(1, result);
+        assertFalse(manager.isCached("room1"));
+    }
+
+    @Test
+    void evictWriteThrowsIfWriteFails() {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+        profile.dirty = true;
+
+        manager.update(profile);
+
+        doReturn(0).when(manager).write("room1");
+
+        assertThrows(Exception.class,
+                () -> manager.evict_write("room1"));
+
+        assertTrue(manager.isCached("room1"));
+    }
+
+    /* ---------------- CLEAR CACHE ---------------- */
+
+	@Test
+	void clearCacheEvictsAllEntries() throws Exception {
+		StudySpaceProfile p1 =
+				new StudySpaceProfile("1", new Document("id", "1"));
+		StudySpaceProfile p2 =
+				new StudySpaceProfile("2", new Document("id", "2"));
+
+		manager.update(p1);
+		manager.update(p2);
+
+		// Both writes succeed
+		when(mockClient.replaceDocumentById(
+				eq("Room Data"), anyString(), any()))
+				.thenReturn(1);
+
+		List<String> errors = manager.clearCache();
+
+		assertTrue(errors.isEmpty());      // no stragglers
+		assertEquals(0, manager.getCacheSize()); // cache fully cleared
+	}
+
+	@Test
+	void clearCacheReturnsIdsThatFailEviction() throws Exception {
+		StudySpaceProfile p1 =
+				new StudySpaceProfile("1", new Document("id", "1"));
+		StudySpaceProfile p2 =
+				new StudySpaceProfile("2", new Document("id", "2"));
+
+		manager.update(p1);
+		manager.update(p2);
+
+		// Write succeeds for "1"
+		when(mockClient.replaceDocumentById(
+				eq("Room Data"), eq("1"), any()))
+				.thenReturn(1);
+
+		// Write fails for "2"
+		when(mockClient.replaceDocumentById(
+				eq("Room Data"), eq("2"), any()))
+				.thenReturn(0);
+
+		List<String> errors = manager.clearCache();
+
+		assertEquals(1, errors.size());
+		assertEquals("2", errors.get(0));
+		assertTrue(manager.isCached("2"));   // eviction failed
+		assertFalse(manager.isCached("1"));  // eviction succeeded
+	}
+
+    /* ---------------- REFRESH ---------------- */
+
+    @Test
+    void refreshClearsDirtyFlag() throws Exception {
+        StudySpaceProfile profile =
+                new StudySpaceProfile("room1", new org.bson.Document("id", "room1"));
+        profile.dirty = true;
+
+        manager.update(profile);
+
+        StudySpaceProfile refreshed = manager.refresh("room1");
+
+        assertFalse(refreshed.dirty);
+    }
+
+    @Test
+    void refreshThrowsIfProfileNotCached() {
+        assertThrows(Exception.class,
+                () -> manager.refresh("missing"));
+    }
+
+    /* ---------------- CACHE HELPERS ---------------- */
+
+    @Test
+    void cacheSizeIsAccurate() {
+        manager.update(new StudySpaceProfile("1", new org.bson.Document("id", "1")));
+        manager.update(new StudySpaceProfile("2", new org.bson.Document("id", "2")));
+
+        assertEquals(2, manager.getCacheSize());
+    }
+
+
 }
