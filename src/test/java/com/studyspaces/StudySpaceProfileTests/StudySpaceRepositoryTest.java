@@ -113,3 +113,4 @@ public class StudySpaceRepositoryTest {
         assertEquals(2, rooms.size());
     }
 }
+
