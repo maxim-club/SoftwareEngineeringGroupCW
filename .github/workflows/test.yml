@@ -22,7 +22,15 @@ jobs:
         run: chmod +x gradlew
           
       - name: Install dependencies
-        run: ./gradlew assemble 
+        run: ./gradlew assemble
+        
+      - name: Create env file
+        run: |
+          touch ./.env
+          echo BOT_USERNAME=${{ secrets.BOT_USERNAME }} >> .env
+          echo BOT_PASSWORD=${{ secrets.BOT_PASSWORD }} >> .env
+          cat ./.env
+          
         
       - name: Run Tests
         run: ./gradlew test
