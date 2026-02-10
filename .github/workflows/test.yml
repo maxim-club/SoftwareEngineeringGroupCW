@@ -17,21 +17,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-          
-      - name: Install dependencies
-        run: ./gradlew assemble
-        
       - name: Create env file
         run: |
           touch ./.env
           echo BOT_USERNAME=${{ secrets.BOT_USERNAME }} >> .env
           echo BOT_PASSWORD=${{ secrets.BOT_PASSWORD }} >> .env
           cat ./.env
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
           
-        
+      - name: Install dependencies
+        run: ./gradlew assemble
+                
       - name: Run Tests
         run: ./gradlew test
         env: 
