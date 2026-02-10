@@ -2,7 +2,7 @@ package com.studyspaces.DatabaseTests;
 
 import com.studyspaces.spacefinder.SpacefinderApplication;
 import com.studyspaces.spacefinder.StudySpaceProfile;
-import com.studyspaces.spacefinder.StudySpaceRepository;
+import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
