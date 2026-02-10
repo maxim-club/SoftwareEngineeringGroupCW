@@ -1,6 +1,5 @@
-package com.studyspaces.spacefinder;
+package com.studyspaces.spacefinder.repository;
 
-import com.studyspaces.spacefinder.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
