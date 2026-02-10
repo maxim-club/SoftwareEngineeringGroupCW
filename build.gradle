@@ -53,4 +53,10 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+	environment System.getenv()
+}
+
+test{
+	useJUnitPlatform()
+	environment System.getenv()
 }
