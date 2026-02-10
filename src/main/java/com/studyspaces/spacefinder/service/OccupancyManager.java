@@ -5,6 +5,10 @@ import java.util.List;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
+import org.springframework.stereotype.Service;
+
+
+@Service
 public class OccupancyManager {
 
     private final RealTimeOccupancyRepository repo;
@@ -14,6 +18,6 @@ public class OccupancyManager {
     }
 
     public void getCurrentOccupancy() {
-
+		return;	
     }
 }

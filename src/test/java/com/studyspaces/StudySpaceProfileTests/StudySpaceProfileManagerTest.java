@@ -1,41 +1,40 @@
 package com.studyspaces.StudySpaceProfileTests;
 
-import com.studyspaces.spacefinder.SpacefinderApplication;
-
-import com.studyspaces.spacefinder.model.StudySpaceProfile;
-import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
+import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.service.StudySpaceProfileManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = SpacefinderApplication.class)
-public class StudySpaceProfileManagerTest {
+class StudySpaceProfileManagerMockTest {
 
-    private StudySpaceProfileManager manager;
-
-    @Autowired
+    @Mock
     private StudySpaceRepository repository;
+
+    @InjectMocks
+    private StudySpaceProfileManager manager;
 
     private StudySpaceProfile profile1;
     private StudySpaceProfile profile2;
 
     @BeforeEach
     void setup() {
-        repository.deleteAll();
-        manager = new StudySpaceProfileManager(repository);
+        MockitoAnnotations.openMocks(this);
 
         // Profile 1
         profile1 = new StudySpaceProfile();
+        profile1.setId("1");
         profile1.setRoomLocation("Room A");
         profile1.setOccupancy(Occupancy.EMPTY);
         profile1.setNoiseLevel(NoiseLevel.SILENT);
@@ -44,10 +43,10 @@ public class StudySpaceProfileManagerTest {
         profile1.setNotes("Quiet room for study");
         profile1.setAmenities(new Amenities(true, true, false, false, false, false, false, true));
         profile1.setSchedule(new ArrayList<>());
-        repository.save(profile1);
 
         // Profile 2
         profile2 = new StudySpaceProfile();
+        profile2.setId("2");
         profile2.setRoomLocation("Room B");
         profile2.setOccupancy(Occupancy.BUSY);
         profile2.setNoiseLevel(NoiseLevel.LOUD);
@@ -56,15 +55,20 @@ public class StudySpaceProfileManagerTest {
         profile2.setNotes("Busy room");
         profile2.setAmenities(new Amenities(false, false, true, false, true, false, false, true));
         profile2.setSchedule(new ArrayList<>());
-        repository.save(profile2);
     }
 
     @Test
     void testSaveAndGetById() {
+        when(repository.save(profile1)).thenReturn(profile1);
+        when(repository.findById("1")).thenReturn(Optional.of(profile1));
+
         StudySpaceProfile saved = manager.save(profile1);
-        Optional<StudySpaceProfile> fetched = manager.getById(saved.getId());
+        Optional<StudySpaceProfile> fetched = manager.getById("1");
+
         assertTrue(fetched.isPresent());
         assertEquals("Room A", fetched.get().getRoomLocation());
+        verify(repository).save(profile1);
+        verify(repository).findById("1");
     }
 
     @Test
@@ -76,57 +80,88 @@ public class StudySpaceProfileManagerTest {
         replacement.setSuitableForGroups(true);
         replacement.setMaxGroupSize(10);
         replacement.setNotes("Updated notes");
-        replacement.setAmenities(new Amenities(true,true,true,true,true,true,true, false));
+        replacement.setAmenities(new Amenities(true,true,true,true,true,true,true,false));
         replacement.setSchedule(new ArrayList<>());
 
-        StudySpaceProfile replaced = manager.replace(profile1.getId(), replacement);
+        when(repository.findById("1")).thenReturn(Optional.of(profile1));
+        when(repository.save(any())).thenReturn(replacement);
+
+        StudySpaceProfile replaced = manager.replace("1", replacement);
+
         assertEquals("Room A Updated", replaced.getRoomLocation());
         assertEquals(Occupancy.MODERATE, replaced.getOccupancy());
         assertEquals(10, replaced.getMaxGroupSize());
+        verify(repository).findById("1");
+        verify(repository).save(replacement);
     }
 
     @Test
     void testGetAll() {
+        when(repository.findAll()).thenReturn(List.of(profile1, profile2));
+
         List<StudySpaceProfile> allProfiles = manager.getAll();
         assertEquals(2, allProfiles.size());
+        verify(repository).findAll();
     }
 
     @Test
     void testGetByRoomLocation() {
+        when(repository.findByRoomLocation("Room A")).thenReturn(List.of(profile1));
+
         List<StudySpaceProfile> results = manager.getByRoomLocation("Room A");
         assertEquals(1, results.size());
         assertEquals("Room A", results.get(0).getRoomLocation());
+        verify(repository).findByRoomLocation("Room A");
     }
 
     @Test
     void testGetByOccupancy() {
+        when(repository.findByOccupancy(Occupancy.EMPTY)).thenReturn(List.of(profile1));
+
         List<StudySpaceProfile> emptyRooms = manager.getByOccupancy(Occupancy.EMPTY);
         assertEquals(1, emptyRooms.size());
         assertEquals("Room A", emptyRooms.get(0).getRoomLocation());
+        verify(repository).findByOccupancy(Occupancy.EMPTY);
     }
 
     @Test
     void testGetSuitableForGroups() {
+        when(repository.findBySuitableForGroupsTrue()).thenReturn(List.of(profile1));
+
         List<StudySpaceProfile> groupRooms = manager.getSuitableForGroups();
         assertEquals(1, groupRooms.size());
         assertTrue(groupRooms.get(0).isSuitableForGroups());
+        verify(repository).findBySuitableForGroupsTrue();
     }
 
     @Test
     void testDeleteById() {
-        manager.deleteById(profile1.getId());
-        assertFalse(manager.getById(profile1.getId()).isPresent());
+        doNothing().when(repository).deleteById("1");
+        when(repository.findById("1")).thenReturn(Optional.empty());
+
+        manager.deleteById("1");
+        Optional<StudySpaceProfile> fetched = manager.getById("1");
+
+        assertFalse(fetched.isPresent());
+        verify(repository).deleteById("1");
+        verify(repository).findById("1");
     }
 
     @Test
     void testSearchNotes() {
+        when(repository.findByNotesContaining("Quiet")).thenReturn(List.of(profile1));
+
         List<StudySpaceProfile> results = manager.searchNotes("Quiet");
         assertEquals(1, results.size());
         assertEquals("Room A", results.get(0).getRoomLocation());
+        verify(repository).findByNotesContaining("Quiet");
     }
 
     @Test
     void testAmenitiesHelpers() {
+        when(repository.findByAmenitiesPlugSocketsTrue()).thenReturn(List.of(profile1));
+        when(repository.findByAmenitiesComputersTrue()).thenReturn(List.of(profile2));
+
         List<StudySpaceProfile> withSockets = manager.getWithPlugSockets();
         assertEquals(1, withSockets.size());
         assertEquals("Room A", withSockets.get(0).getRoomLocation());
@@ -134,5 +169,8 @@ public class StudySpaceProfileManagerTest {
         List<StudySpaceProfile> withComputers = manager.getWithComputers();
         assertEquals(1, withComputers.size());
         assertEquals("Room B", withComputers.get(0).getRoomLocation());
+
+        verify(repository).findByAmenitiesPlugSocketsTrue();
+        verify(repository).findByAmenitiesComputersTrue();
     }
 }
