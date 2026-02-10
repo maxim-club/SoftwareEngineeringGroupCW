@@ -2,7 +2,7 @@ package com.studyspaces.spacefinder.service;
 
 import com.studyspaces.spacefinder.SpacefinderApplication;
 
-import com.studyspaces.spacefinder.StudySpaceProfile;
+import com.studyspaces.spacefinder.model.StudySpaceProfile;
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
 import org.junit.jupiter.api.BeforeEach;

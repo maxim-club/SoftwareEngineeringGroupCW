@@ -1,5 +1,6 @@
 package com.studyspaces.spacefinder;
 
+import com.studyspaces.spacefinder.model.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.mongodb.repository.Query;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import com.studyspaces.spacefinder.model.*;
 
 @Repository
-public interface OccupancyRecordRepository
+public interface RealTimeOccupancyRepository
         extends MongoRepository<OccupancyRecord, String> {
 
     /**
@@ -22,7 +23,7 @@ public interface OccupancyRecordRepository
      * Retrieve all occupancy entries for a given occupancy level.
      */
     @Query("{ 'records.occupancyLevel': ?0 }")
-    List<OccupancyRecord> findByOccupancyLevel(OccupancyLevel occupancyLevel);
+    List<OccupancyRecord> findByOccupancyLevel(Occupancy occupancyLevel);
 
     /**
      * Retrieve all documents that contain records after a given timestamp.

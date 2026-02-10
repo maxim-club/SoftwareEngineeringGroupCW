@@ -1,11 +1,8 @@
 package com.studyspaces.spacefinder.service;
 
 import com.studyspaces.spacefinder.model.*;
-<<<<<<< HEAD
 import com.studyspaces.spacefinder.*;
-=======
-import com.studyspaces.spacefinder.repository.StudySpaceRepository;
->>>>>>> 296782052a65520a10d06607d6b8cb4d5387470c
+//import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
