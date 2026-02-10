@@ -25,33 +25,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'org.springframework.boot:spring-boot-starter-mongodb'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	// Spring Boot main
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	//library to get local env variables. Usernames and passwords are stored in .env
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// .env loader
 	implementation 'io.github.cdimascio:dotenv-java:3.2.0'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	    /* ---------------- TEST DEPENDENCIES ---------------- */
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 
-    // JUnit 5
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+	// Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.7.2'
 
-    // Mockito core
-    testImplementation 'org.mockito:mockito-core:5.10.0'
-
-    // Mockito + JUnit 5 integration
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
+	// JUnit + Mockito extras (optional)
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+	testImplementation 'org.mockito:mockito-core:5.10.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+	environment System.getenv()
+}
+
+test{
+	useJUnitPlatform()
+	environment System.getenv()
 }
