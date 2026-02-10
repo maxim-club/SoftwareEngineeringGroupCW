@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,29 +72,59 @@ class StudySpaceProfileManagerMockTest {
         verify(repository).findById("1");
     }
 
-    @Test
-    void testReplaceProfile() {
-        StudySpaceProfile replacement = new StudySpaceProfile();
-        replacement.setRoomLocation("Room A Updated");
-        replacement.setOccupancy(Occupancy.MODERATE);
-        replacement.setNoiseLevel(NoiseLevel.MODERATE);
-        replacement.setSuitableForGroups(true);
-        replacement.setMaxGroupSize(10);
-        replacement.setNotes("Updated notes");
-        replacement.setAmenities(new Amenities(true,true,true,true,true,true,true,false));
-        replacement.setSchedule(new ArrayList<>());
+	@Test
+	void testReplaceProfile() {
+		// Replacement data (id is ignored)
+		StudySpaceProfile replacement = new StudySpaceProfile();
+		replacement.setRoomLocation("Room A Updated");
+		replacement.setOccupancy(Occupancy.MODERATE);
+		replacement.setNoiseLevel(NoiseLevel.MODERATE);
+		replacement.setSuitableForGroups(true);
+		replacement.setMaxGroupSize(10);
+		replacement.setNotes("Updated notes");
+		replacement.setAmenities(new Amenities(true, true, true, true, true, true, true, false));
+		replacement.setSchedule(new ArrayList<>());
 
-        when(repository.findById("1")).thenReturn(Optional.of(profile1));
-        when(repository.save(any())).thenReturn(replacement);
+		// Mock existing profile in repository
+		when(repository.findById("1")).thenReturn(Optional.of(profile1));
 
-        StudySpaceProfile replaced = manager.replace("1", replacement);
+		// Mock save: return the profile passed in
+		when(repository.save(any(StudySpaceProfile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertEquals("Room A Updated", replaced.getRoomLocation());
-        assertEquals(Occupancy.MODERATE, replaced.getOccupancy());
-        assertEquals(10, replaced.getMaxGroupSize());
-        verify(repository).findById("1");
-        verify(repository).save(replacement);
-    }
+		// Perform replace
+		StudySpaceProfile replaced = manager.replace("1", replacement);
+
+		// Capture what was saved
+		ArgumentCaptor<StudySpaceProfile> captor = ArgumentCaptor.forClass(StudySpaceProfile.class);
+		verify(repository).save(captor.capture());
+		StudySpaceProfile saved = captor.getValue();
+
+		// Verify id is preserved
+		assertEquals("1", saved.getId());
+
+		// Verify fields updated
+		assertEquals("Room A Updated", saved.getRoomLocation());
+		assertEquals("Updated notes", saved.getNotes());
+		assertEquals(Occupancy.MODERATE, saved.getOccupancy());
+		assertEquals(NoiseLevel.MODERATE, saved.getNoiseLevel());
+		assertTrue(saved.isSuitableForGroups());
+		assertEquals(10, saved.getMaxGroupSize());
+
+		// Optional: verify amenities
+		assertNotNull(saved.getAmenities());
+		assertTrue(saved.getAmenities().isPlugSockets());
+		assertTrue(saved.getAmenities().isDesks());
+		assertTrue(saved.getAmenities().isComputers());
+		assertTrue(saved.getAmenities().isPrinters());
+		assertTrue(saved.getAmenities().isFoodAllowed());
+		assertTrue(saved.getAmenities().isWaterFountainNearby());
+		assertTrue(saved.getAmenities().isToiletNearby());
+		assertFalse(saved.getAmenities().isWheelchairAccessible());
+
+		// Verify repository interactions
+		verify(repository).findById("1");
+		verify(repository).save(any(StudySpaceProfile.class));
+	}
 
     @Test
     void testGetAll() {
