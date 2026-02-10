@@ -1,3 +1,5 @@
+//TODO replace this to the new version
+
 package com.studyspaces.spacefinder.dto;
 
 import java.util.List;
