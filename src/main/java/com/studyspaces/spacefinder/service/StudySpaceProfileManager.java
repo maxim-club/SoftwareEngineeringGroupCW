@@ -1,9 +1,9 @@
 package com.studyspaces.spacefinder.service;
 
-import com.studyspaces.spacefinder.*;
-import com.studyspaces.spacefinder.model.*;
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
+import com.studyspaces.spacefinder.model.*;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;

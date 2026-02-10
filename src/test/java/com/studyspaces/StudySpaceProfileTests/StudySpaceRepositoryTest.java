@@ -1,7 +1,7 @@
-package com.studyspaces.DatabaseTests;
+package com.studyspaces.StudySpaceProfileTests;
 
 import com.studyspaces.spacefinder.SpacefinderApplication;
-import com.studyspaces.spacefinder.StudySpaceProfile;
+import com.studyspaces.spacefinder.model.StudySpaceProfile;
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
 
