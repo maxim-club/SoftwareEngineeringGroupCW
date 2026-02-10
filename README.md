@@ -77,3 +77,16 @@ Frontend to Backend connection:
 | Delete          | `deleteByRoomLocationKeyword`    | `String keyword`                            | `void`                        | Deletes profiles whose room location contains the given keyword.                                    |
 	
 
+##Database Models
+
+####Realtime Occupancy
+
+id: String
+records: [ 
+    Timestamp: int,
+    occupancyLevel: Enum,
+]
+
+####Study Space
+
+

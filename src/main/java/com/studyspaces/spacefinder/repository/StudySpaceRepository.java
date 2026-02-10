@@ -1,6 +1,5 @@
 package com.studyspaces.spacefinder.repository;
 
-import com.studyspaces.spacefinder.StudySpaceProfile;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -87,3 +86,5 @@ public interface StudySpaceRepository extends MongoRepository<StudySpaceProfile,
     // ===========================
     void deleteByRoomLocationContaining(String keyword);
 }
+
+
