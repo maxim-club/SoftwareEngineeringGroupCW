@@ -15,9 +15,13 @@ public class OccupancyManager {
         this.repo = repo;
     }
 
-    public void getCurrentOccupancy(String id) {
-        RoomOccupancyRecord room = repo.findById(id).isPresent() ? repo.findById(id).get() : null;
+    public Occupancy getLastOccupancy(String id) {
+        OccupancyRecord lastOccupancy = repo.findLastRoomOccupancy(id).isPresent() ? repo.findLastRoomOccupancy(id).get() : null;
 
-		return;	
+        if (lastOccupancy == null){
+            return null;
+        }
+
+        return lastOccupancy.getOccupancyLevel();
     }
 }
