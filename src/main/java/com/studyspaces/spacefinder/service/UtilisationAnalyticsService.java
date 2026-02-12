@@ -5,8 +5,8 @@ import com.studyspaces.spacefinder.dto.PeakUsageDTO;
 import com.studyspaces.spacefinder.dto.AnalyticsDataWarning;
 import com.studyspaces.spacefinder.dto.BuildingUtilisationDTO;
 import com.studyspaces.spacefinder.model.Occupancy;
+import com.studyspaces.spacefinder.model.RoomOccupancyRecord;
 import com.studyspaces.spacefinder.model.OccupancyRecord;
-import com.studyspaces.spacefinder.model.OccupancyRecordEntry;
 import com.studyspaces.spacefinder.model.StudySpaceProfile;
 import com.studyspaces.spacefinder.repository.HistoricOccupancyRepository;
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
@@ -47,14 +47,14 @@ public class UtilisationAnalyticsService {
         for (StudySpaceProfile room : rooms) {
 
             try {
-                Optional<OccupancyRecord> recordOpt = historicRepo.findById(room.getId());
+                Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(room.getId());
 
                 if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()){
                     results.add(new RoomUtilisationDTO(room.getId(), room.getRoomLocation(), 0.0, true, AnalyticsDataWarning.INSUFFICIENT_DATA));
                     continue;
                 }
                 
-                List<OccupancyRecordEntry> records = recordOpt.get().getRecords();
+                List<OccupancyRecord> records = recordOpt.get().getRecords();
 
                 AnalyticsDataWarning warning = AnalyticsDataWarning.NONE;
 
@@ -74,7 +74,7 @@ public class UtilisationAnalyticsService {
         return results;
     }
 
-    private double computeAverageDemand(List<OccupancyRecordEntry> entries){
+    private double computeAverageDemand(List<OccupancyRecord> entries){
         return entries.stream().mapToDouble(e -> mapOccupancyToRatio(e.getOccupancyLevel())).average().orElse(0.0);
     }
 
@@ -104,13 +104,13 @@ public class UtilisationAnalyticsService {
 
         try{
 
-            Optional<OccupancyRecord> recordOpt = historicRepo.findById(roomId);
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
 
             if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
                 return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
             }
 
-            List<OccupancyRecordEntry> records = recordOpt.get().getRecords();
+            List<OccupancyRecord> records = recordOpt.get().getRecords();
 
             if (records.size() < 5) {
                 return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
@@ -118,7 +118,7 @@ public class UtilisationAnalyticsService {
 
             Map<Integer, List<Double>> hourlyDemand = new HashMap<>();
 
-            for (OccupancyRecordEntry entry : records){
+            for (OccupancyRecord entry : records){
 
                 int hour = extractHour(entry.getTimestamp());
                 double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
@@ -163,7 +163,7 @@ public class UtilisationAnalyticsService {
 
         for (StudySpaceProfile room : rooms){
 
-            Optional<OccupancyRecord> recordOpt = historicRepo.findById(room.getId());
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(room.getId());
 
             if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()){
                 continue; // will add warning logic later
