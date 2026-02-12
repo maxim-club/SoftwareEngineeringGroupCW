@@ -35,4 +35,13 @@ public interface RealTimeOccupancyRepository
     @Query(value = "{ '_id': ?0 }",
            fields = "{ 'records': { $elemMatch: { 'timestamp': { $gt: ?1 } } } }")
     Optional<RoomOccupancyRecord> findRecordsAfterTimestamp(String id, int timestamp);
+
+    /**
+     * Retrieves an occupancy record from a specified room document with the most recent timestamp
+     */
+    @Query(value = "{'_id': ?0}", fields = "{ 'records': { $slice: -1}}")
+    Optional<OccupancyRecord> findLastRoomOccupancy(String id);
 }
+
+
+
