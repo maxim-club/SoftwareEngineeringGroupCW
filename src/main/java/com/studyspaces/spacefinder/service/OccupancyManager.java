@@ -1,7 +1,5 @@
 package com.studyspaces.spacefinder.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
@@ -17,7 +15,9 @@ public class OccupancyManager {
         this.repo = repo;
     }
 
-    public void getCurrentOccupancy() {
+    public void getCurrentOccupancy(String id) {
+        RoomOccupancyRecord room = repo.findById(id).isPresent() ? repo.findById(id).get() : null;
+
 		return;	
     }
 }
