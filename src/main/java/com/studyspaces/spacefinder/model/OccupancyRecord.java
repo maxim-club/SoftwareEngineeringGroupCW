@@ -1,40 +1,30 @@
 package com.studyspaces.spacefinder.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.studyspaces.spacefinder.model.OccupancyRecordEntry;
-
-import java.util.List;
-
-@Document(collection = "occupancy_records")
 public class OccupancyRecord {
 
-    @Id
-    private String id;
-
-    private List<OccupancyRecordEntry> records;
+    private int timestamp;
+    private Occupancy occupancyLevel;
 
     public OccupancyRecord() {}
 
-    public OccupancyRecord(String id, List<OccupancyRecordEntry> records) {
-        this.id = id;
-        this.records = records;
+    public OccupancyRecord(int timestamp, Occupancy occupancyLevel) {
+        this.timestamp = timestamp;
+        this.occupancyLevel = occupancyLevel;
     }
 
-    public String getId() {
-        return id;
+    public int getTimestamp() {
+        return timestamp;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public List<OccupancyRecordEntry> getRecords() {
-        return records;
+    public Occupancy getOccupancyLevel() {
+        return occupancyLevel;
     }
 
-    public void setRecords(List<OccupancyRecordEntry> records) {
-        this.records = records;
+    public void setOccupancyLevel(Occupancy occupancyLevel) {
+        this.occupancyLevel = occupancyLevel;
     }
 }
