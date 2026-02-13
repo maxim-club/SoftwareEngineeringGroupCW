@@ -68,7 +68,7 @@ public interface StudySpaceRepository extends MongoRepository<StudySpaceProfile,
     List<StudySpaceProfile> findByAmenitiesPlugSocketsTrueAndAmenitiesDesksTrue();
 
     // ===========================
-    // Schedule queries (example)
+    // Schedule
     // ===========================
 	@Query("{ 'schedule.day': ?0 }")
     List<StudySpaceProfile> findByScheduleDay(int day);
