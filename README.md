@@ -1,248 +1,104 @@
-# 📚 Project Documentation Template
+#  StudySpace
+
+**StudySpace** is a web application designed to help users find the most ideal study space based on their personal preferences and needs.
+
+The platform allows users to discover study locations by considering factors such as noise level, occupancy, available amenities, accessibility, and opening hours.
 
 ---
 
-<details>
-<summary><h2>📦 Model</h2></summary>
+## Features
 
-<br>
-
-<details>
-<summary><strong</strong></summary>
-
-### Variables
-
-| Field Name | Type | Description |
-|------------|------|------------|
-|            |      |            |
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
+*  Search and discover study spaces
+*  Filter by noise level and environment
+*  View real-time or recorded occupancy levels
+*  Check available amenities and facilities
+*  View opening hours and schedules
+*  Location-based study space information
 
 ---
 
-<details>
-<summary><strong>Model 2</strong></summary>
+##  Project Structure
 
-### Variables
-
-| Field Name | Type | Description |
-|------------|------|------------|
-|            |      |            |
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
+```
+StudySpace
+├── backend (Spring Boot API)
+│   ├── model
+│   ├── repository
+│   ├── service
+│   └── controller
+└── frontend (Web client)
+```
 
 ---
 
-<details>
-<summary><strong>Model 3</strong></summary>
+##  Tech Stack
 
-### Variables
+### Backend
 
-| Field Name | Type | Description |
-|------------|------|------------|
-|            |      |            |
+* Java
+* Spring Boot
+* Spring Data MongoDB
+* Lombok
 
-### Methods
+### Database
 
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
+* MongoDB
 
-</details>
+### Frontend
 
----
-
-<details>
-<summary><strong>Model 4</strong></summary>
-
-### Variables
-
-| Field Name | Type | Description |
-|------------|------|------------|
-|            |      |            |
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
+* React
 
 ---
 
-<details>
-<summary><strong>Model 5</strong></summary>
+##  Core Concept
 
-### Variables
+StudySpace helps students avoid overcrowded or unsuitable environments by providing structured information about study locations, including:
 
-| Field Name | Type | Description |
-|------------|------|------------|
-|            |      |            |
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
-</details>
+* Occupancy trends
+* Noise expectations
+* Group suitability
+* Facilities and accessibility
+* Opening schedules
 
 ---
 
-<details>
-<summary><h2>⚙️ Service</h2></summary>
+## Getting Started
 
-<br>
+### Prerequisites
 
-<details>
-<summary><strong>Service 1</strong></summary>
+* Java 17+
+* Gradle
+* MongoDB installed and running
 
-### Methods
+### Run Backend
 
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
+```bash
+./gradlew bootRun
+```
 
-</details>
+The API will start on:
 
----
-
-<details>
-<summary><strong>Service 2</strong></summary>
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
+```
+http://localhost:8080
+```
 
 ---
 
-<details>
-<summary><strong>Service 3</strong></summary>
+## 📖 Documentation
 
-### Methods
+Project documentation can be found inside ./Docs:
 
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
+* Model.md
+* Service.md
+* Repository.md
+* API Endpoints *(to be added)*
 
-</details>
-
----
-
-<details>
-<summary><strong>Service 4</strong></summary>
-
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
 
 ---
 
-<details>
-<summary><strong>Service 5</strong></summary>
+## Status
 
-### Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
-</details>
+Project currently under active development.
 
 ---
-
-<details>
-<summary><h2>🗄 Repository</h2></summary>
-
-<br>
-
-<details>
-<summary><strong>Repository 1</strong></summary>
-
-### Query Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
----
-
-<details>
-<summary><strong>Repository 2</strong></summary>
-
-### Query Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
----
-
-<details>
-<summary><strong>Repository 3</strong></summary>
-
-### Query Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
----
-
-<details>
-<summary><strong>Repository 4</strong></summary>
-
-### Query Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
----
-
-<details>
-<summary><strong>Repository 5</strong></summary>
-
-### Query Methods
-
-| Method Name | Parameters | Return Type | Description |
-|-------------|------------|------------|------------|
-|             |            |            |            |
-
-</details>
-
-</details>
 
