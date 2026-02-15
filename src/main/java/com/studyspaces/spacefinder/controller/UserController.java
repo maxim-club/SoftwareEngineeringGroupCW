@@ -9,7 +9,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    // TODO: Inject your UserService here once you create it!
+    // TODO: create UserService
     // private final UserService userService;
 
     // Endpoint: POST /api/auth/login
@@ -18,7 +18,7 @@ public class UserController {
         String username = loginData.get("username");
         String password = loginData.get("password");
 
-        // MOCK LOGIC: Replace this with real database checks later
+        // MOCK LOGIC: Replace this with real database checks
         if ("admin".equals(username) && "password".equals(password)) {
             return ResponseEntity.ok(Map.of("message", "Login successful", "role", "admin"));
         } else {
