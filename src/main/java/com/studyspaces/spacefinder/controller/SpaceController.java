@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/spaces") // Base URL: localhost:8080/api/spaces
