@@ -91,7 +91,7 @@ Project documentation can be found inside ./Docs:
 * Model.md
 * Service.md
 * Repository.md
-* API Endpoints
+* API_Endpoints.md
 
 
 ---
