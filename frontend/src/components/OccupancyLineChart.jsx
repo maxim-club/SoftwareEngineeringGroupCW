@@ -4,47 +4,49 @@ import { useMemo, useState } from "react";
 export default function LineChartComponent() {
     const [mode, setMode] = useState("day");
 
+    const busiestTime = [12,24,22]
+    const busiestDay = ["Mon", "Tue", "Sun"]
+
     // dummy data - replaced with simulated/ real
     const dailyData = useMemo(
         () => [
-        { day: "Mon", "Peak Occupancy": 70, "Average Occupancy": 64 },
-        { day: "Tue", "Peak Occupancy": 89, "Average Occupancy": 34 },
-        { day: "Wed", "Peak Occupancy": 43, "Average Occupancy": 25 },
-        { day: "Thu", "Peak Occupancy": 56, "Average Occupancy": 45 },
-        { day: "Fri", "Peak Occupancy": 93, "Average Occupancy": 82 },
-        { day: "Sat", "Peak Occupancy": 78, "Average Occupancy": 60 },
-        { day: "Sun", "Peak Occupancy": 65, "Average Occupancy": 50 },
+        { day: "Mon", "Average Occupancy": 64 },
+        { day: "Tue", "Average Occupancy": 34 },
+        { day: "Wed", "Average Occupancy": 25 },
+        { day: "Thu", "Average Occupancy": 45 },
+        { day: "Fri", "Average Occupancy": 82 },
+        { day: "Sat", "Average Occupancy": 60 },
+        { day: "Sun", "Average Occupancy": 50 },
         ],
         []
     );
 
     const hourlyData = useMemo(
         () => [
-        { hour: 0,  "Peak Occupancy": 10, "Average Occupancy": 8 },
-        { hour: 1,  "Peak Occupancy": 8,  "Average Occupancy": 6 },
-        { hour: 2,  "Peak Occupancy": 6,  "Average Occupancy": 5 },
-        { hour: 3,  "Peak Occupancy": 5,  "Average Occupancy": 4 },
-        { hour: 4,  "Peak Occupancy": 7,  "Average Occupancy": 6 },
-        { hour: 5,  "Peak Occupancy": 12, "Average Occupancy": 10 },
-        { hour: 6,  "Peak Occupancy": 20, "Average Occupancy": 16 },
-        { hour: 7,  "Peak Occupancy": 35, "Average Occupancy": 28 },
-        { hour: 8,  "Peak Occupancy": 55, "Average Occupancy": 45 },
-        { hour: 9,  "Peak Occupancy": 65, "Average Occupancy": 52 },
-        { hour: 10, "Peak Occupancy": 75, "Average Occupancy": 60 },
-        { hour: 11, "Peak Occupancy": 82, "Average Occupancy": 70 },
-        { hour: 12, "Peak Occupancy": 90, "Average Occupancy": 78 },
-        { hour: 13, "Peak Occupancy": 85, "Average Occupancy": 72 },
-        { hour: 14, "Peak Occupancy": 80, "Average Occupancy": 68 },
-        { hour: 15, "Peak Occupancy": 70, "Average Occupancy": 60 },
-        { hour: 16, "Peak Occupancy": 65, "Average Occupancy": 55 },
-        { hour: 17, "Peak Occupancy": 72, "Average Occupancy": 60 },
-        { hour: 18, "Peak Occupancy": 78, "Average Occupancy": 65 },
-        { hour: 19, "Peak Occupancy": 68, "Average Occupancy": 58 },
-        { hour: 20, "Peak Occupancy": 50, "Average Occupancy": 42 },
-        { hour: 21, "Peak Occupancy": 35, "Average Occupancy": 30 },
-        { hour: 22, "Peak Occupancy": 25, "Average Occupancy": 20 },
-        { hour: 23, "Peak Occupancy": 18, "Average Occupancy": 15 },
-        { hour: 24, "Peak Occupancy": 12, "Average Occupancy": 10 },
+        { hour: 0,  "Average Occupancy": 8 },
+        { hour: 1,  "Average Occupancy": 6 },
+        { hour: 2,  "Average Occupancy": 5 },
+        { hour: 3,  "Average Occupancy": 4 },
+        { hour: 4,  "Average Occupancy": 6 },
+        { hour: 5,  "Average Occupancy": 10 },
+        { hour: 6,  "Average Occupancy": 16 },
+        { hour: 7,  "Average Occupancy": 28 },
+        { hour: 8,  "Average Occupancy": 45 },
+        { hour: 9,  "Average Occupancy": 52 },
+        { hour: 10, "Average Occupancy": 60 },
+        { hour: 11, "Average Occupancy": 70 },
+        { hour: 12, "Average Occupancy": 78 },
+        { hour: 13, "Average Occupancy": 72 },
+        { hour: 14, "Average Occupancy": 68 },
+        { hour: 15, "Average Occupancy": 60 },
+        { hour: 16, "Average Occupancy": 55 },
+        { hour: 17, "Average Occupancy": 60 },
+        { hour: 18, "Average Occupancy": 65 },
+        { hour: 19, "Average Occupancy": 58 },
+        { hour: 20, "Average Occupancy": 42 },
+        { hour: 21, "Average Occupancy": 30 },
+        { hour: 22, "Average Occupancy": 20 },
+        { hour: 23, "Average Occupancy": 15 },
         ],
         []
     );
@@ -54,6 +56,23 @@ export default function LineChartComponent() {
     const xKey = mode === "day" ? "day" : "hour";
     const xLabel = mode === "day" ? "Day of Week" : "Time (0-24)";
     const xTickFormatter = mode === "day" ? undefined : (v) => `${v}:00`;
+    const formatHour = (h) => (h === 24 ? "00:00" : `${h}:00`);
+
+    const Chip = ({ children }) => (
+        <span
+        style={{
+            padding: "4px 10px",
+            borderRadius: 999,
+            border: "1px solid #ddd",
+            background: "#f8f9fa",
+            fontSize: 12,
+            lineHeight: "18px",
+            whiteSpace: "nowrap",
+        }}
+        >
+        {children}
+        </span>
+    );
 
 
     return (
@@ -65,10 +84,10 @@ export default function LineChartComponent() {
                     <XAxis
                         dataKey={xKey}
                         type={mode === "hour" ? "number" : "category"}
-                        domain={mode === "hour" ? [0, 24] : undefined}
+                        domain={mode === "hour" ? [0, 23] : undefined}
                         ticks={
                             mode === "hour"
-                            ? [0,2,4,6,8,10,12,14,16,18,20,22,24]
+                            ? [0,2,4,6,8,10,12,14,16,18,20,22]
                             : undefined
                         }
                         tickFormatter={xTickFormatter}
@@ -84,14 +103,10 @@ export default function LineChartComponent() {
                             position: "outsideLeft" 
                         }}/>
                     <Tooltip
-                        itemSorter={(item) =>
-                            item.dataKey === "Peak Occupancy" ? -1 : 1
-                        }
                         labelFormatter={(label) =>
                             mode === "day" ? label : `Hour: ${label}:00`
                         }
                     />
-                    <Line type="monotone" dataKey="Peak Occupancy" stroke="#8884d8" activeDot={{ r: 8 }} />
                     <Line type="monotone" dataKey="Average Occupancy" stroke="#82ca9d" />
                     </LineChart>
             </ResponsiveContainer>
@@ -126,7 +141,24 @@ export default function LineChartComponent() {
                 By Time
                 </button>
             </div>
-        </div>
+
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <strong style={{ fontSize: 13 }}>Busiest Days:</strong>
+                {busiestDay.map((d) => (
+                    <Chip key={d}>{d}</Chip>
+                ))}
+                </div>
+
+                <div style={{ width: 1, height: 18, background: "#eee" }} />
+
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <strong style={{ fontSize: 13 }}>Busiest Times:</strong>
+                {busiestTime.map((t, i) => (
+                    <Chip key={`${t}-${i}`}>{formatHour(t)}</Chip>
+                ))}
+                </div>
+            </div>
+        
   );
 }
 
