@@ -1,5 +1,6 @@
 package com.studyspaces.spacefinder.service;
 
+import com.studyspaces.spacefinder.dto.CheckInDTO;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
@@ -21,6 +22,21 @@ public class OccupancyManager {
     public OccupancyManager(RealTimeOccupancyRepository repo) {
         this.repo = repo;
     }
+
+    // Converts DTO into model
+    public CheckInReport toModel(CheckInDTO dto) {
+        return new CheckInReport(
+                dto.getClosed(),
+                dto.getWifiIssue(),
+                dto.getReserved(),
+                dto.getFullyOccupied(),
+                Occupancy.valueOf(dto.getOccupancy())
+        );
+    }
+
+    // ===========================
+    // Read Requests
+    // ===========================
 
     // Retrieves latest occupancy level for a specified room
     public Occupancy getLastOccupancy(String RoomId) {
@@ -46,8 +62,18 @@ public class OccupancyManager {
         return now - lastTimestamp;
     }
 
-    public Boolean userCheckIn(String RoomId) {
+    // ===========================
+    // Write Requests
+    // ===========================
+
+    // User checks in to a study space and submits report
+    public Boolean userCheckIn(String RoomId, CheckInReport report) {
 
         return false;
+    }
+
+    // User Submits a report
+    public void archiveOccupancyRecord(){
+
     }
 }
