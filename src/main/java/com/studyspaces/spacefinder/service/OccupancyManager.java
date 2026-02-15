@@ -7,6 +7,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+/**
+ * OccupancyManager
+ *
+ *
+ */
 
 @Service
 public class OccupancyManager {
@@ -18,16 +23,17 @@ public class OccupancyManager {
     }
 
     // Retrieves latest occupancy level for a specified room
-    public Occupancy getLastOccupancy(String Roomid) {
-        return repo.findLastRoomOccupancy(Roomid)
+    public Occupancy getLastOccupancy(String RoomId) {
+        return repo.findLastRoomOccupancy(RoomId)
                 .map(OccupancyRecord::getOccupancyLevel)
                 .orElse(null);
     }
 
-    public long whenLastOccupancyWasAdded(String Roomid ) {
+    // Return time since last occupancy update for a room
+    public long whenLastOccupancyWasAdded(String RoomId ) {
         OccupancyRecord lastOccupancy =
-                repo.findLastRoomOccupancy(Roomid).isPresent()
-                        ? repo.findLastRoomOccupancy(Roomid).get()
+                repo.findLastRoomOccupancy(RoomId).isPresent()
+                        ? repo.findLastRoomOccupancy(RoomId).get()
                         : null;
 
         if (lastOccupancy == null){
@@ -38,5 +44,10 @@ public class OccupancyManager {
         long now = Instant.now().getEpochSecond();
 
         return now - lastTimestamp;
+    }
+
+    public Boolean userCheckIn(String RoomId) {
+
+        return false;
     }
 }
