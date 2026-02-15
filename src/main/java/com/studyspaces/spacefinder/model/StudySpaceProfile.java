@@ -20,7 +20,7 @@ public class StudySpaceProfile {
     private String id;
 
     // Core info
-    private String roomLocation;
+    private String roomLocation; // This will be room and building combined into one.
     private String notes;
 
     // Status
