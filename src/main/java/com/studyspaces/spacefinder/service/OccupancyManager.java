@@ -1,10 +1,18 @@
 package com.studyspaces.spacefinder.service;
 
+import com.studyspaces.spacefinder.dto.CheckInDTO;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
+/**
+ * OccupancyManager
+ *
+ *
+ */
 
 @Service
 public class OccupancyManager {
@@ -15,9 +23,57 @@ public class OccupancyManager {
         this.repo = repo;
     }
 
-    public void getCurrentOccupancy(String id) {
-        RoomOccupancyRecord room = repo.findById(id).isPresent() ? repo.findById(id).get() : null;
+    // Converts DTO into model
+    public CheckInReport toModel(CheckInDTO dto) {
+        return new CheckInReport(
+                dto.getClosed(),
+                dto.getWifiIssue(),
+                dto.getReserved(),
+                dto.getFullyOccupied(),
+                Occupancy.valueOf(dto.getOccupancy())
+        );
+    }
 
-		return;	
+    // ===========================
+    // Read Requests
+    // ===========================
+
+    // Retrieves latest occupancy level for a specified room
+    public Occupancy getLastOccupancy(String RoomId) {
+        return repo.findLastRoomOccupancy(RoomId)
+                .map(OccupancyRecord::getOccupancyLevel)
+                .orElse(null);
+    }
+
+    // Return time since last occupancy update for a room
+    public long whenLastOccupancyWasAdded(String RoomId ) {
+        OccupancyRecord lastOccupancy =
+                repo.findLastRoomOccupancy(RoomId).isPresent()
+                        ? repo.findLastRoomOccupancy(RoomId).get()
+                        : null;
+
+        if (lastOccupancy == null){
+            return -1;
+        }
+
+        long lastTimestamp = lastOccupancy.getTimestamp();
+        long now = Instant.now().getEpochSecond();
+
+        return now - lastTimestamp;
+    }
+
+    // ===========================
+    // Write Requests
+    // ===========================
+
+    // User checks in to a study space and submits report
+    public Boolean userCheckIn(String RoomId, CheckInReport report) {
+
+        return false;
+    }
+
+    // User Submits a report
+    public void archiveOccupancyRecord(){
+
     }
 }
