@@ -58,26 +58,10 @@ export default function LineChartComponent() {
     const xTickFormatter = mode === "day" ? undefined : (v) => `${v}:00`;
     const formatHour = (h) => (h === 24 ? "00:00" : `${h}:00`);
 
-    const Chip = ({ children }) => (
-        <span
-        style={{
-            padding: "4px 10px",
-            borderRadius: 999,
-            border: "1px solid #ddd",
-            background: "#f8f9fa",
-            fontSize: 12,
-            lineHeight: "18px",
-            whiteSpace: "nowrap",
-        }}
-        >
-        {children}
-        </span>
-    );
-
 
     return (
         <div>
-            <div style={{ width: "100%", height: "clamp(240px, 35vh, 420px)"}}>
+            <div className="chart-container">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -112,40 +96,28 @@ export default function LineChartComponent() {
             </ResponsiveContainer>
             </div>
 
-            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 12 }}>
+            <div className="ui-row-center" style={{ justifyContent: "center", marginTop: 12 }}>
                 <button
-                type="button"
-                onClick={() => setMode("day")}
-                style={{
-                    padding: "8px 12px",
-                    borderRadius: 8,
-                    border: "1px solid #ccc",
-                    background: mode === "day" ? "#e9ecef" : "white",
-                    cursor: "pointer",
-                }}
-                >
-                By Day
-                </button>
+                    type="button"
+                    onClick={() => setMode("day")}
+                    className={`ui-button ${mode === "day" ? "active" : ""}`}
+                    >
+                    By Day
+                    </button>
 
-                <button
-                type="button"
-                onClick={() => setMode("hour")}
-                style={{
-                    padding: "8px 12px",
-                    borderRadius: 8,
-                    border: "1px solid #ccc",
-                    background: mode === "hour" ? "#e9ecef" : "white",
-                    cursor: "pointer",
-                }}
-                >
-                By Time
-                </button>
+                    <button
+                    type="button"
+                    onClick={() => setMode("hour")}
+                    className={`ui-button ${mode === "hour" ? "active" : ""}`}
+                    >
+                    By Time
+                    </button>
             </div>
 
-                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <strong style={{ fontSize: 13 }}>Busiest Days:</strong>
+            <div className="ui-row-wrap">
+                <strong className="text-sm-strong">Busiest Days:</strong>
                 {busiestDay.map((d) => (
-                    <Chip key={d}>{d}</Chip>
+                    <span key={d} className="ui-chip">{d}</span>
                 ))}
                 </div>
 
@@ -154,7 +126,9 @@ export default function LineChartComponent() {
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <strong style={{ fontSize: 13 }}>Busiest Times:</strong>
                 {busiestTime.map((t, i) => (
-                    <Chip key={`${t}-${i}`}>{formatHour(t)}</Chip>
+                    <span key={`${t}-${i}`} className="ui-chip">
+                        {formatHour(t)}
+                    </span>
                 ))}
                 </div>
             </div>
