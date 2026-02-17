@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class Amenities {
@@ -18,4 +20,17 @@ public class Amenities {
     private boolean wheelchairAccessible;
 
     public Amenities() {}
+
+    public List<Boolean> toList() {
+        return List.of(plugSockets,
+                desks,
+                computers,
+                printers,
+                foodAllowed,
+                waterFountainNearby,
+                toiletNearby,
+                wheelchairAccessible
+        );
+    }
+
 }

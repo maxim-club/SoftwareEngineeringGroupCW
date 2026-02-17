@@ -1,0 +1,98 @@
+package com.studyspaces.spacefinder.service;
+import com.studyspaces.spacefinder.repository.StudySpaceRepository;
+import com.studyspaces.spacefinder.model.*;
+import com.studyspaces.spacefinder.dto.SearchQueryRequest;
+import org.springframework.data.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.Float;
+//This service will handle receiving a query from frontend and getting the best results
+
+//initialising:
+//Fetch ALL rooms from DB and for each room construct a vector corresponding to the parameters. Store in memory.
+
+//search query:
+//
+
+
+public class RoomSearcher {
+
+    private final StudySpaceRepository repository;
+
+    public RoomSearcher(StudySpaceRepository repository) {
+        this.repository = repository;
+    }
+
+    public static ArrayList<Pair<Integer, Float>> Vectorise(FilterQuery query){
+        //Pair holds a weight 0 or 1 which determines if that parameter has any influence on KNN
+        //Take a filter query and make it a vector of floats from 0-1.
+        //If user is indifferent to an option then set the weight of the pair to 0
+
+        ArrayList<Pair<Integer, Float>> output = new ArrayList<>();
+        
+        //first normalize all enums... 
+        output.add(normalizeEnum(query.preferredNoiseLevel));
+        output.add(normalizeEnum(query.preferredOccupancy));
+
+        //normalize bool
+        output.add(normalizeBool(query.preferredGroupSpace));
+
+        if (query.preferredAmenities == null){
+            //Make a list of 8 dummy values. 8 Since that is amount of ammenities.
+
+            Pair<Integer, Float> dummy = Pair.of(0, 0f);
+            for(int i = 0; i < 8; i++){
+                output.add(dummy);
+            }
+
+        }else {
+            List<Boolean> boolList = query.preferredAmenities.toList();
+
+            //iterate through all amenities booleans
+            for (Boolean b : boolList) {
+                output.add(normalizeBool(b));
+            }
+        }
+
+        //Normalize the group size int
+        output.add(query.preferredGroupSize == null ? Pair.of(0, 0f) : Pair.of(1, query.preferredGroupSize / 10f));
+
+        return output;
+    }
+
+    private static Pair<Integer, Float> normalizeEnum(Enum<?> e){
+        Pair<Integer, Float> pair;
+        //enum is null so user is indifferent. Make the weight zero
+        if (e == null) {
+            pair = Pair.of(0, 0f);
+            return pair;
+        }
+        //normalize the int to range from 0 to 1.
+        int max = e.getDeclaringClass().getEnumConstants().length - 1;
+        if (max == 0){
+            pair = Pair.of(1, 0f);
+        } else{
+            pair = Pair.of(1, (e.ordinal() / (float) max));
+        }
+        return pair;
+    }
+    
+    private static Pair<Integer, Float> normalizeBool(Boolean b){
+        Pair<Integer, Float> pair; 
+        if (b == null){
+            pair = Pair.of(0, 0f);
+        } else if (b) {
+            pair = Pair.of(1, 1f);
+        }else{
+            pair = Pair.of(1,0f);
+        }
+        return pair;
+    }
+
+    public List<StudySpaceProfile> Search(SearchQueryRequest query){
+
+
+        return List.of();
+    }
+}
