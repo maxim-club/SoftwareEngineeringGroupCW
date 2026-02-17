@@ -5,6 +5,7 @@ import com.studyspaces.spacefinder.dto.SearchQueryRequest;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.lang.Float;
 //This service will handle receiving a query from frontend and getting the best results
@@ -18,10 +19,33 @@ import java.lang.Float;
 
 public class RoomSearcher {
 
-    private final StudySpaceRepository repository;
-
+    private static StudySpaceRepository repository = null;
+    private static HashMap<String, List<Pair<Integer, Float>>> searchSpace;
     public RoomSearcher(StudySpaceRepository repository) {
-        this.repository = repository;
+        RoomSearcher.repository = repository;
+    }
+
+    public static void initialiseSearchSpace(){
+        searchSpace = new HashMap<>();
+        //fetch everything from study space profile DB.
+
+        List<StudySpaceProfile> allRoomData = repository.findAll();
+
+        for (StudySpaceProfile room : allRoomData) {
+
+            //Convert all study spaces into 2 components:
+            //Filter query data & id
+
+            //vectorise the filter query data from study space
+
+            //Then make a HUGE hash map: HashMap<QueryVector, roomID>
+
+            searchSpace.put(room.getId(), Vectorise(room.toFilterQuery()));
+        }
+    };
+    //for testing
+    public static HashMap<String, List<Pair<Integer, Float>>> getSearchSpace() {
+        return searchSpace;
     }
 
     public static ArrayList<Pair<Integer, Float>> Vectorise(FilterQuery query){
@@ -91,8 +115,6 @@ public class RoomSearcher {
     }
 
     public List<StudySpaceProfile> Search(SearchQueryRequest query){
-
-
         return List.of();
     }
 }
