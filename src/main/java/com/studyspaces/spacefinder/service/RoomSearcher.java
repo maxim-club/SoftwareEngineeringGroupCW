@@ -4,9 +4,7 @@ import com.studyspaces.spacefinder.model.*;
 import com.studyspaces.spacefinder.dto.SearchQueryRequest;
 import org.springframework.data.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.lang.Float;
 //This service will handle receiving a query from frontend and getting the best results
 
@@ -114,7 +112,60 @@ public class RoomSearcher {
         return pair;
     }
 
-    public List<StudySpaceProfile> Search(SearchQueryRequest query){
-        return List.of();
+    //returns 5 best recommendations as roomIds
+    public static List<String> getKRecommended(FilterQuery query, int k){
+        if(searchSpace == null){
+            initialiseSearchSpace();
+        }
+
+        //Iterate through the search space map
+
+        List<Pair<Integer, Float>> queryVector = Vectorise(query);
+
+        PriorityQueue<Pair<String, Float>> heap =
+                new PriorityQueue<>(
+                        (a, b) -> Float.compare(b.getSecond(), a.getSecond())
+                ); // max heap organised by (roomID, distanceFromSearchVector)
+
+        for (HashMap.Entry<String, List<Pair<Integer, Float>>> entry : searchSpace.entrySet()){
+
+            float dist = distance(queryVector, entry.getValue());
+            heap.add(Pair.of(entry.getKey(), dist));
+
+
+            if (heap.size() > k) {
+                heap.poll(); // remove worst
+            }
+
+        }
+
+        List<String> result = new ArrayList<>();
+
+        while (!heap.isEmpty()) {
+            result.add(heap.poll().getFirst());
+        }
+
+        Collections.reverse(result); // closest first
+        return result;
+
     }
+
+    private static float distance(List<Pair<Integer, Float>> vecA, List<Pair<Integer, Float>> vecB){
+        float sum = 0f;
+
+        for(int i = 0; i < vecA.size(); i++){
+            Pair<Integer, Float> p1 = vecA.get(i);
+            Pair<Integer, Float> p2 = vecB.get(i);
+
+            // ignore dimension if either side disabled it
+            if (p1.getFirst() == 0 || p2.getFirst() == 0)
+                continue;
+
+            float diff = p1.getSecond() - p2.getSecond();
+            sum += diff * diff;
+        }
+
+        return (float) sum; //no need to waste resources computing sqrt
+    }
+
 }
