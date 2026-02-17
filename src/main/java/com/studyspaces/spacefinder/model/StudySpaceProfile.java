@@ -39,4 +39,8 @@ public class StudySpaceProfile {
     private Coordinates coordinates;
 
     public StudySpaceProfile() {}
+
+    public FilterQuery toFilterQuery(){
+        return new FilterQuery(noiseLevel, occupancy, amenities, suitableForGroups, maxGroupSize);
+    }
 }
