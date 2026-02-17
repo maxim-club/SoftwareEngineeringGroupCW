@@ -85,6 +85,11 @@ public interface StudySpaceRepository extends MongoRepository<StudySpaceProfile,
     // Delete helpers
     // ===========================
     void deleteByRoomLocationContaining(String keyword);
+
+    //============================
+    //Search & Filters
+    //============================
+
 }
 
 
