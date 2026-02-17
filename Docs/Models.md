@@ -29,6 +29,9 @@ com.studyspaces.spacefinder.model
 | `wheelchairAccessible` | `boolean` | Specifies whether the space is wheelchair accessible. |
 </details>
 
+
+
+
 <details>
 <summary><strong>Coordinates</strong></summary>
 
@@ -49,6 +52,54 @@ com.studyspaces.spacefinder.model
 | `longitude` | `double` |
 
 </details>
+
+
+
+
+
+<details>
+<summary> Filter Query </summary>
+  
+## FilterQuery
+
+Represents a user's study space preferences used when generating recommendations.
+
+A `null` value indicates **no preference (indifference)** for that attribute during similarity comparison.
+
+---
+
+### Package
+`com.studyspaces.spacefinder.model`
+
+---
+
+<details>
+<summary><strong>Fields</strong></summary>
+
+<br>
+
+| Field | Type | Description |
+|------|------|-------------|
+| `preferredNoiseLevel` | `NoiseLevel` | Desired environmental noise level (e.g., quiet or social). |
+| `preferredOccupancy` | `Occupancy` | Preferred crowd density of the study space. |
+| `preferredAmenities` | `Amenities` | Requested available amenities (e.g., sockets, Wi-Fi, facilities). |
+| `preferredGroupSpace` | `Boolean` | Indicates whether the user prefers a group study area. |
+| `preferredGroupSize` | `Integer` | Preferred group size capacity for the study space. |
+
+</details>
+
+---
+
+### Notes
+
+- Fields may be `null`, meaning the user has no preference.
+- Used as input for vectorisation and KNN recommendation search.
+- Lombok annotations generate getters, setters, constructors, and utility methods automatically.
+
+</details>
+
+
+
 
 <details>
 <summary><strong>OccupancyRecord</strong></summary>
