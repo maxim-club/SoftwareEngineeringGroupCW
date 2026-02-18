@@ -59,3 +59,77 @@ com.studyspaces.spacefinder.service
 
 </details>
 </details>
+
+<details>
+<summary> RoomSearcher </summary>
+
+## Overview
+
+`RoomSearcher` is a service responsible for performing **vector-based similarity search** over study spaces.
+
+It converts study space attributes and user filter preferences into normalized numeric vectors and applies a **K-Nearest Neighbours (KNN)** algorithm to return the most relevant room recommendations.
+
+The service maintains an **in-memory search space** built from all study space profiles stored in the database, allowing fast recommendation queries without repeated database access.
+
+### Responsibilities
+
+- Load and cache all study spaces into memory
+- Convert filter preferences into normalized vectors
+- Perform weighted similarity comparison
+- Return top-K recommended study spaces
+- Provide testing access to cached search data
+
+---
+
+### Package
+
+```java
+com.studyspaces.spacefinder.service
+```
+
+<details>
+<summary>RoomSearcher Public Methods</summary>
+
+<br>
+
+| Category                | Method                  | Parameters                        | Returns                                       | Description                                                                                                                                                       |
+| ----------------------- | ----------------------- | --------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Initialisation**      | `RoomSearcher`          | `StudySpaceRepository repository` | —                                             | Constructor that injects the repository used to fetch study space data.                                                                                           |
+|                         | `initialiseSearchSpace` | —                                 | `void`                                        | Loads all study spaces from the database, vectorises their filter data, and stores them in an in-memory search map for fast querying.                             |
+| **Testing / Debugging** | `getSearchSpace`        | —                                 | `HashMap<String, List<Pair<Integer, Float>>>` | Returns the current cached search space. Primarily intended for testing and verification.                                                                         |
+| **Vectorisation**       | `Vectorise`             | `FilterQuery query`               | `ArrayList<Pair<Integer, Float>>`             | Converts a user filter query into a fixed-length normalized vector. Each element contains a weight (0 or 1) and a value between 0–1 representing user preference. |
+| **Recommendation**      | `getKRecommended`       | `FilterQuery query, int k`        | `List<String>`                                | Performs a KNN similarity search and returns the IDs of the `k` closest matching study spaces ordered from most similar to least similar.                         |
+
+</details>
+
+Design Notes
+Vector Representation
+
+Each vector element is stored as:
+
+```java
+Pair<Integer, Float>
+```
+
+Integer (weight)
+
+- 1 → parameter influences similarity
+
+- 0 → parameter ignored (user indifferent)
+
+Float (value)
+
+- Normalized preference value in range 0–1
+
+This allows dimensions to be selectively excluded during distance calculation.
+
+Time Complexity
+```
+O(N log K)
+```
+Where:
+
+- N = number of study spaces
+- K = requested recommendations
+
+</details>
