@@ -120,7 +120,7 @@ public class UtilisationAnalyticsService {
 
             for (OccupancyRecord entry : records){
 
-                int hour = extractHour(entry.getTimestamp());
+                int hour = extractHour(Math.toIntExact(entry.getTimestamp()));
                 double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
 
                 hourlyDemand.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);

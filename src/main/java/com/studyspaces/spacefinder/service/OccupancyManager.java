@@ -7,6 +7,8 @@ import com.studyspaces.spacefinder.model.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,27 +42,22 @@ public class OccupancyManager {
     // ===========================
 
     // Retrieves latest occupancy level for a specified room
-    public Occupancy getLastOccupancy(String RoomId) {
-        return repo.findLastRoomOccupancy(RoomId)
+    public Occupancy getLastOccupancy(String roomId) {
+        return repo.findLastRoomOccupancy(roomId)
                 .map(OccupancyRecord::getOccupancyLevel)
                 .orElse(null);
     }
 
     // Return time since last occupancy update for a room
-    public long whenLastOccupancyWasAdded(String RoomId ) {
-        OccupancyRecord lastOccupancy =
-                repo.findLastRoomOccupancy(RoomId).isPresent()
-                        ? repo.findLastRoomOccupancy(RoomId).get()
-                        : null;
+    public long whenLastOccupancyWasAdded(String roomId ) {
+        Optional<OccupancyRecord> lastOccupancyOpt = repo.findLastRoomOccupancy(roomId);
 
-        if (lastOccupancy == null){
-            return -1;
-        }
+        if (lastOccupancyOpt.isEmpty()) return -1;
 
-        long lastTimestamp = lastOccupancy.getTimestamp();
-        long now = Instant.now().getEpochSecond();
+        long lastTimestamp = lastOccupancyOpt.get().getTimestamp(); // in millis
+        long now = System.currentTimeMillis();
 
-        return now - lastTimestamp;
+        return (now - lastTimestamp) / 1000; // return seconds
     }
 
     // ===========================
@@ -68,31 +65,43 @@ public class OccupancyManager {
     // ===========================
 
     // User checks in to a study space and submits report
-    public boolean userCheckIn(String RoomId, CheckInReport report) {
+    public boolean userCheckIn(String roomId, CheckInReport report) {
 
-        Optional<RoomOccupancyRecord> optionalRoom = repo.findById(RoomId);
+        if (roomId == null || report == null) {
+            return false;
+        }
 
-        if(optionalRoom.isEmpty()) {
+        Optional<RoomOccupancyRecord> optionalRoom = repo.findById(roomId);
+
+        if (optionalRoom.isEmpty()) {
             return false;
         }
 
         RoomOccupancyRecord room = optionalRoom.get();
 
-        // Create new occupancy record
-        OccupancyRecord newRecord = new OccupancyRecord();
-        newRecord.setOccupancyLevel(report.getOccupancy());
-        newRecord.setTimestamp((int) (System.currentTimeMillis() / 1000));
+        List<OccupancyRecord> records = room.getRecords();
 
-        // Add record to document
-        room.getRecords().add(newRecord);
+        if (records == null) {
+            records = new ArrayList<>();
+            room.setRecords(records);
+        }
 
-        // Save updated document
+        OccupancyRecord newRecord = new OccupancyRecord(
+                System.currentTimeMillis(),
+                report.getOccupancy(),
+                report.getClosed(),
+                report.getWifiIssue(),
+                report.getReserved(),
+                report.getFullyOccupied()
+        );
+
+        records.add(newRecord);
         repo.save(room);
 
         return true;
     }
 
-    // User Submits a report
+    // If an OccupancyRecord > 7 days, archive record
     public void archiveOccupancyRecord(){
 
     }
