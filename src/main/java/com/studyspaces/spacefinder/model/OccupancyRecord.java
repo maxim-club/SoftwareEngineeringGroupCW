@@ -1,5 +1,10 @@
 package com.studyspaces.spacefinder.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class OccupancyRecord {
 
     private int timestamp;
@@ -7,24 +12,4 @@ public class OccupancyRecord {
 
     public OccupancyRecord() {}
 
-    public OccupancyRecord(int timestamp, Occupancy occupancyLevel) {
-        this.timestamp = timestamp;
-        this.occupancyLevel = occupancyLevel;
-    }
-
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Occupancy getOccupancyLevel() {
-        return occupancyLevel;
-    }
-
-    public void setOccupancyLevel(Occupancy occupancyLevel) {
-        this.occupancyLevel = occupancyLevel;
-    }
 }

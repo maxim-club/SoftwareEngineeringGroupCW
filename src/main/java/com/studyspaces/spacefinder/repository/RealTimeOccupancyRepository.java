@@ -41,6 +41,8 @@ public interface RealTimeOccupancyRepository
      */
     @Query(value = "{'_id': ?0}", fields = "{ 'records': { $slice: -1}}")
     Optional<OccupancyRecord> findLastRoomOccupancy(String id);
+
+
 }
 
 
