@@ -1,7 +1,6 @@
 package com.studyspaces.OccupancyManagerTests;
 
-import com.studyspaces.spacefinder.model.Occupancy;
-import com.studyspaces.spacefinder.model.OccupancyRecord;
+import com.studyspaces.spacefinder.model.*;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.service.OccupancyManager;
 
@@ -12,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,11 +88,11 @@ public class OccupancyManagerTests {
     void whenLastOccupancyWasAdded_returnsCorrectTimeDifference_whenRecordExists() {
         String roomId = "room1";
 
-        long now = Instant.now().getEpochSecond();
-        int fiveMinutesAgo = (int) (now - 300); // must be int
+        long nowMillis = System.currentTimeMillis();
+        long fiveMinutesAgoMillis = nowMillis - 300_000;
 
         OccupancyRecord record = mock(OccupancyRecord.class);
-        when(record.getTimestamp()).thenReturn(fiveMinutesAgo);
+        when(record.getTimestamp()).thenReturn(fiveMinutesAgoMillis);
 
         when(repo.findLastRoomOccupancy(roomId))
                 .thenReturn(Optional.of(record));
@@ -101,7 +101,44 @@ public class OccupancyManagerTests {
 
         assertTrue(result >= 300 && result <= 301);
 
-        // STILL called twice in your current implementation
-        verify(repo, times(2)).findLastRoomOccupancy(roomId);
+        verify(repo, times(1)).findLastRoomOccupancy(roomId);
+
     }
+
+    // -------------------------
+    // userCheckIn tests
+    // -------------------------
+
+    @Test
+    void userCheckIn_addsNewRecordAndSavesRoom() {
+
+        String roomId = "room1";
+
+        CheckInReport report = new CheckInReport(
+                false,
+                true,
+                false,
+                false,
+                Occupancy.FREE
+        );
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(new ArrayList<>());
+
+        when(repo.findById(roomId)).thenReturn(Optional.of(room));
+
+        boolean result = occupancyManager.userCheckIn(roomId, report);
+
+        assertTrue(result);
+        assertEquals(1, room.getRecords().size());
+
+        OccupancyRecord savedRecord = room.getRecords().get(0);
+
+        assertEquals(Occupancy.FREE, savedRecord.getOccupancyLevel());
+        assertEquals(true, savedRecord.getWifiIssue());
+        assertEquals(false, savedRecord.getClosed());
+
+        verify(repo).save(room);
+    }
+
 }
