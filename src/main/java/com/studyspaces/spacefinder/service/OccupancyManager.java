@@ -1,15 +1,22 @@
 package com.studyspaces.spacefinder.service;
 
 import com.studyspaces.spacefinder.dto.CheckInDTO;
+import com.studyspaces.spacefinder.repository.HistoricOccupancyRepository;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+
 
 /**
  * OccupancyManager
@@ -21,9 +28,13 @@ import java.util.Optional;
 public class OccupancyManager {
 
     private final RealTimeOccupancyRepository repo;
+    private final HistoricOccupancyRepository historicRepo;
+    private final MongoTemplate mongoTemplate;
 
-    public OccupancyManager(RealTimeOccupancyRepository repo) {
+    public OccupancyManager(RealTimeOccupancyRepository repo, HistoricOccupancyRepository historicRepo, MongoTemplate mongoTemplate) {
         this.repo = repo;
+        this.historicRepo = historicRepo;
+        this.mongoTemplate = mongoTemplate;
     }
 
     // Converts DTO into model
@@ -103,6 +114,30 @@ public class OccupancyManager {
 
     // If an OccupancyRecord > 7 days, archive record
     public void archiveOccupancyRecord(){
+
+        long sevenDaysAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000;
+        List<RoomOccupancyRecord> rooms = repo.findRoomsWithRecordsOlderThan(sevenDaysAgo);
+
+        // Find all room with old records
+        for(RoomOccupancyRecord room : rooms){
+
+            List<OccupancyRecord> oldRecords = room.getRecords().stream()
+                    .filter(o -> o.getTimestamp() < sevenDaysAgo)
+                    .collect(Collectors.toList());
+
+            // Archive room
+            RoomOccupancyRecord historicRoom = historicRepo.findById(room.getId())
+                    .orElse(new RoomOccupancyRecord(room.getId(), new ArrayList<>()));
+
+            historicRoom.getRecords().addAll(oldRecords);
+            historicRepo.save(historicRoom);
+
+            // Remove old records from real-time collection using MongoTemplate $pull
+            Query query = new Query(Criteria.where("_id").is(room.getId()));
+            Update update = new Update().pull("records", Query.query(Criteria.where("timestamp").lt(sevenDaysAgo)));
+            mongoTemplate.updateFirst(query, update, RoomOccupancyRecord.class);
+
+        }
 
     }
 }
