@@ -24,6 +24,8 @@ public interface StudySpaceRepository extends MongoRepository<StudySpaceProfile,
     // ===========================
     Optional<StudySpaceProfile> findById(String id);
     List<StudySpaceProfile> findAll();
+    @Query("{'_id': {$in: ?0}}")
+    List<StudySpaceProfile> findByIds(List<String> ids);
     void deleteById(String id);
 
     // ===========================

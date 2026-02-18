@@ -130,4 +130,50 @@ class RoomSearcherKNNTest {
 
         assertEquals(List.of("near", "mid", "far"), result);
     }
+
+    @Test
+    void getSortedByRecommended_returnsAllRoomsSortedByDistance() {
+
+        // ---- mock rooms ----
+        StudySpaceProfile near = mock(StudySpaceProfile.class);
+        StudySpaceProfile mid  = mock(StudySpaceProfile.class);
+        StudySpaceProfile far  = mock(StudySpaceProfile.class);
+
+        when(near.getId()).thenReturn("near");
+        when(mid.getId()).thenReturn("mid");
+        when(far.getId()).thenReturn("far");
+
+        // control distance ordering via group size
+        when(near.toFilterQuery()).thenReturn(makeQuery(0.1f)); // closest
+        when(mid.toFilterQuery()).thenReturn(makeQuery(0.5f));
+        when(far.toFilterQuery()).thenReturn(makeQuery(1.0f));  // farthest
+
+        when(repository.findAll()).thenReturn(List.of(near, mid, far));
+
+        // build search space
+        RoomSearcher.initialiseSearchSpace();
+
+        // query near 0
+        FilterQuery userQuery = makeQuery(0.0f);
+
+        List<String> result =
+                RoomSearcher.getSortedByRecommended(userQuery);
+
+        // ---- assertions ----
+        assertEquals(3, result.size());
+        assertEquals(List.of("near", "mid", "far"), result);
+    }
+
+    @Test
+    void getSortedByRecommended_emptyRepository_returnsEmptyList() {
+
+        when(repository.findAll()).thenReturn(List.of());
+
+        RoomSearcher.initialiseSearchSpace();
+
+        List<String> result =
+                RoomSearcher.getSortedByRecommended(new FilterQuery());
+
+        assertTrue(result.isEmpty());
+    }
 }

@@ -3,6 +3,7 @@ import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
 import com.studyspaces.spacefinder.dto.SearchQueryRequest;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.lang.Float;
@@ -14,7 +15,7 @@ import java.lang.Float;
 //search query:
 //
 
-
+@Service
 public class RoomSearcher {
 
     private static StudySpaceRepository repository = null;
@@ -41,7 +42,7 @@ public class RoomSearcher {
             searchSpace.put(room.getId(), Vectorise(room.toFilterQuery()));
         }
     };
-    //for testing
+
     public static HashMap<String, List<Pair<Integer, Float>>> getSearchSpace() {
         return searchSpace;
     }
@@ -117,37 +118,50 @@ public class RoomSearcher {
         if(searchSpace == null){
             initialiseSearchSpace();
         }
-
         //Iterate through the search space map
-
         List<Pair<Integer, Float>> queryVector = Vectorise(query);
-
         PriorityQueue<Pair<String, Float>> heap =
                 new PriorityQueue<>(
                         (a, b) -> Float.compare(b.getSecond(), a.getSecond())
                 ); // max heap organised by (roomID, distanceFromSearchVector)
-
         for (HashMap.Entry<String, List<Pair<Integer, Float>>> entry : searchSpace.entrySet()){
-
             float dist = distance(queryVector, entry.getValue());
             heap.add(Pair.of(entry.getKey(), dist));
-
-
             if (heap.size() > k) {
                 heap.poll(); // remove worst
             }
-
         }
 
         List<String> result = new ArrayList<>();
-
         while (!heap.isEmpty()) {
             result.add(heap.poll().getFirst());
         }
-
         Collections.reverse(result); // closest first
         return result;
+    }
+    //returns 5 best recommendations as roomIds
+    public static List<String> getSortedByRecommended(FilterQuery query){
 
+        if(searchSpace == null){
+            initialiseSearchSpace();
+        }
+        //Iterate through the search space map
+        List<Pair<Integer, Float>> queryVector = Vectorise(query);
+        PriorityQueue<Pair<String, Float>> heap =
+                new PriorityQueue<>(
+                        (a, b) -> Float.compare(b.getSecond(), a.getSecond())
+                ); // max heap organised by (roomID, distanceFromSearchVector)
+        for (HashMap.Entry<String, List<Pair<Integer, Float>>> entry : searchSpace.entrySet()){
+            float dist = distance(queryVector, entry.getValue());
+            heap.add(Pair.of(entry.getKey(), dist));
+        }
+
+        List<String> result = new ArrayList<>();
+        while (!heap.isEmpty()) {
+            result.add(heap.poll().getFirst());
+        }
+        Collections.reverse(result); // closest first
+        return result;
     }
 
     private static float distance(List<Pair<Integer, Float>> vecA, List<Pair<Integer, Float>> vecB){
