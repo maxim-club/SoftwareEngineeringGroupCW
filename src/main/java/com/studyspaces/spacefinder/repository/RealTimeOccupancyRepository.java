@@ -30,6 +30,12 @@ public interface RealTimeOccupancyRepository
     List<RoomOccupancyRecord> findWithRecordsAfterTimestamp(long timestamp);
 
     /**
+     * Find all rooms that have at least one record older than the given timestamp
+     */
+    @Query("{ 'records.timestamp': { $lt: ?0 } }")
+    List<RoomOccupancyRecord> findRoomsWithRecordsOlderThan(long timestamp);
+
+    /**
      * Retrieve a specific document and filter its records by timestamp.
      */
     @Query(value = "{ '_id': ?0 }",
@@ -41,8 +47,6 @@ public interface RealTimeOccupancyRepository
      */
     @Query(value = "{'_id': ?0}", fields = "{ 'records': { $slice: -1}}")
     Optional<OccupancyRecord> findLastRoomOccupancy(String id);
-
-
 }
 
 
