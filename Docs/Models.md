@@ -124,23 +124,99 @@ Used for framework deserialization and object creation.
 
 Parameterized Constructor
 ```jave
-OccupancyRecord(int timestamp, Occupancy occupancyLevel);
+public OccupancyRecord(long timestamp, Occupancy occupancyLevel, Boolean closed, Boolean wifiIssue, Boolean reserved, Boolean fullyOccupied) {
+        this.timestamp = timestamp;
+        this.occupancyLevel = occupancyLevel;
+        this.closed = closed;
+        this.wifiIssue = wifiIssue;
+        this.reserved = reserved;
+        this.fullyOccupied = fullyOccupied;
+    }
 ```
 
 Creates a record with a specific timestamp and occupancy level.
 
 | Field            | Type        | Description                                                                                     |
-| ---------------- | ----------- | ----------------------------------------------------------------------------------------------- |
-| `timestamp`      | `int`       | The recorded time of the occupancy measurement (typically Unix timestamp or system time value). |
+|------------------|-------------|-------------------------------------------------------------------------------------------------|
+| `timestamp`      | `long`      | The recorded time of the occupancy measurement (typically Unix timestamp or system time value). |
 | `occupancyLevel` | `Occupancy` | The occupancy state of the study space at the recorded time.                                    |
+| `closed`         | `Boolean`   | Whether the study space is closed                                                               |
+| `wifiIssue`      | `Boolean`   | Whether the study space has wifiIssues                                                          |
+| `reserved`       | `Boolean`   | Whether the study space is reserved                                                             |
+| `fullyOccupied`  | `Boolean`   | Whether the study space is fully occupied                                                       |
 
-| Method                                        | Description                     |
-| --------------------------------------------- | ------------------------------- |
-| `getTimestamp()`                              | Returns the recorded timestamp. |
-| `setTimestamp(int timestamp)`                 | Updates the timestamp value.    |
-| `getOccupancyLevel()`                         | Returns the occupancy level.    |
-| `setOccupancyLevel(Occupancy occupancyLevel)` | Updates the occupancy level.    |
 </details>
+
+<details>
+<summary><strong>CheckInReport</strong></summary>
+
+## CheckInReport Class
+
+The `CheckInReport` class represents the data submitted by a user when checking into a study space.  
+It captures the user’s perception of the room’s current condition and occupancy status at the time of check-in.
+
+---
+
+### Package
+```java
+com.studyspaces.spacefinder.model
+```
+
+---
+
+### Purpose
+
+This model is used to:
+
+- Collect user-submitted room status information
+- Transfer validated check-in data to the service layer
+- Generate a corresponding `OccupancyRecord`
+- Update real-time occupancy tracking
+
+It acts as a domain model representation of a check-in submission.
+
+---
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `closed` | `Boolean` | Indicates whether the study space is closed at the time of check-in. |
+| `wifiIssue` | `Boolean` | Indicates if there are Wi-Fi connectivity problems. |
+| `reserved` | `Boolean` | Indicates whether the space is reserved. |
+| `fullyOccupied` | `Boolean` | Indicates whether all seating capacity appears to be taken. |
+| `occupancy` | `Occupancy` | The user-selected occupancy level (`EMPTY`, `FREE`, `MODERATE`, `BUSY`). |
+
+---
+
+### Constructors
+
+#### All-Arguments Constructor
+```java
+public CheckInReport(Boolean closed, Boolean wifiIssue, Boolean reserved,
+                     Boolean fullyOccupied, Occupancy occupancy)
+```
+Creates a complete check-in report with all status fields defined.
+
+#### No-Arguments Constructor
+```java
+public CheckInReport() {}
+```
+Required for:
+- JSON deserialization
+- Framework object instantiation
+- MongoDB/Spring mapping compatibility
+
+---
+
+### Notes
+
+- All boolean fields use `Boolean` (object type) rather than `boolean` to allow potential null handling.
+- Designed as a lightweight domain object focused purely on check-in state reporting.
+- Does not contain timestamp information — timestamps are generated when creating `OccupancyRecord`.
+
+</details>
+
 
 <details>
 <summary><strong>RoomOccupancyRecord</strong></summary>
