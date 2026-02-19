@@ -20,8 +20,6 @@ import org.springframework.data.mongodb.core.query.Update;
 
 /**
  * OccupancyManager
- *
- *
  */
 
 @Service
@@ -70,6 +68,31 @@ public class OccupancyManager {
 
         return (now - lastTimestamp) / 1000; // return seconds
     }
+
+    // Returns the average occupancy for a room from the last 7 days
+    public Occupancy get7DayAverage(String roomId) {
+        long sevenDaysAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000;
+
+        Optional<RoomOccupancyRecord> optionalRoom = repo.findById(roomId);
+        if (optionalRoom.isEmpty()) return null;
+
+        RoomOccupancyRecord room = optionalRoom.get();
+
+        if(room.getRecords() == null || room.getRecords().isEmpty()) return null;
+
+        List<OccupancyRecord> recentRecords = room.getRecords().stream()
+                .filter(r -> r.getTimestamp() > sevenDaysAgo)
+                .toList();
+
+        if (recentRecords.isEmpty()) return null;
+
+        double average = recentRecords.stream()
+                .mapToInt(r -> occupancyToValue((r.getOccupancyLevel())))
+                .average().orElse(0);
+
+        return valueToOccupancy(average);
+    }
+
 
     // ===========================
     // Write Requests
@@ -145,5 +168,30 @@ public class OccupancyManager {
 
         }
 
+    }
+
+
+    // ===========================
+    // Helper Functions
+    // ===========================
+
+    // Helper functions for get7DayAverage()
+    private int occupancyToValue(Occupancy occupancy) {
+        return switch (occupancy) {
+            case EMPTY -> 0;
+            case FREE -> 1;
+            case MODERATE -> 2;
+            case BUSY -> 3;
+        };
+    }
+    private Occupancy valueToOccupancy(double value) {
+        int rounded = (int) Math.round(value);
+
+        return switch (rounded) {
+            case 0 -> Occupancy.EMPTY;
+            case 1 -> Occupancy.FREE;
+            case 3 -> Occupancy.BUSY;
+            default -> Occupancy.MODERATE;
+        };
     }
 }
