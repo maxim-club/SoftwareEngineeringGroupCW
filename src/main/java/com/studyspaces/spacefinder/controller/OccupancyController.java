@@ -47,8 +47,21 @@ public class OccupancyController {
         return ResponseEntity.ok(seconds);
     }
 
+    // Returns the average occupancy for a room from the last 7 days
+    @GetMapping("/{roomId}/average-occupancy")
+    public ResponseEntity<Occupancy> getAverageOccupancy(@PathVariable String roomId) {
+
+        Occupancy occupancy = occupancyManager.get7DayAverage(roomId);
+
+        if (occupancy == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(occupancy);
+    }
+
     // ===========================
-    // READ
+    // Write
     // ===========================
 
     @PostMapping("/{roomId}/check-in")

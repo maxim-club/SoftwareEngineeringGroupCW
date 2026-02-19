@@ -186,12 +186,93 @@ public class OccupancyManagerTests {
     }
 
     // -------------------------
-    // archiveOccupancyRecord tests
+    // get7DayAverage tests
     // -------------------------
 
+    @Test
+    void get7DayAverage_returnsNull_whenRoomDoesNotExist() {
+        String roomId = "room1";
+
+        when(repo.findById(roomId)).thenReturn(Optional.empty());
+
+        Occupancy result = occupancyManager.get7DayAverage(roomId);
+
+        assertNull(result);
+
+        verify(repo, times(1)).findById(roomId);
+    }
+
+    @Test
+    void get7DayAverage_returnsNull_whenNoRecordsExist() {
+        String roomId = "room1";
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(new ArrayList<>());
+
+        when(repo.findById(roomId)).thenReturn(Optional.of(room));
+
+        Occupancy result = occupancyManager.get7DayAverage(roomId);
+
+        assertNull(result);
+
+        verify(repo, times(1)).findById(roomId);
+    }
+
+    @Test
+    void get7DayAverage_returnsNull_whenNoRecordsInLast7Days() {
+        String roomId = "room1";
+
+        long oldTimestamp = System.currentTimeMillis() - 10L * 24 * 60 * 60 * 1000;
+
+        OccupancyRecord oldRecord = mock(OccupancyRecord.class);
+        when(oldRecord.getTimestamp()).thenReturn(oldTimestamp);
+        when(oldRecord.getOccupancyLevel()).thenReturn(Occupancy.BUSY);
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(List.of(oldRecord));
+
+        when(repo.findById(roomId)).thenReturn(Optional.of(room));
+
+        Occupancy result = occupancyManager.get7DayAverage(roomId);
+
+        assertNull(result);
+
+        verify(repo, times(1)).findById(roomId);
+    }
+
+    @Test
+    void get7DayAverage_returnsCorrectAverageOccupancy() {
+        String roomId = "room1";
+
+        long now = System.currentTimeMillis();
+        long twoDaysAgo = now - 2L * 24 * 60 * 60 * 1000;
+        long fiveDaysAgo = now - 5L * 24 * 60 * 60 * 1000;
+
+        OccupancyRecord record1 = mock(OccupancyRecord.class);
+        when(record1.getTimestamp()).thenReturn(twoDaysAgo);
+        when(record1.getOccupancyLevel()).thenReturn(Occupancy.FREE);
+
+        OccupancyRecord record2 = mock(OccupancyRecord.class);
+        when(record2.getTimestamp()).thenReturn(fiveDaysAgo);
+        when(record2.getOccupancyLevel()).thenReturn(Occupancy.BUSY);
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(List.of(record1, record2));
+
+        when(repo.findById(roomId)).thenReturn(Optional.of(room));
+
+        Occupancy result = occupancyManager.get7DayAverage(roomId);
+
+        // FREE (1) + BUSY (3) -> avg = 2 -> MODERATE
+        assertEquals(Occupancy.MODERATE, result);
+
+        verify(repo, times(1)).findById(roomId);
+    }
+
+
     // -------------------------
-// archiveOccupancyRecord tests
-// -------------------------
+    // archiveOccupancyRecord tests
+    // -------------------------
 
     @Test
     void archiveOccupancyRecord_archivesOldRecordsAndRemovesThem() {
