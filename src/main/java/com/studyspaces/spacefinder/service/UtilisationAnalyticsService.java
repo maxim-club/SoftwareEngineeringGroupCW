@@ -4,6 +4,7 @@ import com.studyspaces.spacefinder.dto.RoomUtilisationDTO;
 import com.studyspaces.spacefinder.dto.PeakUsageDTO;
 import com.studyspaces.spacefinder.dto.AnalyticsDataWarning;
 import com.studyspaces.spacefinder.dto.BuildingUtilisationDTO;
+import com.studyspaces.spacefinder.dto.OccupancyGraphPointDTO;
 import com.studyspaces.spacefinder.model.Occupancy;
 import com.studyspaces.spacefinder.model.RoomOccupancyRecord;
 import com.studyspaces.spacefinder.model.OccupancyRecord;
@@ -146,11 +147,19 @@ public class UtilisationAnalyticsService {
     }
 
     //helper function to extract the hour
-    private int extractHour(int timestamp){
-        Instant instant = Instant.ofEpochSecond(timestamp);
+    private int extractHour(long timestamp){
+        Instant instant = Instant.ofEpochMilli(timestamp);
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
 
         return dateTime.getHour(); //0-23
+    }
+
+    //helper function to extract day of the week
+    private int extractDayOfWeek(long timestamp) {
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        
+        return dateTime.getDayOfWeek().getValue(); // 1 = Monday, 7 = Sunday
     }
 
     public List<BuildingUtilisationDTO> getBuildingUtilisationSummary(){
@@ -206,5 +215,74 @@ public class UtilisationAnalyticsService {
     //to return only underutilised rooms which was previously defined as used <30%
     public List<RoomUtilisationDTO> getUnderUtilisedRooms(){
         return getRoomUtilisationSummary().stream().filter(RoomUtilisationDTO::isUnderUtilised).toList();
+    }
+
+
+    public List<OccupancyGraphPointDTO> getHourlyGraphData(String roomId){
+        try {
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
+
+            if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
+                return List.of();
+            }
+
+            List<OccupancyRecord> records = recordOpt.get().getRecords();
+
+            Map<Integer, List<Double>> hourlyBuckets = new HashMap<>();
+
+            for (OccupancyRecord entry : records) {
+                int hour = extractHour(entry.getTimestamp());
+                double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
+
+                hourlyBuckets.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+            }
+
+            List<OccupancyGraphPointDTO> result = new ArrayList<>();
+
+            for (int h = 0; h < 24; h++) {
+
+                double avg = hourlyBuckets.getOrDefault(h, List.of()).stream().mapToDouble(d -> d).average().orElse(0.0);
+                result.add(new OccupancyGraphPointDTO(null, h, avg * 100));
+            }
+
+            return result;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+    
+    public List<OccupancyGraphPointDTO> getWeeklyGraphData(String roomId) {
+
+        try {
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
+
+            if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
+                return List.of();
+            }
+
+            List<OccupancyRecord> records = recordOpt.get().getRecords();
+
+            Map<Integer, List<Double>> dailyBuckets = new HashMap<>();
+
+            for (OccupancyRecord entry : records) {
+                int day = extractDayOfWeek(entry.getTimestamp());
+                double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
+
+                dailyBuckets.computeIfAbsent(day, k -> new ArrayList<>()).add(demand);
+            }
+
+            String[] days = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+
+            List<OccupancyGraphPointDTO> result = new ArrayList<>();
+
+            for (int d = 1; d <= 7; d++) {
+                double avg = dailyBuckets.getOrDefault(d, List.of()).stream().mapToDouble(val -> val).average().orElse(0.0);
+                result.add(new OccupancyGraphPointDTO(days[d-1], null, avg * 100));
+            }
+
+            return result;
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }
