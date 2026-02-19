@@ -5,12 +5,12 @@ import com.studyspaces.spacefinder.repository.HistoricOccupancyRepository;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import com.studyspaces.spacefinder.model.*;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -112,7 +112,13 @@ public class OccupancyManager {
         return true;
     }
 
-    // If an OccupancyRecord > 7 days, archive record
+
+    // ===========================
+    // Data Transfers
+    // ===========================
+
+    // If an OccupancyRecord > 7 days, archive record. Runs daily
+    @Scheduled(cron = "0 0 3 * * ?")
     public void archiveOccupancyRecord(){
 
         long sevenDaysAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000;
@@ -123,7 +129,7 @@ public class OccupancyManager {
 
             List<OccupancyRecord> oldRecords = room.getRecords().stream()
                     .filter(o -> o.getTimestamp() < sevenDaysAgo)
-                    .collect(Collectors.toList());
+                    .toList();
 
             // Archive room
             RoomOccupancyRecord historicRoom = historicRepo.findById(room.getId())

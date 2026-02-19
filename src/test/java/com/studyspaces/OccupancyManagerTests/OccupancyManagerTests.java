@@ -2,6 +2,7 @@ package com.studyspaces.OccupancyManagerTests;
 
 import com.studyspaces.spacefinder.model.*;
 import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
+import com.studyspaces.spacefinder.repository.HistoricOccupancyRepository;
 import com.studyspaces.spacefinder.service.OccupancyManager;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -9,17 +10,29 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 public class OccupancyManagerTests {
 
     @Mock
     private RealTimeOccupancyRepository repo;
+
+    @Mock
+    private MongoTemplate mongoTemplate;
+
+    @Mock
+    private HistoricOccupancyRepository historicRepo;
 
     @InjectMocks
     private OccupancyManager occupancyManager;
@@ -140,4 +153,91 @@ public class OccupancyManagerTests {
         verify(repo).save(room);
     }
 
+    @Test
+    void userCheckIn_nulLReport(){
+        String roomId = "room1";
+        CheckInReport report = null;
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(new ArrayList<>());
+
+        when(repo.findById(roomId)).thenReturn(Optional.of(room));
+        boolean result = occupancyManager.userCheckIn(roomId, report);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void userCheckIn_nulLRoom(){
+        String roomId = null;
+        CheckInReport report = new CheckInReport(
+                false,
+                true,
+                false,
+                false,
+                Occupancy.FREE
+        );
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord();
+        room.setRecords(new ArrayList<>());
+
+        boolean result = occupancyManager.userCheckIn(roomId, report);
+        assertFalse(result);
+    }
+
+    // -------------------------
+    // archiveOccupancyRecord tests
+    // -------------------------
+
+    // -------------------------
+// archiveOccupancyRecord tests
+// -------------------------
+
+    @Test
+    void archiveOccupancyRecord_archivesOldRecordsAndRemovesThem() {
+
+        String roomId = "room1";
+
+        long now = System.currentTimeMillis();
+        long eightDaysAgo = now - (8L * 24 * 60 * 60 * 1000);
+        long oneDayAgo = now - ((long) 24 * 60 * 60 * 1000);
+
+        // Mock records
+        OccupancyRecord oldRecord = mock(OccupancyRecord.class);
+        when(oldRecord.getTimestamp()).thenReturn(eightDaysAgo);
+
+        OccupancyRecord recentRecord = mock(OccupancyRecord.class);
+        when(recentRecord.getTimestamp()).thenReturn(oneDayAgo);
+
+        ArrayList<OccupancyRecord> records = new ArrayList<>();
+        records.add(oldRecord);
+        records.add(recentRecord);
+
+        RoomOccupancyRecord room = new RoomOccupancyRecord(roomId, records);
+
+        when(repo.findRoomsWithRecordsOlderThan(anyLong()))
+                .thenReturn(List.of(room));
+
+        when(historicRepo.findById(roomId))
+                .thenReturn(Optional.empty());
+
+        // Act
+        occupancyManager.archiveOccupancyRecord();
+
+        // Verify historic save
+        ArgumentCaptor<RoomOccupancyRecord> captor =
+                ArgumentCaptor.forClass(RoomOccupancyRecord.class);
+
+        verify(historicRepo, times(1)).save(captor.capture());
+
+        RoomOccupancyRecord savedHistoricRoom = captor.getValue();
+
+        assertEquals(roomId, savedHistoricRoom.getId());
+        assertEquals(1, savedHistoricRoom.getRecords().size());
+        assertEquals(oldRecord, savedHistoricRoom.getRecords().get(0));
+
+        // Verify Mongo pull was executed
+        verify(mongoTemplate, times(1))
+                .updateFirst(any(Query.class), any(Update.class), eq(RoomOccupancyRecord.class));
+    }
 }
