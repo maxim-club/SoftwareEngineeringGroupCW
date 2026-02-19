@@ -108,41 +108,54 @@ public class UtilisationAnalyticsService {
             Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
 
             if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
-                return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
+                return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.INSUFFICIENT_DATA);
             }
 
             List<OccupancyRecord> records = recordOpt.get().getRecords();
 
             if (records.size() < 5) {
-                return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
+                return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.INSUFFICIENT_DATA);
             }
 
-            Map<Integer, List<Double>> hourlyDemand = new HashMap<>();
+            Map<Integer, List<Double>> hourlyBuckets = new HashMap<>();
+            Map<Integer, List<Double>> dailyBuckets = new HashMap<>();
 
             for (OccupancyRecord entry : records){
 
-                int hour = extractHour(Math.toIntExact(entry.getTimestamp()));
+                int hour = extractHour(entry.getTimestamp());
+                int day = extractDayOfWeek(entry.getTimestamp());
+
                 double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
 
-                hourlyDemand.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+                hourlyBuckets.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+                dailyBuckets.computeIfAbsent(day, k-> new ArrayList<>()).add(demand);
             }
 
-            int peakHour = -1;
-            double highestAvg = 0.0;
-
-            for (Map.Entry<Integer, List<Double>> e : hourlyDemand.entrySet()){
-
+            //calculates the averages per hour
+            Map<Integer, Double> hourlyAvg = new HashMap<>();
+            for(var e : hourlyBuckets.entrySet()) {
                 double avg = e.getValue().stream().mapToDouble(d -> d).average().orElse(0.0);
-
-                if (avg > highestAvg) {
-                    highestAvg = avg;
-                    peakHour = e.getKey();
-                }
+                hourlyAvg.put(e.getKey(), avg);
             }
 
-            return new PeakUsageDTO(roomId, peakHour, highestAvg, AnalyticsDataWarning.NONE);
+            //calculates the averages per day
+            Map<Integer, Double> dailyAvg = new HashMap<>();
+            for(var e : dailyBuckets.entrySet()) {
+                double avg = e.getValue().stream().mapToDouble(d -> d).average().orElse(0.0);
+                dailyAvg.put(e.getKey(), avg);
+            }
+
+            //sort to get the 3 busiest hours
+            List<Integer> busiestTimes = hourlyAvg.entrySet().stream().sorted((a,b) -> Double.compare(b.getValue(), a.getValue())).limit(3).map(Map.Entry::getKey).toList();
+
+            //sort to get the 3 busiest days
+            String[] dayNames = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+            List<String> busiestDays = dailyAvg.entrySet().stream().sorted((a,b) -> Double.compare(b.getValue(), a.getValue())).limit(3).map(e -> dayNames[e.getKey() - 1]).toList();
+
+
+            return new PeakUsageDTO(roomId, busiestTimes, busiestDays, AnalyticsDataWarning.NONE);
         } catch (Exception e) {
-            return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.DATA_SOURCE_OFFLINE);
+            return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.DATA_SOURCE_OFFLINE);
         }
     }
 
