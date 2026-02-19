@@ -133,3 +133,164 @@ Where:
 - K = requested recommendations
 
 </details>
+
+
+<details>
+<summary><strong>OccupancyManager</strong></summary>
+
+## OccupancyManager Class
+
+The `OccupancyManager` class is the core service responsible for managing
+real-time occupancy tracking, user check-ins, and historical archiving of study space data.
+
+It acts as the business logic layer between the controller layer and the MongoDB repositories.
+
+---
+
+### Package
+```java
+com.studyspaces.spacefinder.service
+```
+
+## Dependencies
+
+| Dependency | Type | Purpose |
+|------------|------|---------|
+| `repo` | `RealTimeOccupancyRepository` | Handles real-time occupancy records stored in MongoDB. |
+| `historicRepo` | `HistoricOccupancyRepository` | Stores archived occupancy records older than 7 days. |
+| `mongoTemplate` | `MongoTemplate` | Executes MongoDB update operations (e.g., `$pull`). |
+
+Injected via constructor for immutability and testability.
+
+---
+
+# Functional Overview
+
+The service is divided into four main responsibilities:
+
+1. DTO → Model conversion
+2. Read operations
+3. Write operations
+4. Scheduled archival operations
+
+---
+
+# DTO Conversion
+
+### `toModel(CheckInDTO dto)`
+
+Converts a `CheckInDTO` object into a `CheckInReport` domain model.
+
+**Purpose:**
+- Decouples external API layer from internal model representation
+- Transforms String occupancy values into `Occupancy` enum
+
+---
+
+# Read Operations
+
+## `getLastOccupancy(String roomId)`
+
+Returns the most recent occupancy level for a given room.
+
+**Returns:**
+- `Occupancy` value if found
+- `null` if no record exists
+
+Uses:
+```java
+repo.findLastRoomOccupancy(roomId)
+```
+
+---
+
+## `whenLastOccupancyWasAdded(String roomId)`
+
+Returns the number of seconds since the last occupancy update.
+
+**Returns:**
+- Seconds since last update
+- `-1` if no record exists
+
+Used to inform users how recent the data is.
+
+---
+
+# Write Operations
+
+## `userCheckIn(String roomId, CheckInReport report)`
+
+Processes a user check-in submission.
+
+### Flow:
+
+1. Validate input (`roomId` and `report`)
+2. Retrieve room document
+3. Initialize records list if null
+4. Create new `OccupancyRecord`
+5. Append record to room
+6. Save updated room
+
+### Returns:
+
+| Value | Meaning |
+|--------|----------|
+| `true` | Check-in successful |
+| `false` | Invalid input or room not found |
+
+---
+
+# Scheduled Archival Process
+
+## `archiveOccupancyRecord()`
+
+Automatically archives occupancy records older than 7 days.
+
+### Scheduling
+```java
+@Scheduled(cron = "0 0 3 * * ?")
+```
+
+Runs daily at **03:00 AM server time**.
+
+---
+
+### Archival Logic
+
+1. Calculate timestamp for 7 days ago.
+2. Retrieve rooms containing outdated records.
+3. Filter records older than threshold.
+4. Move old records to `historicRepo`.
+5. Remove old records from real-time collection using MongoDB `$pull`.
+
+---
+
+### MongoDB Operation Used
+
+```java
+Update().pull("records",
+    Query.query(Criteria.where("timestamp").lt(sevenDaysAgo))
+)
+```
+
+Removes embedded records directly in MongoDB without loading full documents into memory.
+
+---
+
+# Production Behaviour
+
+- User check-ins update real-time data immediately.
+- Every night at 3 AM, old records are archived automatically.
+- Real-time collection remains lightweight.
+- Historical data is preserved for long-term analysis.
+
+---
+
+# Design Notes
+
+- Uses constructor injection (recommended Spring practice).
+- Uses Optional for safe null handling.
+- Separates real-time and historic data storage.
+- Scheduling avoids exposing archive functionality via public API.
+
+</details>
