@@ -62,6 +62,8 @@ public class StudySpaceProfileManager {
         return repository.findAll();
     }
 
+    public List<StudySpaceProfile> getByIds(List<String> ids) { return repository.findByIds(ids);}
+
     public Optional<StudySpaceProfile> getFirstByRoomLocation(String roomLocation) {
         return repository.findFirstByRoomLocation(roomLocation);
     }

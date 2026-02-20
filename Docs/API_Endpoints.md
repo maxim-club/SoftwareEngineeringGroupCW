@@ -3,14 +3,16 @@
 **Base URL:** `http://localhost:8080`
 
 ## 1. Spaces & Search (`SpaceController`)
-| Method | Endpoint | Description                            |
-| :--- | :--- |:---------------------------------------|
-| `GET` | `/api/spaces` | Get all study spaces                   |
-| `GET` | `/api/spaces/{id}` | Get details for a specific space       |
-| `GET` | `/api/spaces/search?q={keyword}` | Search by location name or description |
-| `GET` | `/api/spaces/filter/noise?level={QUIET/MODERATE}` | Filter by noise level                  |
-| `GET` | `/api/spaces/filter/occupancy?level={EMPTY/BUSY}` | Filter by occupancy                    |
-| `GET` | `/api/spaces/filter/features?computers=true` | Filter by amenities                    |
+| Method | Endpoint                                          | Description                                                                     |
+|:-------|:--------------------------------------------------|:--------------------------------------------------------------------------------|
+| `GET`  | `/api/spaces`                                     | Get all study spaces                                                            |
+| `GET`  | `/api/spaces/{id}`                                | Get details for a specific space                                                |
+| `GET`  | `/api/spaces/search?q={keyword}`                  | Search by location name or description                                          |
+| `GET`  | `/api/spaces/filter/noise?level={QUIET/MODERATE}` | Filter by noise level                                                           |
+| `GET`  | `/api/spaces/filter/occupancy?level={EMPTY/BUSY}` | Filter by occupancy                                                             |
+| `GET`  | `/api/spaces/filter/features?computers=true`      | Filter by amenities                                                             |
+| `GET`  | `/api/spaces/recommend`                           | Get the 5 best rooms based on Filter                                            |
+| `GET`  | `/api/spaces/recommendSearch`                     | Get all rooms that contains the search query and sorted by closeness to filters |
 
 ## 2. Analytics (`AnalyticsController`)
 | Method | Endpoint | Description                    |
