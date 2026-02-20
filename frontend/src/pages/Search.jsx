@@ -17,8 +17,33 @@ function Search() {
     try {
       setLoading(true);
       setError(null);
-      const data = await getAllSpaces();
-      setSpaces(data);
+     // const data = await getAllSpaces();
+      const mockSpaces = [
+        {
+          id: "1",
+          roomLocation: "Library Study Room",
+          notes: "Quiet space with natural lighting",
+          noiseLevel: "Quiet",
+          occupancy: "Empty",
+        },
+        {
+          id: "2",
+          roomLocation: "8W Silent Area",
+          notes: "Silent individual study space",
+          noiseLevel: "Quiet discussion",
+          occupancy: "Busy",
+        },
+        {
+          id: "3",
+          roomLocation: "10E Group Study Room",
+          notes: "Great for group meetings",
+          noiseLevel: "Moderate noise",
+          occupancy: "Moderately occupied",
+        },
+      ];
+
+      // if API returns nothing, use fake data for UI testing
+      setSpaces(mockSpaces);
     } catch (err) {
       setError(err.message);
     } finally {

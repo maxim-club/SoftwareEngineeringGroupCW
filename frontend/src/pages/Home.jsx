@@ -29,11 +29,11 @@ function Home() {
       </p>
 
       <Button
-        variant="primary"
-        size="lg"
-        as={Link}
-        to={`/search?q=${encodeURIComponent(searchInput)}`}
-        className="mt-3"
+      variant="primary"
+      size="lg"
+      as={Link}
+      to="/search"
+      className="mt-3"
       >
         Search Spaces
       </Button>
