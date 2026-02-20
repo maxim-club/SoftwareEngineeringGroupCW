@@ -1,8 +1,10 @@
 package com.studyspaces.spacefinder.controller;
 
+import com.studyspaces.spacefinder.dto.SearchQueryRequest;
 import com.studyspaces.spacefinder.model.NoiseLevel;
 import com.studyspaces.spacefinder.model.Occupancy;
 import com.studyspaces.spacefinder.model.StudySpaceProfile;
+import com.studyspaces.spacefinder.service.RoomSearcher;
 import com.studyspaces.spacefinder.service.StudySpaceProfileManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,31 @@ public class SpaceController {
     }
 
     // SEARCH & FILTER PAGE
+
+
+
+    //Recommendation algorithm. Get k best values that closest match the user's filters
+    //Does not search using the string.
+    @GetMapping("/recommended")
+    public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request){
+        List<String> ids = RoomSearcher.getKRecommended(request.getFilters(), 5);
+        return profileManager.getByIds(ids);
+    }
+
+    @GetMapping("/recommendedSearch")
+    public List<StudySpaceProfile> getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request){
+        List<String> ids = RoomSearcher.getSortedByRecommended(request.getFilters());
+        List<StudySpaceProfile> rooms = profileManager.getByIds(ids);
+
+        String searchTerm = request.getSearchBarBuildingQuery().toLowerCase();
+
+        return rooms.stream()
+                .filter(room -> room.getRoomLocation() != null && room.getRoomLocation().toLowerCase().contains(searchTerm))
+                .toList();
+    }
+
+
+
 
     // Text Search (Location name / Notes)
     @GetMapping("/search")

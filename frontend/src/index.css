@@ -11,3 +11,91 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-container {
+  overflow: hidden;
+}
+
+.ui-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 12px;
+  background: white;
+}
+
+.ui-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #f8f9fa;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.ui-button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.ui-button.active {
+  background: #e9ecef;
+}
+
+.ui-row-between {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.ui-row-center {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ui-row-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chart-container {
+  width: 100%;
+  height: clamp(240px, 35vh, 420px);
+}
+
+.map-container {
+  width: 100%;
+  height: clamp(260px, 55vh, 520px);
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.text-muted {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.text-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.text-sm-strong {
+  font-size: 13px;
+  font-weight: 700;
+}
