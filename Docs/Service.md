@@ -93,12 +93,13 @@ com.studyspaces.spacefinder.service
 <br>
 
 | Category                | Method                  | Parameters                        | Returns                                       | Description                                                                                                                                                       |
-| ----------------------- | ----------------------- | --------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------| ----------------------- | --------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Initialisation**      | `RoomSearcher`          | `StudySpaceRepository repository` | —                                             | Constructor that injects the repository used to fetch study space data.                                                                                           |
 |                         | `initialiseSearchSpace` | —                                 | `void`                                        | Loads all study spaces from the database, vectorises their filter data, and stores them in an in-memory search map for fast querying.                             |
 | **Testing / Debugging** | `getSearchSpace`        | —                                 | `HashMap<String, List<Pair<Integer, Float>>>` | Returns the current cached search space. Primarily intended for testing and verification.                                                                         |
 | **Vectorisation**       | `Vectorise`             | `FilterQuery query`               | `ArrayList<Pair<Integer, Float>>`             | Converts a user filter query into a fixed-length normalized vector. Each element contains a weight (0 or 1) and a value between 0–1 representing user preference. |
 | **Recommendation**      | `getKRecommended`       | `FilterQuery query, int k`        | `List<String>`                                | Performs a KNN similarity search and returns the IDs of the `k` closest matching study spaces ordered from most similar to least similar.                         |
+| **Recommendation**      | `getSortedByRecommended`| `FilterQuery query` | `List<String>` | Performs a full similarity search across all study spaces and returns **all room IDs sorted by similarity**, ordered from most similar (closest distance) to least similar. |
 
 </details>
 
