@@ -4,6 +4,7 @@ import com.studyspaces.spacefinder.dto.RoomUtilisationDTO;
 import com.studyspaces.spacefinder.dto.PeakUsageDTO;
 import com.studyspaces.spacefinder.dto.AnalyticsDataWarning;
 import com.studyspaces.spacefinder.dto.BuildingUtilisationDTO;
+import com.studyspaces.spacefinder.dto.OccupancyGraphPointDTO;
 import com.studyspaces.spacefinder.model.Occupancy;
 import com.studyspaces.spacefinder.model.RoomOccupancyRecord;
 import com.studyspaces.spacefinder.model.OccupancyRecord;
@@ -107,50 +108,71 @@ public class UtilisationAnalyticsService {
             Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
 
             if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
-                return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
+                return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.INSUFFICIENT_DATA);
             }
 
             List<OccupancyRecord> records = recordOpt.get().getRecords();
 
             if (records.size() < 5) {
-                return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.INSUFFICIENT_DATA);
+                return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.INSUFFICIENT_DATA);
             }
 
-            Map<Integer, List<Double>> hourlyDemand = new HashMap<>();
+            Map<Integer, List<Double>> hourlyBuckets = new HashMap<>();
+            Map<Integer, List<Double>> dailyBuckets = new HashMap<>();
 
             for (OccupancyRecord entry : records){
 
                 int hour = extractHour(entry.getTimestamp());
+                int day = extractDayOfWeek(entry.getTimestamp());
+
                 double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
 
-                hourlyDemand.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+                hourlyBuckets.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+                dailyBuckets.computeIfAbsent(day, k-> new ArrayList<>()).add(demand);
             }
 
-            int peakHour = -1;
-            double highestAvg = 0.0;
-
-            for (Map.Entry<Integer, List<Double>> e : hourlyDemand.entrySet()){
-
+            //calculates the averages per hour
+            Map<Integer, Double> hourlyAvg = new HashMap<>();
+            for(var e : hourlyBuckets.entrySet()) {
                 double avg = e.getValue().stream().mapToDouble(d -> d).average().orElse(0.0);
-
-                if (avg > highestAvg) {
-                    highestAvg = avg;
-                    peakHour = e.getKey();
-                }
+                hourlyAvg.put(e.getKey(), avg);
             }
 
-            return new PeakUsageDTO(roomId, peakHour, highestAvg, AnalyticsDataWarning.NONE);
+            //calculates the averages per day
+            Map<Integer, Double> dailyAvg = new HashMap<>();
+            for(var e : dailyBuckets.entrySet()) {
+                double avg = e.getValue().stream().mapToDouble(d -> d).average().orElse(0.0);
+                dailyAvg.put(e.getKey(), avg);
+            }
+
+            //sort to get the 3 busiest hours
+            List<Integer> busiestTimes = hourlyAvg.entrySet().stream().sorted((a,b) -> Double.compare(b.getValue(), a.getValue())).limit(3).map(Map.Entry::getKey).toList();
+
+            //sort to get the 3 busiest days
+            String[] dayNames = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+            List<String> busiestDays = dailyAvg.entrySet().stream().sorted((a,b) -> Double.compare(b.getValue(), a.getValue())).limit(3).map(e -> dayNames[e.getKey() - 1]).toList();
+
+
+            return new PeakUsageDTO(roomId, busiestTimes, busiestDays, AnalyticsDataWarning.NONE);
         } catch (Exception e) {
-            return new PeakUsageDTO(roomId, -1, 0.0, AnalyticsDataWarning.DATA_SOURCE_OFFLINE);
+            return new PeakUsageDTO(roomId, List.of(), List.of(), AnalyticsDataWarning.DATA_SOURCE_OFFLINE);
         }
     }
 
     //helper function to extract the hour
-    private int extractHour(int timestamp){
-        Instant instant = Instant.ofEpochSecond(timestamp);
+    private int extractHour(long timestamp){
+        Instant instant = Instant.ofEpochMilli(timestamp);
         ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
 
         return dateTime.getHour(); //0-23
+    }
+
+    //helper function to extract day of the week
+    private int extractDayOfWeek(long timestamp) {
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        
+        return dateTime.getDayOfWeek().getValue(); // 1 = Monday, 7 = Sunday
     }
 
     public List<BuildingUtilisationDTO> getBuildingUtilisationSummary(){
@@ -206,5 +228,74 @@ public class UtilisationAnalyticsService {
     //to return only underutilised rooms which was previously defined as used <30%
     public List<RoomUtilisationDTO> getUnderUtilisedRooms(){
         return getRoomUtilisationSummary().stream().filter(RoomUtilisationDTO::isUnderUtilised).toList();
+    }
+
+
+    public List<OccupancyGraphPointDTO> getHourlyGraphData(String roomId){
+        try {
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
+
+            if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
+                return List.of();
+            }
+
+            List<OccupancyRecord> records = recordOpt.get().getRecords();
+
+            Map<Integer, List<Double>> hourlyBuckets = new HashMap<>();
+
+            for (OccupancyRecord entry : records) {
+                int hour = extractHour(entry.getTimestamp());
+                double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
+
+                hourlyBuckets.computeIfAbsent(hour, k -> new ArrayList<>()).add(demand);
+            }
+
+            List<OccupancyGraphPointDTO> result = new ArrayList<>();
+
+            for (int h = 0; h < 24; h++) {
+
+                double avg = hourlyBuckets.getOrDefault(h, List.of()).stream().mapToDouble(d -> d).average().orElse(0.0);
+                result.add(new OccupancyGraphPointDTO(null, h, avg * 100));
+            }
+
+            return result;
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+    
+    public List<OccupancyGraphPointDTO> getWeeklyGraphData(String roomId) {
+
+        try {
+            Optional<RoomOccupancyRecord> recordOpt = historicRepo.findById(roomId);
+
+            if (recordOpt.isEmpty() || recordOpt.get().getRecords() == null || recordOpt.get().getRecords().isEmpty()) {
+                return List.of();
+            }
+
+            List<OccupancyRecord> records = recordOpt.get().getRecords();
+
+            Map<Integer, List<Double>> dailyBuckets = new HashMap<>();
+
+            for (OccupancyRecord entry : records) {
+                int day = extractDayOfWeek(entry.getTimestamp());
+                double demand = mapOccupancyToRatio(entry.getOccupancyLevel());
+
+                dailyBuckets.computeIfAbsent(day, k -> new ArrayList<>()).add(demand);
+            }
+
+            String[] days = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+
+            List<OccupancyGraphPointDTO> result = new ArrayList<>();
+
+            for (int d = 1; d <= 7; d++) {
+                double avg = dailyBuckets.getOrDefault(d, List.of()).stream().mapToDouble(val -> val).average().orElse(0.0);
+                result.add(new OccupancyGraphPointDTO(days[d-1], null, avg * 100));
+            }
+
+            return result;
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

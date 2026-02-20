@@ -27,7 +27,13 @@ public interface RealTimeOccupancyRepository
      * Retrieve all documents that contain records after a given timestamp.
      */
     @Query("{ 'records.timestamp': { $gt: ?0 } }")
-    List<RoomOccupancyRecord> findWithRecordsAfterTimestamp(int timestamp);
+    List<RoomOccupancyRecord> findWithRecordsAfterTimestamp(long timestamp);
+
+    /**
+     * Find all rooms that have at least one record older than the given timestamp
+     */
+    @Query("{ 'records.timestamp': { $lt: ?0 } }")
+    List<RoomOccupancyRecord> findRoomsWithRecordsOlderThan(long timestamp);
 
     /**
      * Retrieve a specific document and filter its records by timestamp.
