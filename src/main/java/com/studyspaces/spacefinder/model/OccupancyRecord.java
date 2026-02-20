@@ -1,30 +1,29 @@
 package com.studyspaces.spacefinder.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
 public class OccupancyRecord {
 
-    private int timestamp;
+    private long timestamp;
     private Occupancy occupancyLevel;
 
-    public OccupancyRecord() {}
+    private Boolean closed;
+    private Boolean wifiIssue;
+    private Boolean reserved;
+    private Boolean fullyOccupied;
 
-    public OccupancyRecord(int timestamp, Occupancy occupancyLevel) {
+    public OccupancyRecord(long timestamp, Occupancy occupancyLevel, Boolean closed, Boolean wifiIssue, Boolean reserved, Boolean fullyOccupied) {
         this.timestamp = timestamp;
         this.occupancyLevel = occupancyLevel;
+        this.closed = closed;
+        this.wifiIssue = wifiIssue;
+        this.reserved = reserved;
+        this.fullyOccupied = fullyOccupied;
     }
 
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Occupancy getOccupancyLevel() {
-        return occupancyLevel;
-    }
-
-    public void setOccupancyLevel(Occupancy occupancyLevel) {
-        this.occupancyLevel = occupancyLevel;
-    }
 }

@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import BackendTest from "./components/BackendTest";
 import LineTrial from "./pages/Line-trial";
+import MapView from './pages/Map-trial';
 
 
 
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/backendtest" element={<BackendTest />} />
                 <Route path="/line-chart" element={<LineTrial />} />
+                <Route path="/mapview" element={<MapView />} />
             </Routes>
         </Router>
     );
