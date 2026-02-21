@@ -2,12 +2,19 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
 import SearchBar from "../components/SearchBar";
 import { getAllSpaces } from "../services/apiServices";
+import { useNavigate, useLocation } from "react-router-dom";
+
+
 
 function Search() {
   const [query, setQuery] = useState("");
   const [spaces, setSpaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const activeFilters = location.state?.filters || null;
 
   useEffect(() => {
     loadSpaces();
@@ -55,13 +62,27 @@ function Search() {
   const hasQuery = normalizedQuery.length > 0;
 
   const matchesQuery = (space) => {
-    if (!hasQuery) return true;
+  const text =
+    `${space.roomLocation ?? ""} ${space.notes ?? ""}`.toLowerCase();
 
-    const text =
-      `${space.roomLocation ?? ""} ${space.notes ?? ""}`.toLowerCase();
+  const matchesText =
+    !hasQuery || text.includes(normalizedQuery);
 
-    return text.includes(normalizedQuery);
-  };
+  if (!activeFilters) return matchesText;
+
+  const matchesOccupancy =
+    !activeFilters.preferredOccupancy ||
+    space.occupancy?.toUpperCase() ===
+      activeFilters.preferredOccupancy;
+
+  const matchesNoise =
+    !activeFilters.preferredNoiseLevel ||
+    space.noiseLevel?.toUpperCase().includes(
+      activeFilters.preferredNoiseLevel.replace("_", " ")
+    );
+
+  return matchesText && matchesOccupancy && matchesNoise;
+};
 
   const filterMatchScore = () => 1; // placeholder until filters are added
 
@@ -83,14 +104,13 @@ function Search() {
 
       <div className="mb-4">
         <SearchBar
-          value={query}
-          onChange={setQuery}
-          onFilterClick={() => console.log("Open filters (later)")}
-          placeholder="Search by name, building, or location..."
+        value={query}
+        onChange={setQuery}
+        onFilterClick={() => navigate("/filters", { state: { filters: activeFilters } })}
+        placeholder="Search by name, building, or location..."
         />
       </div>
-
-      {/* Error Block (kept from main) */}
+        {/* Error Block (kept from main) */}
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError(null)}>
           <Alert.Heading>Connection Error</Alert.Heading>
