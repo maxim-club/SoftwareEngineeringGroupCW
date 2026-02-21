@@ -17,7 +17,7 @@ function Search() {
       setLoading(true);
       setError(null);
 
-      // Temporary sample data to test the UI (replace with API data later)
+ 
       const sampleSpaces = [
         {
           id: "1",
@@ -66,7 +66,7 @@ function Search() {
     const suggestionsList = isSearching
       ? spaces
           .filter((s) => !resultsList.includes(s))
-          .map((s) => ({ ...s, _score: 1 })) // placeholder until ranking is added
+          .map((s) => ({ ...s, _score: 1 })) 
       : [];
 
     return { results: resultsList, suggestions: suggestionsList };
@@ -87,19 +87,15 @@ function Search() {
 
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError(null)}>
-          <Alert.Heading>Connection Error</Alert.Heading>
+          <Alert.Heading>Error loading spaces</Alert.Heading>
           <p>{error}</p>
           <hr />
           <p className="mb-0">
             <strong>Troubleshooting:</strong>
             <ul>
-              <li>
-                Make sure backend is running: <code>./gradlew bootRun</code>
-              </li>
+              <li>Make sure backend is running: <code>./gradlew bootRun</code></li>
               <li>Check backend is on port 8080</li>
-              <li>
-                Try: <code>curl http://localhost:8080/api/spaces</code>
-              </li>
+              <li>Try: <code>curl http://localhost:8080/api/spaces</code></li>
             </ul>
           </p>
         </Alert>
@@ -120,9 +116,9 @@ function Search() {
                 <Card.Body>
                   <h5 className="text-success">✅ API Connected!</h5>
                   <p className="text-muted mb-0">
-                    Backend is working but database is empty.
+                    
                     <br />
-                    Ask backend team to seed MongoDB with test data.
+                
                   </p>
                 </Card.Body>
               </Card>
