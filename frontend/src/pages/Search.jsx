@@ -24,8 +24,9 @@ function Search() {
     try {
       setLoading(true);
       setError(null);
-     // const data = await getAllSpaces();
-      const mockSpaces = [
+
+ 
+      const sampleSpaces = [
         {
           id: "1",
           roomLocation: "Library Study Room",
@@ -49,14 +50,14 @@ function Search() {
         },
       ];
 
-      // if API returns nothing, use fake data for UI testing
-      setSpaces(mockSpaces);
+      setSpaces(sampleSpaces);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   }
+
 
   const normalizedQuery = query.trim().toLowerCase();
   const hasQuery = normalizedQuery.length > 0;
@@ -86,17 +87,28 @@ function Search() {
 
   const filterMatchScore = () => 1; // placeholder until filters are added
 
-  const { results, suggestions } = useMemo(() => {
-    const resultsList = spaces.filter(matchesQuery);
+  const hasQuery = query.trim().length > 0;
 
-    const suggestionsList = hasQuery
+
+  const { results, suggestions } = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const isSearching = normalized.length > 0;
+
+    const resultsList = spaces.filter((space) => {
+      if (!isSearching) return true;
+
+      const text = `${space.roomLocation ?? ""} ${space.notes ?? ""}`.toLowerCase();
+      return text.includes(normalized);
+    });
+
+    const suggestionsList = isSearching
       ? spaces
           .filter((s) => !resultsList.includes(s))
-          .map((s) => ({ ...s, _score: filterMatchScore(s) }))
+          .map((s) => ({ ...s, _score: 1 })) 
       : [];
 
     return { results: resultsList, suggestions: suggestionsList };
-  }, [spaces, query, hasQuery]);
+  }, [spaces, query]);
 
   return (
     <Container className="mt-4">
@@ -110,28 +122,23 @@ function Search() {
         placeholder="Search by name, building, or location..."
         />
       </div>
-        {/* Error Block (kept from main) */}
+
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError(null)}>
-          <Alert.Heading>Connection Error</Alert.Heading>
+          <Alert.Heading>Error loading spaces</Alert.Heading>
           <p>{error}</p>
           <hr />
           <p className="mb-0">
             <strong>Troubleshooting:</strong>
             <ul>
-              <li>
-                Make sure backend is running: <code>./gradlew bootRun</code>
-              </li>
+              <li>Make sure backend is running: <code>./gradlew bootRun</code></li>
               <li>Check backend is on port 8080</li>
-              <li>
-                Try: <code>curl http://localhost:8080/api/spaces</code>
-              </li>
+              <li>Try: <code>curl http://localhost:8080/api/spaces</code></li>
             </ul>
           </p>
         </Alert>
       )}
 
-      {/* Loading Spinner (kept from main) */}
       {loading ? (
         <div className="text-center my-5">
           <Spinner animation="border" role="status">
@@ -142,45 +149,34 @@ function Search() {
       ) : (
         <Row>
           <Col md={12}>
-
-            {/* API Connected but Empty (kept from main) */}
             {spaces.length === 0 && (
               <Card className="text-center mb-3">
                 <Card.Body>
                   <h5 className="text-success">✅ API Connected!</h5>
                   <p className="text-muted mb-0">
-                    Backend is working but database is empty.
+                    
                     <br />
-                    Ask backend team to seed MongoDB with test data.
+                
                   </p>
                 </Card.Body>
               </Card>
             )}
 
-            {/* Results / Recommendations Card */}
             {spaces.length > 0 && (
               <Card>
                 <Card.Body>
-
-                  {/* Dynamic Title */}
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h5 className="mb-0">
-                      {hasQuery
-                        ? `Results for “${query.trim()}”`
-                        : "Recommendations"}
+                      {hasQuery ? `Results for "${query.trim()}"` : "Recommendations"}
                     </h5>
 
                     {!hasQuery && (
-                      <span
-                        className="text-muted"
-                        style={{ cursor: "pointer" }}
-                      >
+                      <span className="text-muted" style={{ cursor: "pointer" }}>
                         See all
                       </span>
                     )}
                   </div>
 
-                  {/* Results */}
                   {results.map((space) => (
                     <div key={space.id} className="mb-3">
                       <strong>{space.roomLocation}</strong>
@@ -190,39 +186,19 @@ function Search() {
                     </div>
                   ))}
 
-                  {/* No matches */}
                   {hasQuery && results.length === 0 && (
                     <p className="text-muted">No results found.</p>
                   )}
 
-                  {/* Suggestions Divider */}
                   {hasQuery && suggestions.length > 0 && (
                     <>
                       <div
                         className="my-4 text-center text-muted"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                        }}
+                        style={{ display: "flex", alignItems: "center", gap: "12px" }}
                       >
-                        <div
-                          style={{
-                            flex: 1,
-                            height: "1px",
-                            background: "#e9ecef",
-                          }}
-                        />
-                        <span style={{ whiteSpace: "nowrap" }}>
-                          More suggestions
-                        </span>
-                        <div
-                          style={{
-                            flex: 1,
-                            height: "1px",
-                            background: "#e9ecef",
-                          }}
-                        />
+                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+                        <span style={{ whiteSpace: "nowrap" }}>More suggestions</span>
+                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
                       </div>
 
                       {suggestions.map((space) => (
@@ -235,11 +211,9 @@ function Search() {
                       ))}
                     </>
                   )}
-
                 </Card.Body>
               </Card>
             )}
-
           </Col>
         </Row>
       )}
