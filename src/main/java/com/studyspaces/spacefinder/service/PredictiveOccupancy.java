@@ -6,6 +6,13 @@ import com.studyspaces.spacefinder.repository.RealTimeOccupancyRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import smile.data.DataFrame;
+import smile.data.vector.*;
+import smile.regression.*;
+
+import java.time.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.Map;
 
 /**
