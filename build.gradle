@@ -49,6 +49,10 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 	testImplementation 'org.mockito:mockito-core:5.10.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
+
+	// Smile library
+	implementation("com.github.haifengl:smile-core:5.2.0")
+	implementation("com.github.haifengl:smile-deep:5.2.0")
 }
 
 tasks.named('test') {
