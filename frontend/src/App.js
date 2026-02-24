@@ -5,6 +5,7 @@ import Search from './pages/Search';
 import BackendTest from "./components/BackendTest";
 import LineTrial from "./pages/Line-trial";
 import MapView from './pages/Map-trial';
+import SpaceDetailPage from './pages/SpaceDetailPage';
 
 
 
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/backendtest" element={<BackendTest />} />
                 <Route path="/line-chart" element={<LineTrial />} />
                 <Route path="/mapview" element={<MapView />} />
+                <Route path="/space/:id" element={<SpaceDetailPage />} />
             </Routes>
         </Router>
     );
