@@ -50,67 +50,50 @@ export default function StudySpacesMap() {
     }, []);
 
     useEffect(() => {
-        if (!navigator.geolocation) return;
-            navigator.geolocation.getCurrentPosition(
-                (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                () => {},
-                { enableHighAccuracy: true, timeout: 8000 }
+        if (!navigator.geolocation) {
+            console.error("Geolocation not supported");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+            const loc = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+            };
+            console.log("User location:", loc);
+            setUserLoc(loc);
+            },
+            (err) => {
+            console.error("Geolocation error:", err);
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
         );
-    }, []);
+        }, []);
 
     const center = userLoc ?? defaultCenter;
 
 
     return (
-        <div className="ui-card">
-            <div className="ui-row-between">
-                <div>
-                    <div className="text-title">Study Spaces Map</div>
-                    <div className="text-muted">
-                        Map shows your location and study spaces
-                    </div>
-                </div>
-
-            <div className="ui-row-center">
-                <button
-                    className="ui-button"
-                    onClick={() => {
-                        if (!navigator.geolocation) return;
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                        setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-                        });
-                    }}
-                    >
-                    Recenter to me
-                </button>
-                <span className="ui-chip">
-                    {studySpaces.length} spaces
-                </span>
-
-                <span className="ui-chip">
-                    {userLoc ? "Your Location On" : "Your Location Off"}
-                </span>
-            </div>
-        </div>
-
-        <div className="map-container">
-            <MapContainer center={center} zoom={16} style={{ height: "100%", width: "100%" }}>
-            <InvalidateSizeOnMount />
-            <Recenter center={center} />
-
-            <TileLayer
-                attribution='&copy; OpenStreetMap contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-
-            {userLoc && (
+        <MapContainer center={center} zoom={16} style={{ height: "100%", width: "100%" }}>
+        <InvalidateSizeOnMount />
+        <Recenter center={center} />
+        <TileLayer
+            attribution='&copy; OpenStreetMap contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {userLoc && (
                 <Marker position={userLoc} icon={userIcon}>
                 <Popup>You are here</Popup>
                 </Marker>
             )}
 
             {studySpaces.map((s) => (
-                <Marker key={s.id} position={{ lat: s.lat, lng: s.lng }} icon={studyIcon}>
+                <Marker 
+                    key={s.id} 
+                    position={{ lat: s.lat, lng: s.lng }} 
+                    icon={studyIcon} 
+                >
                 <Popup>
                     <strong>{s.name}</strong>
                     {Array.isArray(s.tags) && s.tags.length > 0 && (
@@ -127,13 +110,5 @@ export default function StudySpacesMap() {
                 </Marker>
             ))}
             </MapContainer>
-        </div>
-
-        <div className="ui-row-wrap" style={{ marginTop: 12 }}>
-            <strong className="text-sm-strong">Tips:</strong>
-            <span className="ui-chip">Click a pin for details</span>
-            <span className="ui-chip">Allow location to show “Your” pin</span>
-        </div>
-    </div>
   );
 }
