@@ -29,6 +29,22 @@ const profileMock = {
       timeRange: "13:00 - 13:30",
       durationText: "0 Hour 30 Minutes",
     },
+    {
+      id: 3,
+      placeName: "EB 0.11",
+      placeSub: "East building",
+      date: "17/02/2026",
+      timeRange: "14:25 - 16:25",
+      durationText: "2 Hour 0 Minutes",
+    },
+    {
+      id: 4,
+      placeName: "Pavilion Café",
+      placeSub: "Management building",
+      date: "15/02/2026",
+      timeRange: "13:45 - 17:55",
+      durationText: "4 Hour 10 Minutes",
+    },
   ],
 };
 
@@ -40,7 +56,7 @@ function isValidProfile(data) {
   return data && data.user && data.totals && data.totals.today && Array.isArray(data.checkins);
 }
 
-export default function Profile() {
+export default function UserProfile() {
   const [profile, setProfile] = useState(profileMock);
   const [usingMock, setUsingMock] = useState(true);
 
@@ -64,13 +80,18 @@ export default function Profile() {
   return (
     <div className="profile-page">
       <div className="profile-container">
+        {/* Title (ellipsized by CSS if long) */}
         <h1 className="profile-title">{profile.user.name}’s Account</h1>
 
         {/* Account card */}
         <div className="account-card">
           <div className="account-left">
             <div className="avatar-circle">
-              <span className="avatar-emoji">👩🏻</span>
+              {profile.user.avatarUrl ? (
+                <img className="avatar-img" src={profile.user.avatarUrl} alt="avatar" />
+              ) : (
+                <span className="avatar-emoji">👩🏻</span>
+              )}
             </div>
 
             <div className="account-meta">
@@ -90,53 +111,55 @@ export default function Profile() {
 
         {usingMock && <div className="profile-hint">Showing demo data (backend not connected)</div>}
 
-        {/* Labels row  */}
-        <div className="segmented segmented-static">
-          <div className="seg-pill">Today</div>
-          <div className="seg-pill">This week</div>
-          <div className="seg-pill">This month</div>
-        </div>
-
-        {/* 3 duration cards */}
+        {/* Duration cards (with attached blue headers, like your Isaree design) */}
         <div className="duration-grid">
           <div className="duration-card">
-            <div className="duration-time">
-              <span className="duration-num">{pad2(profile.totals.today.hours)}</span>
-              <span className="duration-colon">:</span>
-              <span className="duration-num">{pad2(profile.totals.today.minutes)}</span>
-            </div>
-            <div className="duration-label">
-              <span>hours</span>
-              <span>minutes</span>
-            </div>
-          </div>
-
-          <div className="duration-card">
-            <div className="duration-time">
-              <span className="duration-num">{pad2(profile.totals.week.hours)}</span>
-              <span className="duration-colon">:</span>
-              <span className="duration-num">{pad2(profile.totals.week.minutes)}</span>
-            </div>
-            <div className="duration-label">
-              <span>hours</span>
-              <span>minutes</span>
+            <div className="duration-header">Today</div>
+            <div className="duration-body">
+              <div className="duration-time">
+                <span className="duration-num">{pad2(profile.totals.today.hours)}</span>
+                <span className="duration-colon">:</span>
+                <span className="duration-num">{pad2(profile.totals.today.minutes)}</span>
+              </div>
+              <div className="duration-label">
+                <span>hours</span>
+                <span>minutes</span>
+              </div>
             </div>
           </div>
 
           <div className="duration-card">
-            <div className="duration-time">
-              <span className="duration-num">{pad2(profile.totals.month.hours)}</span>
-              <span className="duration-colon">:</span>
-              <span className="duration-num">{pad2(profile.totals.month.minutes)}</span>
+            <div className="duration-header">This week</div>
+            <div className="duration-body">
+              <div className="duration-time">
+                <span className="duration-num">{pad2(profile.totals.week.hours)}</span>
+                <span className="duration-colon">:</span>
+                <span className="duration-num">{pad2(profile.totals.week.minutes)}</span>
+              </div>
+              <div className="duration-label">
+                <span>hours</span>
+                <span>minutes</span>
+              </div>
             </div>
-            <div className="duration-label">
-              <span>hours</span>
-              <span>minutes</span>
+          </div>
+
+          <div className="duration-card">
+            <div className="duration-header">This month</div>
+            <div className="duration-body">
+              <div className="duration-time">
+                <span className="duration-num">{pad2(profile.totals.month.hours)}</span>
+                <span className="duration-colon">:</span>
+                <span className="duration-num">{pad2(profile.totals.month.minutes)}</span>
+              </div>
+              <div className="duration-label">
+                <span>hours</span>
+                <span>minutes</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Check-ins */}
+        {/* Check-in history */}
         <h2 className="history-title">Check-in History</h2>
 
         <div className="history-list">
