@@ -7,7 +7,6 @@ export default function MapPage() {
 
   return (
     <div className="map-page">
-      {/* floating search */}
       <div className="map-search">
         <SearchBar
           value={q}
@@ -18,7 +17,6 @@ export default function MapPage() {
         />
       </div>
 
-      {/* map goes behind */}
       <div className="map-full">
         <StudySpacesMap />
       </div>
