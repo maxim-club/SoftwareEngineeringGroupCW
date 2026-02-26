@@ -25,9 +25,7 @@ public class SpaceController {
         this.profileManager = profileManager;
     }
 
-    // ==========================================
-    // CORE RETRIEVAL (Map Pins & Details)
-    // ==========================================
+    // RETRIEVAL (map pins & space details)
 
     @GetMapping
     public List<StudySpaceProfile> getAllSpaces() {
@@ -41,9 +39,7 @@ public class SpaceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ==========================================
-    // ADVANCED SEARCH & RECOMMENDATION ENGINE
-    // ==========================================
+    // ADVANCED SEARCH & RECOMMENDATION
 
     @PostMapping("/recommended")
     public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request) {
@@ -53,14 +49,14 @@ public class SpaceController {
 
     @PostMapping("/recommendedSearch")
     public SearchResponseDTO getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request) {
-        // 1. Safely extract the raw query
+        // extract raw query
         String rawQuery = request.getSearchBarBuildingQuery();
         String searchTerm = (rawQuery != null) ? rawQuery.toLowerCase() : "";
 
         List<StudySpaceProfile> exactMatches = new ArrayList<>();
 
-        // 2. Process Exact Text Matches (if a search term was provided)
-        if (!searchTerm.isBlank()) { // Java 11+ optimization over isEmpty()
+        // 2. find exact matches (if search term provided)
+        if (!searchTerm.isBlank()) {
             List<StudySpaceProfile> allRooms = profileManager.getAll();
             exactMatches = allRooms.stream()
                     .filter(room -> {
@@ -70,14 +66,14 @@ public class SpaceController {
                                 room.getNotes().toLowerCase().contains(searchTerm);
                         return matchesLocation || matchesNotes;
                     })
-                    .toList(); // Modern Java Stream toList()
+                    .toList();
         }
 
-        // 3. Process Recommendations via KNN Algorithm
+        // recommendations
         List<String> ids = RoomSearcher.getSortedByRecommended(request.getFilters());
         List<StudySpaceProfile> recommendations = profileManager.getByIds(ids);
 
-        // 4. Deduplicate (Remove exact matches from the recommendation list)
+        // remove duplicates
         final List<StudySpaceProfile> finalExactMatches = exactMatches;
         recommendations = recommendations.stream()
                 .filter(rec -> !finalExactMatches.contains(rec))
@@ -86,9 +82,8 @@ public class SpaceController {
         return new SearchResponseDTO(exactMatches, recommendations);
     }
 
-    // ==========================================
-    // QUICK FILTERS (Retained for simple frontend usage)
-    // ==========================================
+    // QUICK FILTERS
+    // old code, can be removed if not used
 
     @GetMapping("/filter/noise")
     public List<StudySpaceProfile> getByNoise(@RequestParam NoiseLevel level) {
