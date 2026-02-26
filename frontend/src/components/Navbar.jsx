@@ -25,7 +25,7 @@ function AppNavbar() {
           <div className="tab-label">Map</div>
         </Nav.Link>
 
-        <Nav.Link as={Link} to="/account" className={isActive("/account") ? "active" : ""}>
+        <Nav.Link as={Link} to="/profile" className={isActive("/profile") ? "active" : ""}>
           <Person size={22} />
           <div className="tab-label">Account</div>
         </Nav.Link>
