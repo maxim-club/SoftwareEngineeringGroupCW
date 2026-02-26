@@ -1,239 +1,364 @@
-import React, { useState } from "react";
-import { Container, Card, Button, Row, Col } from "react-bootstrap";
+import React, { useMemo, useState } from "react";
+import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FiX } from "react-icons/fi";
 
 function Filters() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If user re-opens filters, keep their previous selections
-  const initial = location.state?.filters || {
-    preferredOccupancy: null,        // "EMPTY" | "FREE" | "MODERATE" | "BUSY"
-    preferredNoiseLevel: null,       // "SILENT" | "QUIET_DISCUSSION" | "MODERATE" | "LOUD"
-    preferredGroupSpace: null,       // true | false | null
-    preferredGroupSize: null,        // number | null
-    preferredAmenities: {
-      plugSockets: false,
-      desks: false,
-      computers: false,
-      printers: false,
-      foodAllowed: false,
-      waterFountainNearby: false,
-      toiletNearby: false,
-      wheelchairAccessible: false,
-    },
+  const existing = location.state?.filters || null;
+
+  // Location 
+  const [useCurrentLocation, setUseCurrentLocation] = useState(
+    existing?.useCurrentLocation ?? false
+  );
+
+  // Amenities 
+  const allAmenities = useMemo(
+    () => [
+      { key: "projectors", label: "Projectors", icon: "🎞️" },
+      { key: "printer", label: "Printer", icon: "🖨️" },
+      { key: "whiteboard", label: "Whiteboard", icon: "🧾" },
+      { key: "powerOutlets", label: "Power Outlets", icon: "🔌" },
+      { key: "naturalLights", label: "Natural Lighting", icon: "🌤️" },
+      { key: "monitor", label: "Monitor", icon: "🖥️" },
+      { key: "quietZone", label: "Quiet Zone", icon: "🤫" },
+      { key: "heaters", label: "Heaters", icon: "♨️" },
+      { key: "wheelchairAccess", label: "Wheelchair Access", icon: "♿" },
+    ],
+    []
+  );
+
+  const [selectedAmenities, setSelectedAmenities] = useState(existing?.amenities ?? {});
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const visibleAmenities = showAllAmenities ? allAmenities : allAmenities.slice(0, 6);
+
+  const toggleAmenity = (key) => {
+    setSelectedAmenities((prev) => ({ ...prev, [key]: !prev?.[key] }));
   };
 
-  const [filters, setFilters] = useState(initial);
+  // --- Number of people (default: NONE) ---
+  const peopleLabels = ["1", "2-3", "4-5", "6-8", "8-10", "10+"];
 
-  const setAmenity = (key) => {
-    setFilters((prev) => ({
-      ...prev,
-      preferredAmenities: {
-        ...prev.preferredAmenities,
-        [key]: !prev.preferredAmenities[key],
-      },
-    }));
+  const [peopleIndex, setPeopleIndex] = useState(
+    typeof existing?.peopleIndex === "number" ? existing.peopleIndex : null
+  );
+
+  // Other filters 
+ 
+  const initMulti = (val) => {
+    if (val && typeof val === "object" && !Array.isArray(val)) return val;
+    if (typeof val === "string" && val.length) return { [val]: true };
+    return {};
   };
 
-  const clearAll = () => {
-    setFilters({
-      preferredOccupancy: null,
-      preferredNoiseLevel: null,
-      preferredGroupSpace: null,
-      preferredGroupSize: null,
-      preferredAmenities: {
-        plugSockets: false,
-        desks: false,
-        computers: false,
-        printers: false,
-        foodAllowed: false,
-        waterFountainNearby: false,
-        toiletNearby: false,
-        wheelchairAccessible: false,
-      },
+  const [atmosphere, setAtmosphere] = useState(initMulti(existing?.atmosphere));
+  const [foodPolicy, setFoodPolicy] = useState(initMulti(existing?.foodPolicy));
+  const [reviews, setReviews] = useState(initMulti(existing?.reviews));
+
+  const toggleMulti = (setter) => (key) => {
+    setter((prev) => ({ ...(prev || {}), [key]: !prev?.[key] }));
+  };
+
+  const toggleAtmosphere = toggleMulti(setAtmosphere);
+
+
+  const toggleFoodPolicy = (key) => {
+    setFoodPolicy((prev) => {
+      const next = { ...(prev || {}) };
+
+      if (key === "Any") {
+        const willBeOn = !next.Any;
+        return willBeOn ? { Any: true } : {};
+      }
+
+
+      next[key] = !next[key];
+
+      // if any specific policy is selected, ensure Any is off
+      if (next[key]) delete next.Any;
+
+      // if key was turned off and nothing left, keep as {}
+      const hasAny = Object.values(next).some(Boolean);
+      return hasAny ? next : {};
     });
   };
 
-  const applyFilters = () => {
-    // go back to Search page and pass filters along
-    navigate("/search", { state: { filters } });
+  const toggleReviews = toggleMulti(setReviews);
+
+  const accessibilityOptions = [
+    { key: "wheelchairAccess", label: "Wheelchair Access" },
+    { key: "liftAccess", label: "Lift Access" },
+    { key: "stepFreeAccess", label: "Step-free Access" },
+  ];
+  const [accessibility, setAccessibility] = useState(existing?.accessibility ?? {});
+
+  const toggleAccessibility = (key) => {
+    setAccessibility((prev) => ({ ...prev, [key]: !prev?.[key] }));
   };
 
-  const Chip = ({ active, onClick, children }) => (
+  const onReset = () => {
+    setUseCurrentLocation(false);
+    setSelectedAmenities({});
+    setShowAllAmenities(false);
+    setPeopleIndex(null);
+    setAtmosphere({});
+    setFoodPolicy({});
+    setReviews({});
+    setAccessibility({});
+  };
+
+  const onApply = () => {
+    const filtersToSend = {
+      useCurrentLocation,
+      amenities: selectedAmenities,
+      peopleIndex,
+      atmosphere,  
+      foodPolicy,  
+      reviews,     
+      accessibility,
+    };
+
+    navigate("/filtered-results", { state: { filters: filtersToSend } });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onApply();
+  };
+
+  const Pill = ({ active, children }) => (
     <Button
-      variant={active ? "primary" : "outline-secondary"}
-      size="sm"
-      className="me-2 mb-2"
-      onClick={onClick}
+      type="button"
+      variant={active ? "primary" : "outline-primary"}
+      className="rounded-pill px-3 py-1"
+      style={{ fontWeight: 600 }}
     >
       {children}
     </Button>
   );
 
   return (
-    <Container className="mt-4" style={{ maxWidth: 600 }}>
-      <div className="d-flex align-items-center mb-3">
-        <Button variant="link" className="p-0 me-2" onClick={() => navigate(-1)}>
-          ←
-        </Button>
-        <h3 className="mb-0">Filters</h3>
-      </div>
+    <form onSubmit={handleSubmit}>
+      <Container className="mt-4" style={{ maxWidth: 520 }}>
+        {/* Header */}
+        <div className="d-flex align-items-center gap-2 mb-3">
+          <Button
+            type="button"
+            variant="link"
+            className="p-0 text-decoration-none"
+            onClick={() => navigate("/search")}
+            aria-label="Close"
+            style={{ fontSize: 28, lineHeight: "28px" }}
+          >
+            <FiX size={24} />
+          </Button>
 
-      <Card className="mb-3">
-        <Card.Body>
-          <h6>Occupancy</h6>
-          <div>
-            {["EMPTY", "FREE", "MODERATE", "BUSY"].map((lvl) => (
-              <Chip
-                key={lvl}
-                active={filters.preferredOccupancy === lvl}
-                onClick={() =>
-                  setFilters((p) => ({
-                    ...p,
-                    preferredOccupancy: p.preferredOccupancy === lvl ? null : lvl,
-                  }))
-                }
+          <h1 className="m-0" style={{ fontSize: 44, fontWeight: 800 }}>
+            Filter
+          </h1>
+        </div>
+
+        {/* Top pills row (visual only) */}
+        <div className="d-flex gap-2 mb-3 flex-wrap">
+          <Pill active>Location</Pill>
+          <Pill>Filter building</Pill>
+          <Pill>Filter time</Pill>
+        </div>
+
+        {/* Location */}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Location</div>
+            <hr className="my-3" />
+            <div className="d-flex justify-content-between align-items-center">
+              <div>Use My Current Location</div>
+              <Form.Check
+                type="switch"
+                checked={useCurrentLocation}
+                onChange={(e) => setUseCurrentLocation(e.target.checked)}
+              />
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* Amenities */}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Amenities</div>
+            <hr className="my-3" />
+
+            <div className="d-flex flex-column gap-3">
+              {visibleAmenities.map((a) => (
+                <div key={a.key} className="d-flex align-items-center justify-content-between">
+                  <div className="d-flex align-items-center gap-2">
+                    <span style={{ width: 22, textAlign: "center" }}>{a.icon}</span>
+                    <span>{a.label}</span>
+                  </div>
+                  <Form.Check
+                    type="checkbox"
+                    checked={!!selectedAmenities?.[a.key]}
+                    onChange={() => toggleAmenity(a.key)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-3">
+              <Button
+                type="button"
+                variant="link"
+                className="text-decoration-none"
+                onClick={() => setShowAllAmenities((v) => !v)}
+                style={{ color: "#0B5ED7", fontWeight: 600 }}
               >
-                {lvl}
-              </Chip>
-            ))}
-          </div>
-        </Card.Body>
-      </Card>
+                {showAllAmenities ? "Show less ▲" : "Show more ▼"}
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
 
-      <Card className="mb-3">
-        <Card.Body>
-          <h6>Atmosphere</h6>
-          <div>
+        {/* Number of people */}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Number of people</div>
+            <hr className="my-3" />
+
+            <Form.Range
+              min={0}
+              max={5}
+              step={1}
+              value={peopleIndex ?? 0}
+              onChange={(e) => setPeopleIndex(Number(e.target.value))}
+            />
+
+            <div className="d-flex justify-content-between mt-2" style={{ color: "#6c757d" }}>
+              {peopleLabels.map((label, idx) => (
+                <span
+                  key={label}
+                  style={{
+                    fontWeight: idx === peopleIndex ? 700 : 400,
+                    color: idx === peopleIndex ? "#111" : "#6c757d",
+                  }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* Atmosphere (multi-select)*/}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Atmosphere</div>
+            <hr className="my-3" />
+
+            {["Silent", "Quiet", "Moderate", "Collaborative"].map((v) => (
+              <Form.Check
+                key={v}
+                type="checkbox"
+                label={v}
+                className="mb-2"
+                checked={!!atmosphere?.[v]}
+                onChange={() => toggleAtmosphere(v)}
+              />
+            ))}
+          </Card.Body>
+        </Card>
+
+        {/* Food Policy (multi-select) */}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Food Policy</div>
+            <hr className="my-3" />
+
+            {["Food Allowed", "Drinks Only", "No Food/Drinks", "Any"].map((v) => (
+              <Form.Check
+                key={v}
+                type="checkbox"
+                label={v}
+                className="mb-2"
+                checked={!!foodPolicy?.[v]}
+                onChange={() => toggleFoodPolicy(v)}
+              />
+            ))}
+          </Card.Body>
+        </Card>
+
+        {/* Reviews (✅ multi-select) */}
+        <Card className="mb-3" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Reviews</div>
+            <hr className="my-3" />
+
             {[
-              { key: "SILENT", label: "Silent" },
-              { key: "QUIET_DISCUSSION", label: "Quiet discussion" },
-              { key: "MODERATE", label: "Moderate" },
-              { key: "LOUD", label: "Loud" },
-            ].map((n) => (
-              <Chip
-                key={n.key}
-                active={filters.preferredNoiseLevel === n.key}
-                onClick={() =>
-                  setFilters((p) => ({
-                    ...p,
-                    preferredNoiseLevel: p.preferredNoiseLevel === n.key ? null : n.key,
-                  }))
-                }
-              >
-                {n.label}
-              </Chip>
+              { key: "4.5+", label: "4.5 and above", stars: "★★★★★" },
+              { key: "4.0-4.5", label: "4.0 - 4.5", stars: "★★★★☆" },
+              { key: "3.5-4.0", label: "3.5 - 4.0", stars: "★★★☆☆" },
+              { key: "3.0-3.5", label: "3.0 - 3.5", stars: "★★☆☆☆" },
+            ].map((r) => (
+              <div key={r.key} className="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <div style={{ color: "#f4b400", letterSpacing: 1 }}>{r.stars}</div>
+                  <div style={{ color: "#6c757d", fontSize: 14 }}>{r.label}</div>
+                </div>
+                <Form.Check
+                  type="checkbox"
+                  checked={!!reviews?.[r.key]}
+                  onChange={() => toggleReviews(r.key)}
+                />
+              </div>
             ))}
-          </div>
-        </Card.Body>
-      </Card>
+          </Card.Body>
+        </Card>
 
-      <Card className="mb-3">
-        <Card.Body>
-          <h6>Seats</h6>
-          <div>
-            <Chip
-              active={filters.preferredGroupSize === 4}
-              onClick={() =>
-                setFilters((p) => ({
-                  ...p,
-                  preferredGroupSize: p.preferredGroupSize === 4 ? null : 4,
-                }))
-              }
+        {/* Accessibility (multi-select) */}
+        <Card className="mb-4" style={{ borderRadius: 18 }}>
+          <Card.Body className="py-3">
+            <div className="fw-semibold">Accessibility</div>
+            <hr className="my-3" />
+
+            {accessibilityOptions.map((a) => (
+              <div key={a.key} className="d-flex justify-content-between align-items-center mb-2">
+                <div>{a.label}</div>
+                <Form.Check
+                  type="checkbox"
+                  checked={!!accessibility?.[a.key]}
+                  onChange={() => toggleAccessibility(a.key)}
+                />
+              </div>
+            ))}
+          </Card.Body>
+        </Card>
+
+        {/* Bottom buttons */}
+        <Row className="g-2 mb-4">
+          <Col>
+            <Button
+              type="button"
+              variant="outline-primary"
+              className="w-100"
+              style={{ borderRadius: 999, height: 48, fontWeight: 700 }}
+              onClick={onReset}
             >
-              1–4
-            </Chip>
-
-            <Chip
-              active={filters.preferredGroupSize === 8}
-              onClick={() =>
-                setFilters((p) => ({
-                  ...p,
-                  preferredGroupSize: p.preferredGroupSize === 8 ? null : 8,
-                }))
-              }
+              Reset Filter
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-100"
+              style={{ borderRadius: 999, height: 48, fontWeight: 700 }}
             >
-              5–8
-            </Chip>
-
-            <Chip
-              active={filters.preferredGroupSize === 9}
-              onClick={() =>
-                setFilters((p) => ({
-                  ...p,
-                  preferredGroupSize: p.preferredGroupSize === 9 ? null : 9,
-                }))
-              }
-            >
-              9+
-            </Chip>
-          </div>
-          <div className="text-muted small mt-1">
-          </div>
-        </Card.Body>
-      </Card>
-
-      <Card className="mb-3">
-        <Card.Body>
-          <h6>Type</h6>
-          <div>
-            <Chip
-              active={filters.preferredGroupSpace === false}
-              onClick={() =>
-                setFilters((p) => ({
-                  ...p,
-                  preferredGroupSpace: p.preferredGroupSpace === false ? null : false,
-                }))
-              }
-            >
-              Individual
-            </Chip>
-            <Chip
-              active={filters.preferredGroupSpace === true}
-              onClick={() =>
-                setFilters((p) => ({
-                  ...p,
-                  preferredGroupSpace: p.preferredGroupSpace === true ? null : true,
-                }))
-              }
-            >
-              Group
-            </Chip>
-          </div>
-        </Card.Body>
-      </Card>
-
-      <Card className="mb-3">
-        <Card.Body>
-          <h6>Amenities</h6>
-          <div>
-            <Chip active={filters.preferredAmenities.plugSockets} onClick={() => setAmenity("plugSockets")}>
-              Outlets
-            </Chip>
-            <Chip active={filters.preferredAmenities.desks} onClick={() => setAmenity("desks")}>
-              Desks
-            </Chip>
-            <Chip active={filters.preferredAmenities.computers} onClick={() => setAmenity("computers")}>
-              Computers
-            </Chip>
-          </div>
-        </Card.Body>
-      </Card>
-
-      <Row className="mt-3">
-        <Col>
-          <Button variant="outline-secondary" className="w-100" onClick={clearAll}>
-            Clear
-          </Button>
-        </Col>
-        <Col>
-          <Button variant="primary" className="w-100" onClick={applyFilters}>
-            Apply filters
-          </Button>
-        </Col>
-      </Row>
-    </Container>
+              Apply
+            </Button>
+          </Col>
+        </Row>
+      </Container>
+    </form>
   );
 }
 

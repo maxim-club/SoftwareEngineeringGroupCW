@@ -6,6 +6,8 @@ import BackendTest from "./components/BackendTest";
 import LineTrial from "./pages/Line-trial";
 import MapView from './pages/Map-trial';
 import Filters from "./pages/Filters";
+import FilteredResults from "./pages/FilteredResults";
+
 
 
 
@@ -21,6 +23,7 @@ function App() {
                 <Route path="/line-chart" element={<LineTrial />} />
                 <Route path="/mapview" element={<MapView />} />
                 <Route path="/filters" element={<Filters />} />
+                <Route path="/filtered-results" element={<FilteredResults />} />
             </Routes>
         </Router>
     );
