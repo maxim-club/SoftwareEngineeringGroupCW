@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/spaces") // Base URL: localhost:8080/api/spaces
+@RequestMapping("/api/spaces")
 @CrossOrigin(origins = "*")
 public class SpaceController {
 
@@ -26,7 +25,9 @@ public class SpaceController {
         this.profileManager = profileManager;
     }
 
-    // HOME PAGE & MAP
+    // ==========================================
+    // CORE RETRIEVAL (Map Pins & Details)
+    // ==========================================
 
     @GetMapping
     public List<StudySpaceProfile> getAllSpaces() {
@@ -40,23 +41,26 @@ public class SpaceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // RECOMMENDATION & ADVANCED SEARCH
+    // ==========================================
+    // ADVANCED SEARCH & RECOMMENDATION ENGINE
+    // ==========================================
 
     @PostMapping("/recommended")
-    public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request){
+    public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request) {
         List<String> ids = RoomSearcher.getKRecommended(request.getFilters(), 5);
         return profileManager.getByIds(ids);
     }
 
     @PostMapping("/recommendedSearch")
-    public SearchResponseDTO getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request){
+    public SearchResponseDTO getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request) {
+        // 1. Safely extract the raw query
         String rawQuery = request.getSearchBarBuildingQuery();
         String searchTerm = (rawQuery != null) ? rawQuery.toLowerCase() : "";
 
         List<StudySpaceProfile> exactMatches = new ArrayList<>();
 
-        // find exact matches
-        if (!searchTerm.isEmpty()) {
+        // 2. Process Exact Text Matches (if a search term was provided)
+        if (!searchTerm.isBlank()) { // Java 11+ optimization over isEmpty()
             List<StudySpaceProfile> allRooms = profileManager.getAll();
             exactMatches = allRooms.stream()
                     .filter(room -> {
@@ -66,40 +70,25 @@ public class SpaceController {
                                 room.getNotes().toLowerCase().contains(searchTerm);
                         return matchesLocation || matchesNotes;
                     })
-                    .toList();
+                    .toList(); // Modern Java Stream toList()
         }
 
-        // get recommendations
+        // 3. Process Recommendations via KNN Algorithm
         List<String> ids = RoomSearcher.getSortedByRecommended(request.getFilters());
         List<StudySpaceProfile> recommendations = profileManager.getByIds(ids);
 
-        // remove duplicates
-        List<StudySpaceProfile> finalExactMatches = exactMatches; // Need a final variable for the stream
+        // 4. Deduplicate (Remove exact matches from the recommendation list)
+        final List<StudySpaceProfile> finalExactMatches = exactMatches;
         recommendations = recommendations.stream()
                 .filter(rec -> !finalExactMatches.contains(rec))
                 .toList();
 
-        // package into DTO
         return new SearchResponseDTO(exactMatches, recommendations);
     }
 
-    // OLD TEXT SEARCH & FILTERS
-    // can be deleted if not used
-
-    @GetMapping("/search")
-    public List<StudySpaceProfile> searchByKeyword(@RequestParam String q) {
-        List<StudySpaceProfile> byLocation = profileManager.searchByRoomLocationKeyword(q);
-        List<StudySpaceProfile> byNotes = profileManager.searchNotes(q);
-
-        return Stream.concat(byLocation.stream(), byNotes.stream())
-                .filter(distinctByKey(StudySpaceProfile::getId))
-                .collect(Collectors.toList());
-    }
-
-    private static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, ?> keyExtractor) {
-        java.util.Set<Object> seen = java.util.concurrent.ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
+    // ==========================================
+    // QUICK FILTERS (Retained for simple frontend usage)
+    // ==========================================
 
     @GetMapping("/filter/noise")
     public List<StudySpaceProfile> getByNoise(@RequestParam NoiseLevel level) {
