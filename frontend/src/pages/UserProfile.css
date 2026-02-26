@@ -1,7 +1,7 @@
 .profile-page {
-  background: #f6f7f9;
+  background: #f8f9fa;
   min-height: 100vh;
-  padding: 16px 14px 80px;
+  padding: 14px 14px 80px;
 }
 
 .profile-container {
@@ -10,10 +10,13 @@
 }
 
 .profile-title {
-  font-size: 20px;
-  font-weight: 800;
-  margin: 4px 0 6px;
+  font-size: 24px;
+  margin: 2px 0 10px;
   color: #111;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* account card */
@@ -24,7 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px 0 16px;
+  margin: 0 0 14px;
 }
 
 .account-left {
@@ -55,7 +58,6 @@
 }
 
 .account-name {
-  font-weight: 800;
   font-size: 15px;
   color: #111;
   white-space: nowrap;
@@ -77,17 +79,16 @@
   opacity: 0.7;
 }
 
-/* section header: "Your Total Study Duration ⓘ" */
+/* section header */
 .section-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 6px 0 10px;
+  margin: 8px 0 10px;
 }
 
 .section-header h2 {
   font-size: 16px;
-  font-weight: 800;
   margin: 0;
   color: #111;
 }
@@ -97,49 +98,42 @@
   color: #6b7280;
 }
 
-/* segmented buttons */
-.segmented {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
+/* demo hint should not “crush” spacing */
 .profile-hint {
-  font-size: 12px;
+  font-size: 11px;
   color: #6b7280;
-  margin-bottom: 8px;
+  margin: 0 0 10px;
+  line-height: 1.2;
 }
 
-/* static labels row */
-.segmented-static {
-  margin-bottom: 10px;
-}
-
-.seg-pill {
-  border-radius: 10px;
-  padding: 10px 10px;
-  font-weight: 700;
-  font-size: 12px;
-  background: #0d6efd;
-  color: #fff;
-  text-align: center;
-  opacity: 0.9;
-}
-
-/* 3 duration cards row */
+/* duration cards (Isaree style: blue header attached) */
 .duration-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .duration-card {
   background: #fff;
   border-radius: 12px;
   border: 1px solid #e7e9ee;
-  padding: 12px 10px;
+  overflow: hidden; /* ✅ makes header attach nicely */
+}
+
+/* blue header bar */
+.duration-header {
+  background: #0d6efd;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 6px;
+}
+
+/* white body area */
+.duration-body {
+  padding: 10px 10px 12px;
 }
 
 .duration-time {
@@ -152,14 +146,12 @@
 
 .duration-num {
   font-size: 22px;
-  font-weight: 900;
   color: #0d6efd;
   line-height: 1;
 }
 
 .duration-colon {
   font-size: 18px;
-  font-weight: 900;
   color: #0d6efd;
   line-height: 1;
 }
@@ -173,9 +165,8 @@
 
 /* history */
 .history-title {
-  margin: 10px 0 10px;
+  margin: 8px 0 10px;
   font-size: 16px;
-  font-weight: 800;
   color: #111;
 }
 
@@ -202,7 +193,7 @@
 }
 
 .place-name {
-  font-weight: 800;
+  font-weight: 600;
   font-size: 14px;
   color: #111;
   margin-bottom: 2px;
@@ -227,12 +218,6 @@
 
 /* small screens */
 @media (max-width: 380px) {
-  .seg-btn {
-    font-size: 11px;
-    padding: 9px 8px;
-  }
-
-  .duration-num {
-    font-size: 20px;
-  }
+  .duration-num { font-size: 20px; }
+  .duration-header { font-size: 10px; }
 }
