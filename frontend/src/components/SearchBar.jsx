@@ -1,20 +1,20 @@
-import { InputGroup, FormControl, Button } from "react-bootstrap";
+import React from "react";
+import { InputGroup, Form, Button } from "react-bootstrap";
 import { Funnel } from "react-bootstrap-icons";
 
-function SearchBar({ value, onChange, onFilterClick, placeholder = "Search...", onSubmit }) {
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && onSubmit) onSubmit();
-  };
-
+function SearchBar({ value, onChange, onFilterClick, placeholder }) {
   return (
     <InputGroup>
-      <FormControl
-        placeholder={placeholder}
+      <Form.Control
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
+        placeholder={placeholder || "Search..."}
       />
-      <Button variant="outline-secondary" onClick={onFilterClick}>
+
+      <Button
+        variant="outline-secondary"
+        onClick={onFilterClick}
+      >
         <Funnel />
       </Button>
     </InputGroup>
