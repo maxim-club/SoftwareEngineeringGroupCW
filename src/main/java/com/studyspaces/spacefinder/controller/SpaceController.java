@@ -1,6 +1,7 @@
 package com.studyspaces.spacefinder.controller;
 
 import com.studyspaces.spacefinder.dto.SearchQueryRequest;
+import com.studyspaces.spacefinder.dto.SearchResponseDTO;
 import com.studyspaces.spacefinder.model.NoiseLevel;
 import com.studyspaces.spacefinder.model.Occupancy;
 import com.studyspaces.spacefinder.model.StudySpaceProfile;
@@ -9,12 +10,12 @@ import com.studyspaces.spacefinder.service.StudySpaceProfileManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/spaces") // Base URL: localhost:8080/api/spaces
+@RequestMapping("/api/spaces")
 @CrossOrigin(origins = "*")
 public class SpaceController {
 
@@ -24,15 +25,13 @@ public class SpaceController {
         this.profileManager = profileManager;
     }
 
-    // HOME PAGE & MAP
+    // RETRIEVAL (map pins & space details)
 
-    // Get all spaces (for map pins)
     @GetMapping
     public List<StudySpaceProfile> getAllSpaces() {
         return profileManager.getAll();
     }
 
-    // Get specific space details (when clicking a pin or result)
     @GetMapping("/{id}")
     public ResponseEntity<StudySpaceProfile> getSpaceById(@PathVariable String id) {
         return profileManager.getById(id)
@@ -40,64 +39,62 @@ public class SpaceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // SEARCH & FILTER PAGE
+    // ADVANCED SEARCH & RECOMMENDATION
 
-
-
-    //Recommendation algorithm. Get k best values that closest match the user's filters
-    //Does not search using the string.
-    @GetMapping("/recommended")
-    public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request){
+    @PostMapping("/recommended")
+    public List<StudySpaceProfile> getRecommendedSpaces(@RequestBody SearchQueryRequest request) {
         List<String> ids = RoomSearcher.getKRecommended(request.getFilters(), 5);
         return profileManager.getByIds(ids);
     }
 
-    @GetMapping("/recommendedSearch")
-    public List<StudySpaceProfile> getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request){
+    @PostMapping("/recommendedSearch")
+    public SearchResponseDTO getRecommendedSpacesWithSearch(@RequestBody SearchQueryRequest request) {
+        // extract raw query
+        String rawQuery = request.getSearchBarBuildingQuery();
+        String searchTerm = (rawQuery != null) ? rawQuery.toLowerCase() : "";
+
+        List<StudySpaceProfile> exactMatches = new ArrayList<>();
+
+        // 2. find exact matches (if search term provided)
+        if (!searchTerm.isBlank()) {
+            List<StudySpaceProfile> allRooms = profileManager.getAll();
+            exactMatches = allRooms.stream()
+                    .filter(room -> {
+                        boolean matchesLocation = room.getRoomLocation() != null &&
+                                room.getRoomLocation().toLowerCase().contains(searchTerm);
+                        boolean matchesNotes = room.getNotes() != null &&
+                                room.getNotes().toLowerCase().contains(searchTerm);
+                        return matchesLocation || matchesNotes;
+                    })
+                    .toList();
+        }
+
+        // recommendations
         List<String> ids = RoomSearcher.getSortedByRecommended(request.getFilters());
-        List<StudySpaceProfile> rooms = profileManager.getByIds(ids);
+        List<StudySpaceProfile> recommendations = profileManager.getByIds(ids);
 
-        String searchTerm = request.getSearchBarBuildingQuery().toLowerCase();
-
-        return rooms.stream()
-                .filter(room -> room.getRoomLocation() != null && room.getRoomLocation().toLowerCase().contains(searchTerm))
+        // remove duplicates
+        final List<StudySpaceProfile> finalExactMatches = exactMatches;
+        recommendations = recommendations.stream()
+                .filter(rec -> !finalExactMatches.contains(rec))
                 .toList();
+
+        return new SearchResponseDTO(exactMatches, recommendations);
     }
 
+    // QUICK FILTERS
+    // old code, can be removed if not used
 
-
-
-    // Text Search (Location name / Notes)
-    @GetMapping("/search")
-    public List<StudySpaceProfile> searchByKeyword(@RequestParam String q) {
-        List<StudySpaceProfile> byLocation = profileManager.searchByRoomLocationKeyword(q);
-        List<StudySpaceProfile> byNotes = profileManager.searchNotes(q);
-
-        // Combine both lists to remove duplicates when result matches both location and notes
-        return Stream.concat(byLocation.stream(), byNotes.stream())
-                .filter(distinctByKey(StudySpaceProfile::getId)) // Custom filter helper
-                .collect(Collectors.toList());
-    }
-
-    // Helper method to filter by a specific key (ID)
-    private static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, ?> keyExtractor) {
-        java.util.Set<Object> seen = java.util.concurrent.ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
-    // Filter by Noise Level (e.g. /api/spaces/filter/noise?level=QUIET)
     @GetMapping("/filter/noise")
     public List<StudySpaceProfile> getByNoise(@RequestParam NoiseLevel level) {
         return profileManager.getByNoiseLevel(level);
     }
 
-    // Filter by Occupancy (e.g. /api/spaces/filter/occupancy?level=EMPTY)
     @GetMapping("/filter/occupancy")
     public List<StudySpaceProfile> getByOccupancy(@RequestParam Occupancy level) {
         return profileManager.getByOccupancy(level);
     }
 
-    // Filters by features (e.g. /api/spaces/filter/features?computers=true)
     @GetMapping("/filter/features")
     public List<StudySpaceProfile> getByFeatures(
             @RequestParam(required = false) boolean computers,

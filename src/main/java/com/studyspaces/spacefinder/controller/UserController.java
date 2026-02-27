@@ -10,7 +10,6 @@ import java.util.Map;
 public class UserController {
 
     // TODO: create UserService
-    // private final UserService userService;
 
     // Endpoint: POST /api/auth/login
     @PostMapping("/login")
