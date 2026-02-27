@@ -191,7 +191,7 @@ export default function FilteredResults() {
   const onViewInfo = (space) => navigate(`/space/${space.id}`, { state: { space } });
 
   return (
-    <Container className="mt-4" style={{ maxWidth: 980 }}>
+    <Container className="mt-4" style={{ maxWidth: 980, paddingBottom: "120px" }}>
       <div className="d-flex justify-content-between mb-3">
         <Button variant="link" onClick={goBack}>
           ←

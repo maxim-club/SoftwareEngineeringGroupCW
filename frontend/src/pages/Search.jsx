@@ -1,4 +1,3 @@
-// src/pages/Search.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Container, Card, Spinner } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,12 +12,9 @@ function Search() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // keep whatever filters you already have (if any)
   const existingFilters = location.state?.filters ?? null;
 
   useEffect(() => {
-    // Demo data (updated so StudySpaceCard can render properly)
-    // Keep your real API later — this is just for UI testing
     setSpaces([
       {
         id: "1",
@@ -87,11 +83,11 @@ function Search() {
       return text.includes(q);
     };
 
-    // what you search for
+    //what the user searches for
     const matched = spaces.filter(matchesQuery);
 
-    // “More suggestions” = other spaces (even if they don’t match the search),
-    // like your old screenshot
+    // “More suggestions”: other spaces (even if they don’t match the search)
+
     const other = spaces.filter((s) => !matched.some((m) => m.id === s.id));
 
     const headerTitle = queryActive ? "Search Results" : "Recommendations";
@@ -105,7 +101,7 @@ function Search() {
   }, [spaces, query]);
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4" style={{ paddingBottom: 120 }}>
       <h2>Search Study Spaces</h2>
 
       <div className="mb-4">
@@ -126,7 +122,7 @@ function Search() {
           <Card.Body>
             <h5 className="mb-3">{title}</h5>
 
-            {/* Top section (search results / recommendations) */}
+            {/* search results / recommendations */}
             {results.length === 0 ? (
               <div className="text-muted">No results.</div>
             ) : (
@@ -135,7 +131,6 @@ function Search() {
               ))
             )}
 
-            {/* Divider + “More suggestions” (ONLY show when user typed something) */}
             {hasQuery && (
               <>
                 <div
