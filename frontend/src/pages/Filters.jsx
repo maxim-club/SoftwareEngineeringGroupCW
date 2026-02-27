@@ -141,7 +141,7 @@ function Filters() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Container className="mt-4" style={{ maxWidth: 520 }}>
+      <Container className="mt-4" style={{ maxWidth: 520, paddingBottom: 120 }}>
         {/* Header */}
         <div className="d-flex align-items-center gap-2 mb-3">
           <Button

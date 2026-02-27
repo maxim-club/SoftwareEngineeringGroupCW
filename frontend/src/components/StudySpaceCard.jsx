@@ -35,7 +35,7 @@ function statusPillStyle(statusRaw) {
     return { background: "#22C55E", color: "#fff", border: "none" };
   }
 
-  // default: grey
+ 
   return {
     background: "#EEF2F7",
     color: "#495057",
@@ -44,9 +44,6 @@ function statusPillStyle(statusRaw) {
 }
 
 export default function StudySpaceCard(props) {
-  // supports:
-  // <StudySpaceCard space={space} ... />
-  // <StudySpaceCard title="..." subtitle="..." ... />
 
   const space = props.space ?? null;
 
@@ -106,11 +103,10 @@ export default function StudySpaceCard(props) {
         borderRadius: 18,
         border: "1px solid #E9ECEF",
         overflow: "hidden",
-        boxShadow: "0 0 0 rgba(0,0,0,0)", // keep clean like Figma
+        boxShadow: "0 0 0 rgba(0,0,0,0)", 
       }}
     >
       <Card.Body style={{ padding: 16 }}>
-        {/* Top row: text left + image right */}
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.2 }}>
@@ -282,12 +278,12 @@ export default function StudySpaceCard(props) {
           </button>
         </div>
 
-        {/* ✅ bottom buttons (View info + Check-in) */}
+        {/* bottom buttons: View info & Check-in */}
         <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
           <Button
             type="button"
             variant="outline-primary"
-            onClick={onViewInfo} // can be no-op, just needs to exist
+            onClick={onViewInfo} 
             style={{
               flex: 1,
               borderRadius: 999,
