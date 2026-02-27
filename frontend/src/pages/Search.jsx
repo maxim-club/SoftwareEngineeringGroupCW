@@ -1,183 +1,162 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
+import React, { useEffect, useMemo, useState } from "react";
+import { Container, Card, Spinner } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import StudySpaceCard from "../components/StudySpaceCard";
 
 function Search() {
   const [query, setQuery] = useState("");
   const [spaces, setSpaces] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const existingFilters = location.state?.filters ?? null;
 
   useEffect(() => {
-    loadSpaces();
+    setSpaces([
+      {
+        id: "1",
+        roomLocation: "Library Study Room",
+        building: "Claverton Down",
+        rating: 4.3,
+        reviewCount: 47,
+        occupancy: "Free",
+        distance: "4 m",
+        walkTime: "3 mins",
+        imageUrl:
+          "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=60",
+        amenities: ["wheelchairAccess", "monitor", "whiteboard", "powerOutlets"],
+      },
+      {
+        id: "2",
+        roomLocation: "8W Silent Area",
+        building: "8 West",
+        rating: 4.5,
+        reviewCount: 128,
+        occupancy: "Busy",
+        distance: "6 m",
+        walkTime: "5 mins",
+        imageUrl:
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=60",
+        amenities: ["powerOutlets", "quietZone"],
+      },
+      {
+        id: "3",
+        roomLocation: "10E Group Study Room",
+        building: "Engineering building",
+        rating: 4.5,
+        reviewCount: 128,
+        occupancy: "Moderate",
+        distance: "10 m",
+        walkTime: "8 mins",
+        imageUrl:
+          "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=60",
+        amenities: ["whiteboard", "projectors", "powerOutlets"],
+      },
+      {
+        id: "4",
+        roomLocation: "4W Study Zone",
+        building: "4 West",
+        rating: 4.2,
+        reviewCount: 62,
+        occupancy: "Free",
+        distance: "7 m",
+        walkTime: "6 mins",
+        imageUrl:
+          "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=60",
+        amenities: ["printer", "powerOutlets"],
+      },
+    ]);
+
+    setLoading(false);
   }, []);
 
-  async function loadSpaces() {
-    try {
-      setLoading(true);
-      setError(null);
+  const { results, suggestions, hasQuery, title } = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const queryActive = q.length > 0;
 
- 
-      const sampleSpaces = [
-        {
-          id: "1",
-          roomLocation: "Library Study Room",
-          notes: "Quiet space with natural lighting",
-          noiseLevel: "Quiet",
-          occupancy: "Empty",
-        },
-        {
-          id: "2",
-          roomLocation: "8W Silent Area",
-          notes: "Silent individual study space",
-          noiseLevel: "Quiet discussion",
-          occupancy: "Busy",
-        },
-        {
-          id: "3",
-          roomLocation: "10E Group Study Room",
-          notes: "Great for group meetings",
-          noiseLevel: "Moderate noise",
-          occupancy: "Moderately occupied",
-        },
-      ];
+    const matchesQuery = (s) => {
+      if (!queryActive) return true;
+      const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
+      return text.includes(q);
+    };
 
-      setSpaces(sampleSpaces);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
+    //what the user searches for
+    const matched = spaces.filter(matchesQuery);
 
-  const hasQuery = query.trim().length > 0;
+    // “More suggestions”: other spaces (even if they don’t match the search)
 
-  const { results, suggestions } = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    const isSearching = normalized.length > 0;
+    const other = spaces.filter((s) => !matched.some((m) => m.id === s.id));
 
-    const resultsList = spaces.filter((space) => {
-      if (!isSearching) return true;
+    const headerTitle = queryActive ? "Search Results" : "Recommendations";
 
-      const text = `${space.roomLocation ?? ""} ${space.notes ?? ""}`.toLowerCase();
-      return text.includes(normalized);
-    });
-
-    const suggestionsList = isSearching
-      ? spaces
-          .filter((s) => !resultsList.includes(s))
-          .map((s) => ({ ...s, _score: 1 })) 
-      : [];
-
-    return { results: resultsList, suggestions: suggestionsList };
+    return {
+      results: matched,
+      suggestions: other,
+      hasQuery: queryActive,
+      title: headerTitle,
+    };
   }, [spaces, query]);
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4" style={{ paddingBottom: 120 }}>
       <h2>Search Study Spaces</h2>
 
       <div className="mb-4">
         <SearchBar
           value={query}
           onChange={setQuery}
-          onFilterClick={() => console.log("Open filters (later)")}
           placeholder="Search by name, building, or location..."
+          onFilterClick={() =>
+            navigate("/filters", { state: { filters: existingFilters } })
+          }
         />
       </div>
 
-      {error && (
-        <Alert variant="danger" dismissible onClose={() => setError(null)}>
-          <Alert.Heading>Error loading spaces</Alert.Heading>
-          <p>{error}</p>
-          <hr />
-          <p className="mb-0">
-            <strong>Troubleshooting:</strong>
-            <ul>
-              <li>Make sure backend is running: <code>./gradlew bootRun</code></li>
-              <li>Check backend is on port 8080</li>
-              <li>Try: <code>curl http://localhost:8080/api/spaces</code></li>
-            </ul>
-          </p>
-        </Alert>
-      )}
-
       {loading ? (
-        <div className="text-center my-5">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p className="mt-2">Connecting to backend...</p>
-        </div>
+        <Spinner />
       ) : (
-        <Row>
-          <Col md={12}>
-            {spaces.length === 0 && (
-              <Card className="text-center mb-3">
-                <Card.Body>
-                  <h5 className="text-success">✅ API Connected!</h5>
-                  <p className="text-muted mb-0">
-                    
-                    <br />
-                
-                  </p>
-                </Card.Body>
-              </Card>
+        <Card>
+          <Card.Body>
+            <h5 className="mb-3">{title}</h5>
+
+            {/* search results / recommendations */}
+            {results.length === 0 ? (
+              <div className="text-muted">No results.</div>
+            ) : (
+              results.map((space) => (
+                <StudySpaceCard key={space.id} space={space} />
+              ))
             )}
 
-            {spaces.length > 0 && (
-              <Card>
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="mb-0">
-                      {hasQuery ? `Results for "${query.trim()}"` : "Recommendations"}
-                    </h5>
+            {hasQuery && (
+              <>
+                <div
+                  className="my-4 text-center text-muted"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                  }}
+                >
+                  <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+                  <span style={{ whiteSpace: "nowrap" }}>More suggestions</span>
+                  <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+                </div>
 
-                    {!hasQuery && (
-                      <span className="text-muted" style={{ cursor: "pointer" }}>
-                        See all
-                      </span>
-                    )}
-                  </div>
-
-                  {results.map((space) => (
-                    <div key={space.id} className="mb-3">
-                      <strong>{space.roomLocation}</strong>
-                      <div className="text-muted">
-                        {space.noiseLevel} • {space.occupancy}
-                      </div>
-                    </div>
-                  ))}
-
-                  {hasQuery && results.length === 0 && (
-                    <p className="text-muted">No results found.</p>
-                  )}
-
-                  {hasQuery && suggestions.length > 0 && (
-                    <>
-                      <div
-                        className="my-4 text-center text-muted"
-                        style={{ display: "flex", alignItems: "center", gap: "12px" }}
-                      >
-                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
-                        <span style={{ whiteSpace: "nowrap" }}>More suggestions</span>
-                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
-                      </div>
-
-                      {suggestions.map((space) => (
-                        <div key={space.id} className="mb-3">
-                          <strong>{space.roomLocation}</strong>
-                          <div className="text-muted">
-                            {space.noiseLevel} • {space.occupancy}
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </Card.Body>
-              </Card>
+                {suggestions.length === 0 ? (
+                  <div className="text-muted">No suggestions.</div>
+                ) : (
+                  suggestions.map((space) => (
+                    <StudySpaceCard key={space.id} space={space} />
+                  ))
+                )}
+              </>
             )}
-          </Col>
-        </Row>
+          </Card.Body>
+        </Card>
       )}
     </Container>
   );
