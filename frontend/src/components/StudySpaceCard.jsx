@@ -31,7 +31,7 @@ function statusPillStyle(statusRaw) {
   }
 
 
-  if (status.includes("free") || status.includes("available")) {
+  if (status.includes("available") || status.includes("available")) {
     return { background: "#22C55E", color: "#fff", border: "none" };
   }
 
@@ -109,7 +109,7 @@ export default function StudySpaceCard(props) {
       <Card.Body style={{ padding: 16 }}>
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.2 }}>
+            <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2 }}>
               {data.title}
             </div>
             <div style={{ fontSize: 13, color: "#6c757d", marginTop: 4 }}>
@@ -172,7 +172,7 @@ export default function StudySpaceCard(props) {
                 <span
                   style={{
                     fontSize: 12,
-                    fontWeight: 700,
+                    fontWeight: 500,
                     padding: "4px 10px",
                     borderRadius: 10,
                     ...pill,
@@ -265,7 +265,7 @@ export default function StudySpaceCard(props) {
               border: "none",
               background: "transparent",
               color: "#0B5ED7",
-              fontWeight: 700,
+              fontWeight: 500,
               fontSize: 13,
               display: "inline-flex",
               alignItems: "center",
@@ -288,7 +288,7 @@ export default function StudySpaceCard(props) {
               flex: 1,
               borderRadius: 999,
               height: 44,
-              fontWeight: 800,
+              fontWeight: 600,
             }}
           >
             View info
@@ -302,7 +302,7 @@ export default function StudySpaceCard(props) {
               flex: 1,
               borderRadius: 999,
               height: 44,
-              fontWeight: 800,
+              fontWeight: 600,
             }}
           >
             Check-in
