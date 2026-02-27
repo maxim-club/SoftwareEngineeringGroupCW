@@ -1,19 +1,35 @@
-import { Navbar, Nav, Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Navbar, Nav } from "react-bootstrap";
+import { Link, useLocation } from "react-router-dom";
+import { House, Bookmark, Map, Person } from "react-bootstrap-icons";
 
 function AppNavbar() {
+  const { pathname } = useLocation();
+
+  const isActive = (path) => pathname === path;
+
   return (
-    <Navbar bg="primary" variant="dark" expand="lg">
-      <Container>
-        <Navbar.Brand as={Link} to="/">Study Space Finder</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/search">Search</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
+    <Navbar className="bottom-tabbar" fixed="bottom">
+      <Nav className="w-100 justify-content-around">
+        <Nav.Link as={Link} to="/" className={isActive("/") ? "active" : ""}>
+          <House size={22} />
+          <div className="tab-label">Home</div>
+        </Nav.Link>
+
+        <Nav.Link as={Link} to="/saved" className={isActive("/saved") ? "active" : ""}>
+          <Bookmark size={22} />
+          <div className="tab-label">Saved</div>
+        </Nav.Link>
+
+        <Nav.Link as={Link} to="/mapview" className={isActive("/mapview") ? "active" : ""}>
+          <Map size={22} />
+          <div className="tab-label">Map</div>
+        </Nav.Link>
+
+        <Nav.Link as={Link} to="/profile" className={isActive("/profile") ? "active" : ""}>
+          <Person size={22} />
+          <div className="tab-label">Account</div>
+        </Nav.Link>
+      </Nav>
     </Navbar>
   );
 }

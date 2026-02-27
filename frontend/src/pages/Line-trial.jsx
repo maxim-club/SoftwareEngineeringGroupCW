@@ -1,11 +1,11 @@
 import { Container, Card } from "react-bootstrap";
 import LineChartComponent from "../components/OccupancyLineChart";
+import './Line-trial.css';
+
 
 function LineTrial() {
   return (
     <Container className="mt-5">
-      <h1 className="text-center">Line Chart Demo</h1>
-      <p className="lead text-center mt-3">This is a dummy-data chart preview</p>
 
       <Card className="mt-4 shadow-sm">
         <Card.Body>
