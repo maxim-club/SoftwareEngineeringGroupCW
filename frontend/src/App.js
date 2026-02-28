@@ -12,7 +12,10 @@ import FilteredResults from "./pages/FilteredResults";
 import SpaceDetailPage from "./pages/SpaceDetailPage";
 import LayoutWithNavbar from "./LayoutWithNavbar";
 import UserProfile from "./pages/UserProfile";
+
 import SearchResults from "./pages/SearchResults";
+
+import CheckedInScreen from "./pages/CheckinTimer";
 
 function App() {
   return (
@@ -31,10 +34,12 @@ function App() {
 
           <Route path="/profile" element={<UserProfile />} />
           {/*<Route path="/saved" element={<SavedStudySpot />} />*/}
+          <Route path="/checkedin" element={<CheckedInScreen />} />
         </Route>
 
         {/* Route WITHOUT navbar */}
         <Route path="/space/:id" element={<SpaceDetailPage />} />
+        <Route path="/search-results" element={<SearchResults />} />
 
       </Routes>
     </Router>
