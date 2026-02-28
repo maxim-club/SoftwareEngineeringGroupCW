@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Container, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import StudySpaceCard from "../components/StudySpaceCard";
-
+import "./FilteredResults.css";
 
 import imgLibrary from "../assets/studyspaces/library.jpg";
 import imgPavilion from "../assets/studyspaces/PavilionCafe.jpg";
@@ -67,7 +67,6 @@ function minRatingFromReviewsKey(key) {
   return null;
 }
 
-
 function selectedKeys(obj) {
   if (!obj || typeof obj !== "object") return [];
   return Object.keys(obj).filter((k) => !!obj[k]);
@@ -90,7 +89,6 @@ export default function FilteredResults() {
         ? peopleLabels[activeFilters.peopleIndex]
         : null;
 
-   
     const selectedAtmospheres = selectedKeys(activeFilters?.atmosphere);
     const selectedFoodPolicies = selectedKeys(activeFilters?.foodPolicy);
     const selectedReviewKeys = selectedKeys(activeFilters?.reviews);
@@ -99,24 +97,18 @@ export default function FilteredResults() {
       .filter((x) => typeof x === "number");
 
     const strictMatchesAll = (space) => {
-      // atmosphere 
       if (selectedAtmospheres.length > 0 && !selectedAtmospheres.includes(space.atmosphere)) return false;
-
-      // number people
       if (selectedPeople && space.people !== selectedPeople) return false;
 
-      // food 
       if (selectedFoodPolicies.length > 0 && !selectedFoodPolicies.includes("Any")) {
         if (!selectedFoodPolicies.includes(space.foodPolicy)) return false;
       }
 
-      // reviews 
       if (minRatings.length > 0) {
         const minRequired = Math.min(...minRatings);
         if (Number(space.rating) < minRequired) return false;
       }
 
-      // amenities: must include all selected amenities
       if (selectedAmenityKeys.length > 0) {
         const ok = selectedAmenityKeys.every((a) => (space.amenities ?? []).includes(a));
         if (!ok) return false;
@@ -144,7 +136,7 @@ export default function FilteredResults() {
         if (selectedFoodPolicies.includes(space.foodPolicy)) matched++;
       } else if (selectedFoodPolicies.includes("Any")) {
         total++;
-        matched++; // Any counts as satisfied
+        matched++;
       }
 
       if (minRatings.length > 0) {
@@ -164,7 +156,6 @@ export default function FilteredResults() {
 
     let strict = spaces.filter(strictMatchesAll);
 
-    
     if (strict.length === 0 && activeFilters) {
       const best = [...spaces]
         .map((s) => ({ s, sc: score(s) }))
@@ -173,7 +164,6 @@ export default function FilteredResults() {
       strict = best ? [best] : [];
     }
 
-  
     const suggestionsList = [...spaces]
       .filter((s) => !strict.some((r) => r.id === s.id))
       .map((s) => ({ s, sc: score(s) }))
@@ -185,51 +175,61 @@ export default function FilteredResults() {
     return { results: strict, suggestions: suggestionsList, countLabel: label };
   }, [activeFilters]);
 
-  const goBack = () => navigate("/filters", { state: { filters: activeFilters } });
+  const goBack = () => navigate(-1);
   const clearAll = () => navigate("/filters", { state: { filters: null } });
 
   const onViewInfo = (space) => navigate(`/space/${space.id}`, { state: { space } });
 
   return (
-    <Container className="mt-4" style={{ maxWidth: 980, paddingBottom: "120px" }}>
-      <div className="d-flex justify-content-between mb-3">
-        <Button variant="link" onClick={goBack}>
-          ←
-        </Button>
-        <Button variant="link" onClick={clearAll}>
-          Clear all
-        </Button>
-      </div>
-
-      <h2 className="mb-4">{countLabel}</h2>
-
-      {results.map((space) => (
-        <StudySpaceCard
-          key={space.id}
-          space={space}
-          onViewInfo={() => onViewInfo(space)}
-        />
-      ))}
-
-      {/* show "More suggestions" when there ARE suggestions */}
-      {suggestions.length > 0 && (
-        <div
-          className="my-4 text-center text-muted"
-          style={{ display: "flex", alignItems: "center", gap: "12px" }}
-        >
-          <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
-          <span>More suggestions</span>
-          <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+    <div className="results-wrap">
+      <Container style={{ maxWidth: 980 }}>
+        <div className="d-flex justify-content-between mb-3">
+          <button
+            type="button"
+            onClick={goBack}
+            style={{
+              border: "none",
+              background: "transparent",
+              padding: 0,
+              cursor: "pointer",
+            }}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="#0B5ED7"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <Button variant="link" onClick={clearAll}>
+            Clear all
+          </Button>
         </div>
-      )}
 
-      {suggestions.map((space) => (
-        <StudySpaceCard
-          key={space.id}
-          space={space}
-          onViewInfo={() => onViewInfo(space)}
-        />
-      ))}
-    </Container>
+        <h2 className="mb-4">{countLabel}</h2>
+
+        {results.map((space) => (
+          <StudySpaceCard key={space.id} space={space} onViewInfo={() => onViewInfo(space)} />
+        ))}
+
+        {suggestions.length > 0 && (
+          <div
+            className="my-4 text-center text-muted"
+            style={{ display: "flex", alignItems: "center", gap: "12px" }}
+          >
+            <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+            <span>More suggestions</span>
+            <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+          </div>
+        )}
+
+        {suggestions.map((space) => (
+          <StudySpaceCard key={space.id} space={space} onViewInfo={() => onViewInfo(space)} />
+        ))}
+      </Container>
+    </div>
   );
 }
