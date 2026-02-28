@@ -12,6 +12,7 @@ import FilteredResults from "./pages/FilteredResults";
 import SpaceDetailPage from "./pages/SpaceDetailPage";
 import LayoutWithNavbar from "./LayoutWithNavbar";
 import UserProfile from "./pages/UserProfile";
+import SearchResults from "./pages/SearchResults";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
 
         {/* Route WITHOUT navbar */}
         <Route path="/space/:id" element={<SpaceDetailPage />} />
+
       </Routes>
     </Router>
   );

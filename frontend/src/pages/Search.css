@@ -1,0 +1,28 @@
+.ui-searchpage {
+  max-width: 520px;
+  margin-top: 18px;
+}
+
+.ui-searchpage-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.ui-backbtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #111827;
+  flex: 0 0 auto;
+}
+
+.ui-searchpage-header .ui-searchbar {
+  flex: 1;
+}
