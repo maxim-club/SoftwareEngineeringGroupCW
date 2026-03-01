@@ -7,7 +7,7 @@ import LineTrial from "./pages/Line-trial";
 import MapView from "./pages/Map-trial";
 import Intro from './pages/Intro';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
+import Signup from './pages/Signup.jsx';
 
 import Filters from "./pages/Filters";
 import FilteredResults from "./pages/FilteredResults";
