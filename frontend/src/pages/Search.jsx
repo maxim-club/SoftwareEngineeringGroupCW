@@ -9,7 +9,6 @@ function Search() {
   const navigate = useNavigate();
   const location = useLocation();
 
-
   const goBack = () => {
     navigate(location.state?.from || "/");
   };
@@ -37,42 +36,42 @@ function Search() {
       },
       {
         id: "2",
-        roomLocation: "8W Silent Area",
-        building: "8 West",
-        rating: 4.5,
-        reviewCount: 128,
+        roomLocation: "Pavilion Café",
+        building: "Management building",
+        rating: 4.4,
+        reviewCount: 96,
         occupancy: "Busy",
         distance: "6 m",
         walkTime: "5 mins",
         imageUrl:
           "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=60",
-        amenities: ["powerOutlets", "quietZone"],
+        amenities: ["powerOutlets", "naturalLights", "wheelchairAccess"],
       },
       {
         id: "3",
-        roomLocation: "10E Group Study Room",
-        building: "Engineering building",
-        rating: 4.5,
-        reviewCount: 128,
+        roomLocation: "Library Level 2nd floor",
+        building: "Claverton Down",
+        rating: 4.6,
+        reviewCount: 210,
         occupancy: "Moderate",
         distance: "10 m",
         walkTime: "8 mins",
         imageUrl:
           "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=60",
-        amenities: ["whiteboard", "projectors", "powerOutlets"],
+        amenities: ["quietZone", "powerOutlets", "wheelchairAccess"],
       },
       {
         id: "4",
-        roomLocation: "4W Study Zone",
-        building: "4 West",
-        rating: 4.2,
-        reviewCount: 62,
+        roomLocation: "1 West Study Area",
+        building: "1 West",
+        rating: 4.3,
+        reviewCount: 74,
         occupancy: "Free",
         distance: "7 m",
         walkTime: "6 mins",
         imageUrl:
           "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=60",
-        amenities: ["printer", "powerOutlets"],
+        amenities: ["powerOutlets", "whiteboard", "naturalLights"],
       },
     ]);
     setLoading(false);
