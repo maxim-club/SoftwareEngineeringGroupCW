@@ -8,6 +8,7 @@ import MapView from "./pages/Map-trial";
 import Intro from './pages/Intro';
 import Login from './pages/Login';
 import Signup from './pages/Signup.jsx';
+import ProfileSetup from './pages/ProfileSetup';
 
 import Filters from "./pages/Filters";
 import FilteredResults from "./pages/FilteredResults";
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/space/:id" element={<SpaceDetailPage />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
 
         {/* Routes WITH navbar */}
         <Route element={<LayoutWithNavbar />}>
