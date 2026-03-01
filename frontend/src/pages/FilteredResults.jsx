@@ -6,9 +6,9 @@ import "./FilteredResults.css";
 
 import imgLibrary from "../assets/studyspaces/library.jpg";
 import imgPavilion from "../assets/studyspaces/PavilionCafe.jpg";
-import img8W from "../assets/studyspaces/4W.jpg";
+import img4W from "../assets/studyspaces/4W.jpg";
 
-const DEMO_SPACES = [
+const SAMPLE_SPACES = [
   {
     id: "1",
     roomLocation: "Library Study Room",
@@ -26,8 +26,8 @@ const DEMO_SPACES = [
   },
   {
     id: "2",
-    roomLocation: "4W Cafe",
-    building: "Claverton Down",
+    roomLocation: "1 West Study Area",
+    building: "1 West",
     rating: 4.1,
     reviewCount: 19,
     occupancy: "Busy",
@@ -37,12 +37,12 @@ const DEMO_SPACES = [
     people: "1",
     foodPolicy: "No Food/Drinks",
     amenities: ["powerOutlets", "quietZone"],
-    imageUrl: img8W,
+    imageUrl: img4W,
   },
   {
     id: "3",
     roomLocation: "Pavilion Cafe Study Area",
-    building: "Management building",
+    building: "Management Building",
     rating: 4.7,
     reviewCount: 301,
     occupancy: "Moderate",
@@ -78,7 +78,7 @@ export default function FilteredResults() {
   const activeFilters = location.state?.filters || null;
 
   const { results, suggestions, countLabel } = useMemo(() => {
-    const spaces = DEMO_SPACES;
+    const spaces = SAMPLE_SPACES;
 
     const selectedAmenityKeys = activeFilters?.amenities
       ? Object.keys(activeFilters.amenities).filter((k) => activeFilters.amenities[k])
@@ -92,12 +92,15 @@ export default function FilteredResults() {
     const selectedAtmospheres = selectedKeys(activeFilters?.atmosphere);
     const selectedFoodPolicies = selectedKeys(activeFilters?.foodPolicy);
     const selectedReviewKeys = selectedKeys(activeFilters?.reviews);
+
     const minRatings = selectedReviewKeys
       .map(minRatingFromReviewsKey)
       .filter((x) => typeof x === "number");
 
     const strictMatchesAll = (space) => {
-      if (selectedAtmospheres.length > 0 && !selectedAtmospheres.includes(space.atmosphere)) return false;
+      if (selectedAtmospheres.length > 0 && !selectedAtmospheres.includes(space.atmosphere))
+        return false;
+
       if (selectedPeople && space.people !== selectedPeople) return false;
 
       if (selectedFoodPolicies.length > 0 && !selectedFoodPolicies.includes("Any")) {
@@ -156,6 +159,7 @@ export default function FilteredResults() {
 
     let strict = spaces.filter(strictMatchesAll);
 
+    // fallback: if no strict matches, show best match
     if (strict.length === 0 && activeFilters) {
       const best = [...spaces]
         .map((s) => ({ s, sc: score(s) }))
@@ -164,6 +168,7 @@ export default function FilteredResults() {
       strict = best ? [best] : [];
     }
 
+    // suggestions = other spaces not in strict
     const suggestionsList = [...spaces]
       .filter((s) => !strict.some((r) => r.id === s.id))
       .map((s) => ({ s, sc: score(s) }))
@@ -193,6 +198,7 @@ export default function FilteredResults() {
               padding: 0,
               cursor: "pointer",
             }}
+            aria-label="Back"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path
@@ -204,6 +210,7 @@ export default function FilteredResults() {
               />
             </svg>
           </button>
+
           <Button variant="link" onClick={clearAll}>
             Clear all
           </Button>
@@ -212,7 +219,11 @@ export default function FilteredResults() {
         <h2 className="mb-4">{countLabel}</h2>
 
         {results.map((space) => (
-          <StudySpaceCard key={space.id} space={space} onViewInfo={() => onViewInfo(space)} />
+          <StudySpaceCard
+            key={space.id}
+            space={space}
+            onViewInfo={() => onViewInfo(space)}
+          />
         ))}
 
         {suggestions.length > 0 && (
@@ -227,7 +238,11 @@ export default function FilteredResults() {
         )}
 
         {suggestions.map((space) => (
-          <StudySpaceCard key={space.id} space={space} onViewInfo={() => onViewInfo(space)} />
+          <StudySpaceCard
+            key={space.id}
+            space={space}
+            onViewInfo={() => onViewInfo(space)}
+          />
         ))}
       </Container>
     </div>
