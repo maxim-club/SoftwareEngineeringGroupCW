@@ -74,20 +74,10 @@ public class StudySpaceProfileManager {
         return repository.findById(id);
     }
 
-//    public List<StudySpaceProfile> getAll() {
-//        return repository.findAll();
-//    }
-
     public List<StudySpaceProfile> getAll() {
-        System.out.println(">>> getAll() called in service");
-        System.out.println(">>> DB name: " + mongoTemplate.getDb().getName());
-        List<StudySpaceProfile> result = repository.findAll();
-        System.out.println(">>> result size: " + result.size());
-        System.out.println(">>> URI being used: " + env.getProperty("spring.data.mongodb.uri"));
-        MongoCollection<Document> collection = mongoTemplate.getDb().getCollection("Room Data");
-        System.out.println(">>> collection count: " + collection.countDocuments());
-        return result;
+        return repository.findAll();
     }
+
     public List<StudySpaceProfile> getByIds(List<String> ids) { return repository.findByIds(ids);}
 
     public Optional<StudySpaceProfile> getFirstByRoomLocation(String roomLocation) {
