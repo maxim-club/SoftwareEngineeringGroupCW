@@ -16,6 +16,9 @@ import FilteredResults from "./pages/FilteredResults";
 import SpaceDetailPage from "./pages/SpaceDetailPage";
 import LayoutWithNavbar from "./LayoutWithNavbar";
 import UserProfile from "./pages/UserProfile";
+
+import SearchResults from "./pages/SearchResults";
+
 import CheckedInScreen from "./pages/CheckinTimer";
 
 function App() {
@@ -26,8 +29,9 @@ function App() {
         <Route path="/intro" element={<Intro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/space/:id" element={<SpaceDetailPage />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="/space/:id" element={<SpaceDetailPage />} />
+        <Route path="/search-results" element={<SearchResults />} />
 
         {/* Routes WITH navbar */}
         <Route element={<LayoutWithNavbar />}>
@@ -41,6 +45,8 @@ function App() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/checkedin" element={<CheckedInScreen />} />
         </Route>
+
+
       </Routes>
     </Router>
   );
