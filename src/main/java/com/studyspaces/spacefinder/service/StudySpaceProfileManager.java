@@ -2,7 +2,13 @@ package com.studyspaces.spacefinder.service;
 
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 
 import java.util.List;
@@ -14,10 +20,20 @@ import java.util.Optional;
  * This service layer handles business logic and provides a clean interface
  * to interact with the StudySpaceRepository.
  */
+
+
 @Service
+
 public class StudySpaceProfileManager {
 
+
     private final StudySpaceRepository repository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private Environment env;
 
     public StudySpaceProfileManager(StudySpaceRepository repository) {
         this.repository = repository;
@@ -58,10 +74,20 @@ public class StudySpaceProfileManager {
         return repository.findById(id);
     }
 
-    public List<StudySpaceProfile> getAll() {
-        return repository.findAll();
-    }
+//    public List<StudySpaceProfile> getAll() {
+//        return repository.findAll();
+//    }
 
+    public List<StudySpaceProfile> getAll() {
+        System.out.println(">>> getAll() called in service");
+        System.out.println(">>> DB name: " + mongoTemplate.getDb().getName());
+        List<StudySpaceProfile> result = repository.findAll();
+        System.out.println(">>> result size: " + result.size());
+        System.out.println(">>> URI being used: " + env.getProperty("spring.data.mongodb.uri"));
+        MongoCollection<Document> collection = mongoTemplate.getDb().getCollection("Room Data");
+        System.out.println(">>> collection count: " + collection.countDocuments());
+        return result;
+    }
     public List<StudySpaceProfile> getByIds(List<String> ids) { return repository.findByIds(ids);}
 
     public Optional<StudySpaceProfile> getFirstByRoomLocation(String roomLocation) {

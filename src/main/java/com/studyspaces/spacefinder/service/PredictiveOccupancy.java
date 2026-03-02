@@ -45,9 +45,9 @@ public class PredictiveOccupancy {
     private double mapOccupancyToRation(Occupancy occupancy){
         return switch (occupancy) {
             case EMPTY -> 0.0;
-            case FREE -> 0.25;
-            case MODERATE -> 0.5;
-            case BUSY -> 0.85;
+            case LOW -> 0.25;
+            case MEDIUM -> 0.5;
+            case HIGH -> 0.85;
         };
     }
 }
