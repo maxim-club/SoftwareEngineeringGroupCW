@@ -1,0 +1,167 @@
+.home-wrap {
+  min-height: 100vh;
+  background: #ffffff;
+  padding-bottom: 110px; 
+
+
+  display: flex;
+  justify-content: center;
+}
+
+.home-wrap > .container {
+
+  width: 100%;
+  max-width: 430px !important;
+
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+  padding-top: 14px !important;
+
+  font-size: 16px;
+  line-height: 1.25;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.home-toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.home-locationlabel {
+  font-size: 14px;
+  color: #6b7280; 
+  margin-bottom: 6px;
+}
+
+.home-locationvalue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 20px;      
+  font-weight: 700;     
+  color: #111827;
+}
+
+.home-wrap .mb-4 {
+  margin-bottom: 18px !important;
+}
+
+.home-sectionrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.home-sectiontitle {
+  margin: 0;
+  font-size: 32px;    
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+.home-link {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0b5ed7;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.home-recs {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.home-recs > div {
+  min-width: 185px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+.home-recs img {
+  height: 150px !important;
+  object-fit: cover;
+}
+
+.home-recs > div > div {
+  padding: 10px 12px !important;
+}
+
+.home-recs > div > div > div:first-child {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  margin-bottom: 6px !important;
+}
+
+.home-recs > div > div > div:nth-child(2) {
+  font-size: 12.5px !important;
+  color: #6b7280 !important;
+  margin-bottom: 10px !important;
+}
+
+.home-recs > div > div > div:nth-child(3) {
+  font-size: 12.5px !important;
+  padding: 5px 12px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  margin-bottom: 10px !important;
+}
+
+.home-recs > div > div > div:nth-child(4) {
+  font-size: 12.5px !important;
+  color: #6b7280 !important;
+}
+
+.home-mapcard {
+  height: 260px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+.home-sectionrow .home-sectiontitle[style] {
+  font-size: 34px !important;
+}
+
+
+.home-wrap h3 {
+  all: unset;
+}
+
+
+.home-sectiontitle {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, sans-serif;
+
+  font-size: 24px !important;   
+  font-weight: 700 !important;  
+  letter-spacing: -0.2px;
+  color: #111827;
+
+  display: block;
+}
+
+.home-sectionrow:last-of-type .home-sectiontitle {
+  font-size: 26px !important;
+}
+
+.home-link {
+  font-size: 15px !important;
+  font-weight: 600;
+}
