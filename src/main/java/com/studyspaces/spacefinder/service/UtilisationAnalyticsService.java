@@ -87,11 +87,11 @@ public class UtilisationAnalyticsService {
         switch (level) {
             case EMPTY:
                 return 0.0;
-            case FREE:
+            case LOW:
                 return 0.25;
-            case MODERATE:
+            case MEDIUM:
                 return 0.5;
-            case BUSY:
+            case HIGH:
                 return 0.85;
             default:
                 return 0.0;

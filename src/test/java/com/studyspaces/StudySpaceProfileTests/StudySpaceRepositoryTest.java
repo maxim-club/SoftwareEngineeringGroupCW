@@ -42,7 +42,7 @@ class StudySpaceRepositoryMockTest {
         profile2 = new StudySpaceProfile();
         profile2.setId("2");
         profile2.setRoomLocation("Room B");
-        profile2.setOccupancy(Occupancy.BUSY);
+        profile2.setOccupancy(Occupancy.HIGH);
         profile2.setNoiseLevel(NoiseLevel.LOUD);
         profile2.setSuitableForGroups(false);
         profile2.setMaxGroupSize(1);

@@ -10,6 +10,7 @@ import com.studyspaces.spacefinder.model.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 public class StudySpaceProfile {
 
     @Id
+    @Field("_id")
     private String id;
 
     // Core info
