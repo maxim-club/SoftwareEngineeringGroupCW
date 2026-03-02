@@ -179,9 +179,9 @@ public class OccupancyManager {
     private int occupancyToValue(Occupancy occupancy) {
         return switch (occupancy) {
             case EMPTY -> 0;
-            case FREE -> 1;
-            case MODERATE -> 2;
-            case BUSY -> 3;
+            case LOW -> 1;
+            case MEDIUM -> 2;
+            case HIGH -> 3;
         };
     }
     private Occupancy valueToOccupancy(double value) {
@@ -189,9 +189,9 @@ public class OccupancyManager {
 
         return switch (rounded) {
             case 0 -> Occupancy.EMPTY;
-            case 1 -> Occupancy.FREE;
-            case 3 -> Occupancy.BUSY;
-            default -> Occupancy.MODERATE;
+            case 1 -> Occupancy.LOW;
+            case 3 -> Occupancy.HIGH;
+            default -> Occupancy.MEDIUM;
         };
     }
 }
