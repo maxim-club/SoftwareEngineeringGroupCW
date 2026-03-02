@@ -1,12 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
-
-// object can be changed according to the real data
-const dummyStudySpaces = [
-    { id: 1, name: "Library 1st Floor", lat: 51.3781, lng: -2.3273, tags: ["quiet", "power sockets"] },
-    { id: 2, name: "Student Hub", lat: 51.3775, lng: -2.3282, tags: ["group", "food nearby"] },
-];
+import { SPACES } from "../spacesDummy";
 
 const studyIcon = L.icon({
     iconUrl: "/icons/study.png",
@@ -20,6 +15,13 @@ const userIcon = L.icon({
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
+});
+
+const selectedStudyIcon = L.icon({
+    iconUrl: "/icons/study-selected.png", 
+    iconSize: [36, 36],                  
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
 });
 
 function Recenter({ center }) {
@@ -39,45 +41,73 @@ function InvalidateSizeOnMount() {
     return null;
 }
 
-export default function StudySpacesMap() {
-    const [studySpaces, setStudySpaces] = useState([]);
-    const [userLoc, setUserLoc] = useState(null);
-    
-    const defaultCenter = useMemo(() => ({ lat: 51.3780, lng: -2.3270 }), []);
-    
+function FlyToSelected({ selectedSpace }) {
+    const map = useMap();
+
     useEffect(() => {
-        setStudySpaces(dummyStudySpaces);
-    }, []);
+        if (!selectedSpace?.lat || !selectedSpace?.lng) return;
+        map.flyTo([selectedSpace.lat, selectedSpace.lng], 18, { animate: true });
+    }, [selectedSpace, map]);
+
+    return null;
+}
+
+function MapClickCatcher({ onMapClick }) {
+  useMapEvents({
+    click: () => onMapClick?.(),
+  });
+  return null;
+}
+
+export default function StudySpacesMap({ spaces, selectedSpace, onSelectSpace, onMapClick }) {
+    const [userLoc, setUserLoc] = useState(null);
+    const markerById = useRef(new Map());
+
+    const defaultCenter = useMemo(() => ({ lat: 51.3780, lng: -2.3270 }), []);
+    const center = userLoc ?? defaultCenter;
+
+    const studySpaces = (spaces && spaces.length > 0) ? spaces : SPACES;
 
     useEffect(() => {
         if (!navigator.geolocation) {
-            console.error("Geolocation not supported");
-            return;
+        console.error("Geolocation not supported");
+        return;
         }
 
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-            const loc = {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude,
-            };
-            console.log("User location:", loc);
-            setUserLoc(loc);
-            },
-            (err) => {
+        (pos) => {
+            setUserLoc({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            });
+        },
+        (err) => {
             console.error("Geolocation error:", err);
-            },
-            { enableHighAccuracy: true, timeout: 8000 }
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
         );
-        }, []);
+    }, []);
 
-    const center = userLoc ?? defaultCenter;
-
+    useEffect(() => {
+        if (!selectedSpace?.id) return;
+        const marker = markerById.current.get(selectedSpace.id);
+        if (marker) marker.openPopup();
+    }, [selectedSpace]);
 
     return (
         <MapContainer center={center} zoom={16} style={{ height: "100%", width: "100%" }}>
         <InvalidateSizeOnMount />
-        <Recenter center={center} />
+
+        <MapClickCatcher onMapClick={() => {
+            onMapClick?.();
+        }} />
+
+        {/* if user location updates, recenter only when no search selection */}
+        {!selectedSpace && <Recenter center={center} />}
+
+        {/* when selectedSpace changes, fly to it */}
+        <FlyToSelected selectedSpace={selectedSpace} />
+
         <TileLayer
             attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -88,27 +118,42 @@ export default function StudySpacesMap() {
                 </Marker>
             )}
 
-            {studySpaces.map((s) => (
-                <Marker 
-                    key={s.id} 
-                    position={{ lat: s.lat, lng: s.lng }} 
-                    icon={studyIcon} 
-                >
+        {studySpaces.map((s) => (
+            <Marker 
+                key={s.id} 
+                position={{ lat: s.lat, lng: s.lng }} 
+                icon={s.id === selectedSpace?.id ? selectedStudyIcon : studyIcon}
+                ref={(m) => {
+                    if (m) markerById.current.set(s.id, m);
+                }}
+                eventHandlers={{
+                    click: () => onSelectSpace?.(s), 
+                }}
+            >
                 <Popup>
-                    <strong>{s.name}</strong>
-                    {Array.isArray(s.tags) && s.tags.length > 0 && (
-                    <div className="ui-row-wrap" style={{ marginTop: 8 }}>
-                        {s.tags.map((t) => (
-                        <span key={t} className="ui-chip">
+                    <strong>{s.roomLocation}</strong>
+                    {!!s.building && <div style={{ fontSize: 12, color: "#6c757d" }}>{s.building}</div>}
+
+                    {Array.isArray(s.amenities) && s.amenities.length > 0 && (
+                    <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {s.amenities.slice(0, 6).map((t) => (
+                        <span
+                            key={t}
+                            style={{
+                            fontSize: 12,
+                            padding: "4px 8px",
+                            borderRadius: 999,
+                            background: "#EEF2F7",
+                            }}
+                        >
                             {t}
                         </span>
-
                         ))}
                     </div>
                     )}
                 </Popup>
-                </Marker>
-            ))}
-            </MapContainer>
+            </Marker>
+        ))}
+    </MapContainer>
   );
 }
