@@ -51,13 +51,13 @@ public class OccupancyManagerTests {
         String roomId = "room1";
 
         OccupancyRecord record = mock(OccupancyRecord.class);
-        when(record.getOccupancyLevel()).thenReturn(Occupancy.BUSY);
+        when(record.getOccupancyLevel()).thenReturn(Occupancy.HIGH);
         when(repo.findLastRoomOccupancy(roomId))
                 .thenReturn(Optional.of(record));
 
         Occupancy result = occupancyManager.getLastOccupancy(roomId);
 
-        assertEquals(Occupancy.BUSY, result);
+        assertEquals(Occupancy.HIGH, result);
 
         // Only ONE call now
         verify(repo, times(1)).findLastRoomOccupancy(roomId);
@@ -131,7 +131,7 @@ public class OccupancyManagerTests {
                 true,
                 false,
                 false,
-                Occupancy.FREE
+                Occupancy.LOW
         );
 
         RoomOccupancyRecord room = new RoomOccupancyRecord();
@@ -146,7 +146,7 @@ public class OccupancyManagerTests {
 
         OccupancyRecord savedRecord = room.getRecords().get(0);
 
-        assertEquals(Occupancy.FREE, savedRecord.getOccupancyLevel());
+        assertEquals(Occupancy.LOW, savedRecord.getOccupancyLevel());
         assertEquals(true, savedRecord.getWifiIssue());
         assertEquals(false, savedRecord.getClosed());
 
@@ -175,7 +175,7 @@ public class OccupancyManagerTests {
                 true,
                 false,
                 false,
-                Occupancy.FREE
+                Occupancy.LOW
         );
 
         RoomOccupancyRecord room = new RoomOccupancyRecord();
@@ -226,7 +226,7 @@ public class OccupancyManagerTests {
 
         OccupancyRecord oldRecord = mock(OccupancyRecord.class);
         when(oldRecord.getTimestamp()).thenReturn(oldTimestamp);
-        when(oldRecord.getOccupancyLevel()).thenReturn(Occupancy.BUSY);
+        when(oldRecord.getOccupancyLevel()).thenReturn(Occupancy.HIGH);
 
         RoomOccupancyRecord room = new RoomOccupancyRecord();
         room.setRecords(List.of(oldRecord));
@@ -250,11 +250,11 @@ public class OccupancyManagerTests {
 
         OccupancyRecord record1 = mock(OccupancyRecord.class);
         when(record1.getTimestamp()).thenReturn(twoDaysAgo);
-        when(record1.getOccupancyLevel()).thenReturn(Occupancy.FREE);
+        when(record1.getOccupancyLevel()).thenReturn(Occupancy.LOW);
 
         OccupancyRecord record2 = mock(OccupancyRecord.class);
         when(record2.getTimestamp()).thenReturn(fiveDaysAgo);
-        when(record2.getOccupancyLevel()).thenReturn(Occupancy.BUSY);
+        when(record2.getOccupancyLevel()).thenReturn(Occupancy.HIGH);
 
         RoomOccupancyRecord room = new RoomOccupancyRecord();
         room.setRecords(List.of(record1, record2));
@@ -264,7 +264,7 @@ public class OccupancyManagerTests {
         Occupancy result = occupancyManager.get7DayAverage(roomId);
 
         // FREE (1) + BUSY (3) -> avg = 2 -> MODERATE
-        assertEquals(Occupancy.MODERATE, result);
+        assertEquals(Occupancy.MEDIUM, result);
 
         verify(repo, times(1)).findById(roomId);
     }
