@@ -29,8 +29,16 @@ public class SpaceController {
 
     @GetMapping
     public List<StudySpaceProfile> getAllSpaces() {
-        return profileManager.getAll();
+        System.out.println(">>> getAllSpaces() called");
+        List<StudySpaceProfile> spaces = profileManager.getAll();
+        System.out.println(">>> spaces returned: " + spaces.size());
+        return spaces;
     }
+
+//    @GetMapping
+//    public List<StudySpaceProfile> getAllSpaces() {
+//        return profileManager.getAll();
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<StudySpaceProfile> getSpaceById(@PathVariable String id) {
