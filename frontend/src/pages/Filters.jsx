@@ -150,7 +150,7 @@ function Filters() {
             type="button"
             variant="link"
             className="p-0 text-decoration-none"
-            onClick={() => navigate("/search")}
+            onClick={() => navigate(location.state?.from || "/search")}
             aria-label="Close"
             style={{ fontSize: 28, lineHeight: "28px" }}
           >

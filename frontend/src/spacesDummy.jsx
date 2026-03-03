@@ -3,6 +3,9 @@ export const SPACES = [
     id: "1",
     roomLocation: "Library Study Room",
     building: "Claverton Down",
+    address: "Claverton Down, University Campus",
+    about:
+      "A quiet study room inside the main library. Ideal for focused work with plenty of desks, natural light, and power outlets.",
     rating: 4.3,
     reviewCount: 47,
     occupancy: "Free",
@@ -18,6 +21,9 @@ export const SPACES = [
     id: "2",
     roomLocation: "Quiet Study Corner",
     building: "Chancellors’ Building",
+    address: "Chancellors’ Building, University Campus",
+    about:
+      "A small and peaceful study corner perfect for independent study sessions. Best during mornings.",
     rating: 4.6,
     reviewCount: 32,
     occupancy: "Busy",
@@ -33,6 +39,9 @@ export const SPACES = [
     id: "3",
     roomLocation: "Group Collaboration Room",
     building: "8 West",
+    address: "8 West Building, University Campus",
+    about:
+      "Designed for teamwork and brainstorming. Includes whiteboards and large monitors for presentations.",
     rating: 4.1,
     reviewCount: 21,
     occupancy: "Free",
@@ -48,6 +57,9 @@ export const SPACES = [
     id: "4",
     roomLocation: "Silent Reading Room",
     building: "Library Level 5",
+    address: "Library Level 5, University Campus",
+    about:
+      "Strict silent zone for deep focus reading and exam preparation. Comfortable seating and calm atmosphere.",
     rating: 4.8,
     reviewCount: 63,
     occupancy: "Free",
@@ -63,6 +75,9 @@ export const SPACES = [
     id: "5",
     roomLocation: "Engineering Study Hub",
     building: "4 West",
+    address: "4 West Building, University Campus",
+    about:
+      "Popular among engineering students. Equipped with collaborative tables and whiteboards.",
     rating: 4.0,
     reviewCount: 18,
     occupancy: "Busy",
@@ -78,6 +93,9 @@ export const SPACES = [
     id: "6",
     roomLocation: "Window Study Space",
     building: "1 East",
+    address: "1 East Building, University Campus",
+    about:
+      "Bright study area with large windows and natural sunlight. Ideal for relaxed productivity.",
     rating: 3.9,
     reviewCount: 12,
     occupancy: "Free",
@@ -93,6 +111,9 @@ export const SPACES = [
     id: "7",
     roomLocation: "Creative Thinking Room",
     building: "The Edge",
+    address: "The Edge Building, University Campus",
+    about:
+      "A flexible creative space designed for brainstorming and innovative projects.",
     rating: 4.7,
     reviewCount: 54,
     occupancy: "Busy",
@@ -108,6 +129,9 @@ export const SPACES = [
     id: "8",
     roomLocation: "Basement Quiet Zone",
     building: "3 South",
+    address: "3 South Building, University Campus",
+    about:
+      "Low-traffic quiet basement space. Best for uninterrupted concentration.",
     rating: 3.8,
     reviewCount: 9,
     occupancy: "Free",
@@ -123,13 +147,16 @@ export const SPACES = [
     id: "9",
     roomLocation: "Computer Lab Study Area",
     building: "2 East",
+    address: "2 East Building, University Campus",
+    about:
+      "Computer-equipped study space perfect for programming and digital projects.",
     rating: 4.2,
     reviewCount: 36,
     occupancy: "Busy",
     distance: "4 m",
     walkTime: "3 mins",
     imageUrl:
-      "https://images.unsplash.com/photo-1581090700227-4c4f50f1e39d?auto=format&fit=crop&w=600&q=60",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=60",
     amenities: ["monitor", "powerOutlets", "wheelchairAccess"],
     lat: 51.3781,
     lng: -2.3269,
@@ -138,6 +165,9 @@ export const SPACES = [
     id: "10",
     roomLocation: "Outdoor Study Terrace",
     building: "Student Centre",
+    address: "Student Centre, University Campus",
+    about:
+      "Outdoor terrace seating for fresh-air study sessions during sunny days.",
     rating: 4.5,
     reviewCount: 29,
     occupancy: "Free",
@@ -153,6 +183,9 @@ export const SPACES = [
     id: "11",
     roomLocation: "Postgraduate Study Lounge",
     building: "Graduate Centre",
+    address: "Graduate Centre, University Campus",
+    about:
+      "Exclusive lounge space for postgraduate students. Quiet, comfortable, and well-equipped.",
     rating: 4.9,
     reviewCount: 71,
     occupancy: "Free",
