@@ -1,0 +1,171 @@
+/* Intro Page */
+.intro-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.intro-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  padding: 60px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+/* Skip button */
+.skip-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  z-index: 10;
+}
+
+.skip-button:hover {
+  color: #0d6efd;
+}
+
+/* Illustration */
+.intro-illustration {
+  margin: 80px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.intro-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+/* Content */
+.intro-content {
+  margin: 20px 0;
+}
+
+.intro-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.intro-title.logo-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-top: 40px;
+}
+
+.intro-description {
+  font-size: 16px;
+  color: #6c757d;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 400px;
+}
+
+/* Pagination dots */
+.intro-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 30px 0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E0E0E0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  width: 24px;
+  border-radius: 5px;
+  background: #0d6efd;
+}
+
+/* Next button */
+.intro-next-button {
+  width: 100%;
+  max-width: 320px;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 20px auto 0;
+}
+
+.intro-next-button:hover {
+  background: #0b5ed7;
+}
+
+.intro-next-button:active {
+  background: #0a58ca;
+}
+
+/* Tap area for first slide */
+.intro-tap-area {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 12px 24px;
+}
+
+.intro-tap-area:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  .intro-title {
+    font-size: 24px;
+  }
+
+  .intro-title.logo-title {
+    font-size: 32px;
+  }
+
+  .intro-description {
+    font-size: 14px;
+  }
+
+  .intro-illustration {
+    min-height: 250px;
+  }
+
+  .intro-image {
+    max-height: 280px;
+  }
+}

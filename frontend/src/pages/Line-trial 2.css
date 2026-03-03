@@ -1,0 +1,51 @@
+/* Occupancy Chart Container */
+.occupancy-chart-container {
+  width: 100%;
+  background: linear-gradient(180deg, #F8FAFF 0%, #F2F5FF 100%);
+  border-radius: 16px;
+  padding: 20px 16px;
+  margin: 24px 0;
+}
+
+/* Chart wrapper */
+.recharts-wrapper {
+  background: transparent !important;
+}
+
+/* Line styling - smooth curve */
+.recharts-line-curve {
+  stroke: #3D8BFF !important;
+  stroke-width: 3.5px !important;
+  fill: none !important;
+}
+
+/* Area fill - gradient */
+.recharts-area {
+  fill: url(#colorOccupancy) !important;
+  opacity: 0.3;
+}
+
+/* Remove grid lines for cleaner look */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: transparent !important;
+}
+
+/* X-axis and Y-axis styling */
+.recharts-cartesian-axis-tick-value {
+  fill: #8B95A8;
+  font-size: 12px;
+}
+
+/* Hide Y-axis line */
+.recharts-cartesian-axis-line {
+  stroke: transparent !important;
+}
+
+/* Tooltip styling */
+.recharts-tooltip-wrapper {
+  border: none !important;
+  background: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}

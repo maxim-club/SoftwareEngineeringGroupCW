@@ -49,7 +49,7 @@ class StudySpaceProfileManagerMockTest {
         profile2 = new StudySpaceProfile();
         profile2.setId("2");
         profile2.setRoomLocation("Room B");
-        profile2.setOccupancy(Occupancy.BUSY);
+        profile2.setOccupancy(Occupancy.HIGH);
         profile2.setNoiseLevel(NoiseLevel.LOUD);
         profile2.setSuitableForGroups(false);
         profile2.setMaxGroupSize(1);
@@ -77,7 +77,7 @@ class StudySpaceProfileManagerMockTest {
 		// Replacement data (id is ignored)
 		StudySpaceProfile replacement = new StudySpaceProfile();
 		replacement.setRoomLocation("Room A Updated");
-		replacement.setOccupancy(Occupancy.MODERATE);
+		replacement.setOccupancy(Occupancy.MEDIUM);
 		replacement.setNoiseLevel(NoiseLevel.MODERATE);
 		replacement.setSuitableForGroups(true);
 		replacement.setMaxGroupSize(10);
@@ -105,7 +105,7 @@ class StudySpaceProfileManagerMockTest {
 		// Verify fields updated
 		assertEquals("Room A Updated", saved.getRoomLocation());
 		assertEquals("Updated notes", saved.getNotes());
-		assertEquals(Occupancy.MODERATE, saved.getOccupancy());
+		assertEquals(Occupancy.MEDIUM, saved.getOccupancy());
 		assertEquals(NoiseLevel.MODERATE, saved.getNoiseLevel());
 		assertTrue(saved.isSuitableForGroups());
 		assertEquals(10, saved.getMaxGroupSize());

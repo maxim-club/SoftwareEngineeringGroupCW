@@ -2,7 +2,13 @@ package com.studyspaces.spacefinder.service;
 
 import com.studyspaces.spacefinder.repository.StudySpaceRepository;
 import com.studyspaces.spacefinder.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 
 import java.util.List;
@@ -14,10 +20,20 @@ import java.util.Optional;
  * This service layer handles business logic and provides a clean interface
  * to interact with the StudySpaceRepository.
  */
+
+
 @Service
+
 public class StudySpaceProfileManager {
 
+
     private final StudySpaceRepository repository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private Environment env;
 
     public StudySpaceProfileManager(StudySpaceRepository repository) {
         this.repository = repository;

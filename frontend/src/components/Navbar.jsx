@@ -1,6 +1,6 @@
 import { Navbar, Nav } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import { House, Bookmark, Map, Person } from "react-bootstrap-icons";
+import { House, Map, Person } from "react-bootstrap-icons";
 
 function AppNavbar() {
   const { pathname } = useLocation();
@@ -15,17 +15,12 @@ function AppNavbar() {
           <div className="tab-label">Home</div>
         </Nav.Link>
 
-        <Nav.Link as={Link} to="/saved" className={isActive("/saved") ? "active" : ""}>
-          <Bookmark size={22} />
-          <div className="tab-label">Saved</div>
-        </Nav.Link>
-
         <Nav.Link as={Link} to="/mapview" className={isActive("/mapview") ? "active" : ""}>
           <Map size={22} />
           <div className="tab-label">Map</div>
         </Nav.Link>
 
-        <Nav.Link as={Link} to="/account" className={isActive("/account") ? "active" : ""}>
+        <Nav.Link as={Link} to="/profile" className={isActive("/profile") ? "active" : ""}>
           <Person size={22} />
           <div className="tab-label">Account</div>
         </Nav.Link>
