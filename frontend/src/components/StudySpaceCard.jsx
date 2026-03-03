@@ -4,7 +4,6 @@ import { FaStar } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 import { MdOutlineAccessible } from "react-icons/md";
 
-
 const AmenityIcon = ({ k }) => {
   const style = { fontSize: 20, color: "#6c757d" };
 
@@ -47,6 +46,8 @@ export default function StudySpaceCard(props) {
 
   const space = props.space ?? null;
 
+  const onCheckIn = props.onCheckIn ?? (() => {});
+
   const data = useMemo(() => {
     const title =
       space?.roomLocation ??
@@ -88,7 +89,6 @@ export default function StudySpaceCard(props) {
 
 
   const onViewInfo = props.onViewInfo ?? (() => {});
-  const onCheckIn = props.onCheckIn ?? (() => {});
   const onBookRoom = props.onBookRoom ?? (() => {});
 
   const pill = statusPillStyle(data.status);

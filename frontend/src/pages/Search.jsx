@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./Search.css";
+import { SPACES } from "../spacesDummy";
 
 function Search() {
   const navigate = useNavigate();
@@ -20,60 +21,7 @@ function Search() {
   const existingFilters = location.state?.filters ?? null;
 
   useEffect(() => {
-    setSpaces([
-      {
-        id: "1",
-        roomLocation: "Library 5th floor",
-        building: "Claverton Down",
-        rating: 4.3,
-        reviewCount: 47,
-        occupancy: "Busy",
-        distance: "4 m",
-        walkTime: "3 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=60",
-        amenities: ["wheelchairAccess", "monitor", "powerOutlets"],
-      },
-      {
-        id: "2",
-        roomLocation: "Pavilion Café",
-        building: "Management building",
-        rating: 4.4,
-        reviewCount: 96,
-        occupancy: "Busy",
-        distance: "6 m",
-        walkTime: "5 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=60",
-        amenities: ["powerOutlets", "naturalLights", "wheelchairAccess"],
-      },
-      {
-        id: "3",
-        roomLocation: "Library Level 2nd floor",
-        building: "Claverton Down",
-        rating: 4.6,
-        reviewCount: 210,
-        occupancy: "Moderate",
-        distance: "10 m",
-        walkTime: "8 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=60",
-        amenities: ["quietZone", "powerOutlets", "wheelchairAccess"],
-      },
-      {
-        id: "4",
-        roomLocation: "1 West Study Area",
-        building: "1 West",
-        rating: 4.3,
-        reviewCount: 74,
-        occupancy: "Free",
-        distance: "7 m",
-        walkTime: "6 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=60",
-        amenities: ["powerOutlets", "whiteboard", "naturalLights"],
-      },
-    ]);
+    setSpaces(SPACES);
     setLoading(false);
   }, []);
 

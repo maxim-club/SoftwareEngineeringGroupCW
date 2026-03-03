@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
 import StudySpacesMap from "../components/StudySpacesMap";
+import useGoToCheckin from "../hooks/useGoToCheckin";
 import { SPACES } from "../spacesDummy";
 
 
 
 export default function MapPage() {
+  const goToCheckin = useGoToCheckin();
   const navigate = useNavigate();
   const location = useLocation();
   const existingFilters = location.state?.filters ?? null;
@@ -114,7 +116,11 @@ export default function MapPage() {
 
       {selected && (
         <div className="map-card">
-          <StudySpaceCard space={selected} />
+          <StudySpaceCard
+            space={selected}
+            onViewInfo={() => navigate(`/space/${selected.id}`)}
+            onCheckIn={() => goToCheckin(selected)}  
+          />
         </div>
       )}
 
