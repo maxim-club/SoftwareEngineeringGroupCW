@@ -1,0 +1,44 @@
+### 1. Get Current Occupancy
+# Returns the latest reported status (e.g., "MEDIUM")
+GET http://localhost:8080/checkIn/library-level2-quiet/occupancy
+Accept: application/json
+
+###
+
+### 2. Get Time Since Last Update
+# Returns a number representing seconds since the last report
+GET http://localhost:8080/checkIn/library-level2-quiet/last-update
+Accept: application/json
+
+###
+
+### 3. Get 7-Day Average
+# Returns the calculated average occupancy for the week
+GET http://localhost:8080/checkIn/library-level2-quiet/average-occupancy
+Accept: application/json
+
+###
+
+### 4. Submit a User Check-In (Report Status)
+# Logic: Updates the room status in the database.
+# Make sure the room ID exists in Atlas.
+POST http://localhost:8080/checkIn/library-level2-quiet/check-in
+Content-Type: application/json
+
+{
+  "occupancy": "HIGH",
+  "comment": "Very busy today, hard to find a desk near a window.",
+  "anonymous": true
+}
+
+###
+
+### 5. Submit Check-In for Engineering Room
+POST http://localhost:8080/checkIn/engineering-1-12/check-in
+Content-Type: application/json
+
+{
+  "occupancy": "LOW",
+  "comment": "Plenty of space available right now.",
+  "anonymous": false
+}
