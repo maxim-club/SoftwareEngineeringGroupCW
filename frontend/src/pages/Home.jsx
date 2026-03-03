@@ -1,39 +1,191 @@
-import { Container, Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import { SPACES } from "../spacesDummy";
+import StudySpacesMap from "../components/StudySpacesMap";
+import "./Home.css";
 
-function Home() {
+import { FiChevronDown } from "react-icons/fi";
+
+export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const navigate = useNavigate();
+  const [nearestSpace, setNearestSpace] = useState(null);
 
-  const handleFilterClick = () => {
-    // Open Filters even from Home page search bar
-    navigate("/filters", { state: { filters: null } });
+  const recommendations = useMemo(() => {
+    return [...SPACES]
+      .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+      .slice(0, 3);
+  }, []);
+
+  const onFilterClick = () => {
+    navigate("/filters", { state: { filters: null, from: "/" } });
   };
 
+  const onSearchSubmit = () => {
+    navigate("/search", { state: { initialQuery: searchInput, from: "/" } });
+  };
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const userLat = pos.coords.latitude;
+        const userLng = pos.coords.longitude;
+
+        // Find nearest space
+        let closest = null;
+        let minDistance = Infinity;
+
+        SPACES.forEach((space) => {
+          const dx = space.lat - userLat;
+          const dy = space.lng - userLng;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closest = space;
+          }
+        });
+
+        setNearestSpace(closest);
+      },
+      () => {
+        console.log("Location access denied");
+      }
+    );
+  }, []);
+
   return (
-    <Container className="text-center mt-5">
-      <div className="mb-4">
-        <SearchBar
-          value={searchInput}
-          onChange={setSearchInput}
-          placeholder="Search study spaces..."
-          onFilterClick={handleFilterClick}
-        />
-      </div>
+    <div className="home-wrap">
+      <Container style={{ maxWidth: 520 }}>
+        <div className="home-toprow">
+          <div>
+            <div className="home-locationlabel">Location</div>
+            <div className="home-locationvalue">
+              <span style={{ fontSize: 18 }}>📍</span>
+              <span>
+                {nearestSpace
+                  ? nearestSpace.building
+                  : "Location unavailable"}
+              </span>
+              <FiChevronDown size={22} color="#0B5ED7" />
+            </div>
+          </div>
 
-      <h1>Find Your Perfect Study Space</h1>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: "#e9ecef",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/profile")}
+          >
+            👤
+          </div>
+        </div>
 
-      <p className="lead mt-3">
-        Discover available study spaces across campus and the city
-      </p>
+        <div className="mb-4">
+          <SearchBar
+            value={searchInput}
+            onChange={setSearchInput}
+            placeholder="Search"
+            onFilterClick={onFilterClick}
+            onSubmit={onSearchSubmit}
+          />
+        </div>
 
-      <Button variant="primary" size="lg" as={Link} to="/search" className="mt-3">
-        Search Spaces
-      </Button>
-    </Container>
+        <div className="home-sectionrow">
+          <h3 className="home-sectiontitle">Recommendations</h3>
+
+          <button
+            type="button"
+            onClick={() => navigate("/search", { state: { from: "/" } })}
+            className="home-link"
+            style={{ border: "none", background: "transparent" }}
+          >
+            See all
+          </button>
+        </div>
+
+        <div className="home-recs">
+          {recommendations.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => navigate(`/space/${s.id}`)}
+              style={{
+                minWidth: 165,
+                borderRadius: 16,
+                background: "white",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+                overflow: "hidden",
+                border: "1px solid #f1f3f5",
+                padding: 0,
+                textAlign: "left",
+                cursor: "pointer",
+              }}
+            >
+              <img
+                src={s.imageUrl}
+                alt={s.roomLocation}
+                style={{ width: "100%", height: 115, objectFit: "cover" }}
+              />
+
+              <div style={{ padding: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 6 }}>
+                  {s.roomLocation}
+                </div>
+
+                <div style={{ fontSize: 12, color: "#6c757d", marginBottom: 8 }}>
+                  {Number(s.rating ?? 0).toFixed(1)} ★★★★★ ({s.reviewCount ?? 0} reviews)
+                </div>
+
+                <div
+                  style={{
+                    display: "inline-block",
+                    fontSize: 12,
+                    padding: "4px 10px",
+                    borderRadius: 10,
+                    background: "#e7f1ff",
+                    color: "#0B5ED7",
+                    fontWeight: 700,
+                    marginBottom: 8,
+                  }}
+                >
+                  {s.occupancy ?? "Free"}
+                </div>
+
+                <div style={{ fontSize: 12, color: "#6c757d" }}>
+                  🕒 {s.walkTime ?? "-"}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="home-sectionrow" style={{ marginTop: 10 }}>
+          <h3 className="home-sectiontitle">Nearby Location</h3>
+          <button
+            type="button"
+            onClick={() => navigate("/mapview")}
+            className="home-link"
+            style={{ border: "none", background: "transparent" }}
+          >
+            View full map
+          </button>
+        </div>
+
+        <div className="home-mapcard">
+          <StudySpacesMap spaces={SPACES} />
+        </div>
+      </Container>
+    </div>
   );
 }
-
-export default Home;

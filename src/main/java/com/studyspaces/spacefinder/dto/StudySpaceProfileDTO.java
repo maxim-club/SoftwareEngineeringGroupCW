@@ -1,7 +1,4 @@
-package com.studyspaces.spacefinder.model;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.studyspaces.spacefinder.dto;
 
 import java.util.List;
 
@@ -10,19 +7,16 @@ import com.studyspaces.spacefinder.model.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "Room Data") //this is the name of the collection in the database
-public class StudySpaceProfile {
+public class StudySpaceProfileDTO {
 
-    @Id
-    @Field("_id")
     private String id;
 
     // Core info
-    private String roomLocation; // This will be room and building combined into one.
+    private String roomLocation;
     private String address;
     private String notes;
 
@@ -43,10 +37,4 @@ public class StudySpaceProfile {
     // Time + place
     private List<ScheduleEntry> schedule;
     private Coordinates coordinates;
-
-    public StudySpaceProfile() {}
-
-    public FilterQuery toFilterQuery(){
-        return new FilterQuery(noiseLevel, occupancy, amenities, suitableForGroups, maxGroupSize);
-    }
 }

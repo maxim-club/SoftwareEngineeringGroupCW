@@ -1,0 +1,246 @@
+/* Profile Setup Page */
+.profile-setup-page {
+  min-height: 100vh;
+  background: #F5F5F5;
+  padding: 20px;
+}
+
+.profile-setup-container {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Header */
+.profile-setup-header {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  color: #212529;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  color: #0d6efd;
+}
+
+/* Content */
+.profile-setup-content {
+  background: white;
+  border-radius: 20px;
+  padding: 30px 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.profile-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 12px;
+}
+
+.profile-subtitle {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+/* Profile Photo Upload */
+.photo-upload-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.photo-circle {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.photo-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #E8E8E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photo-edit-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #0d6efd;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.photo-edit-button:hover {
+  background: #0b5ed7;
+}
+
+/* Form */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-bottom: 2px solid #E0E0E0;
+  font-size: 15px;
+  color: #212529;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-bottom-color: #0d6efd;
+}
+
+.form-input::placeholder {
+  color: #9CA3AF;
+}
+
+/* Select Dropdown */
+.select-wrapper {
+  position: relative;
+}
+
+.form-select {
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  border: none;
+  border-bottom: 2px solid #E0E0E0;
+  font-size: 15px;
+  color: #212529;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.form-select:focus {
+  outline: none;
+  border-bottom-color: #0d6efd;
+}
+
+.form-select option:first-child {
+  color: #9CA3AF;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+}
+
+/* Date Input */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-input {
+  padding-right: 40px;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
+.calendar-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #0d6efd;
+  pointer-events: none;
+}
+
+/* Continue Button */
+.continue-button {
+  width: 100%;
+  background: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 20px;
+}
+
+.continue-button:hover {
+  background: #0b5ed7;
+}
+
+.continue-button:active {
+  background: #0a58ca;
+}
+
+/* Mobile Responsive */
+@media (max-width: 576px) {
+  .profile-title {
+    font-size: 22px;
+  }
+
+  .profile-subtitle {
+    font-size: 13px;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .date-input {
+    padding-right: 38px;
+  }
+}
