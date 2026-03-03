@@ -27,15 +27,25 @@ export default function MapPage() {
   }, []);
 
   const suggestions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return spaces.slice(0, 6);
+  const q = query.trim().toLowerCase();
+  if (!q) return spaces.slice(0, 6);
 
-    return spaces
-      .filter((s) => {
-        const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
-        return text.includes(q);
-      })
-      .slice(0, 6);
+  return spaces
+    // #1: search only by room name (not building) 
+    .filter((s) => (s.roomLocation || "").toLowerCase().includes(q))
+    // #2: sort results so that the “most relevant” appears first based on what the user types out then alphabetically
+    .sort((a, b) => {
+      const an = (a.roomLocation || "").toLowerCase();
+      const bn = (b.roomLocation || "").toLowerCase();
+
+      const aStarts = an.startsWith(q);
+      const bStarts = bn.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return an.localeCompare(bn);
+    })
+    .slice(0, 6);
   }, [spaces, query]);
 
   function choose(space) {
