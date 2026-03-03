@@ -28,10 +28,10 @@ function Search() {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return spaces;
-    return spaces.filter((s) => {
-      const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
-      return text.includes(q);
-    });
+
+    return spaces.filter((s) =>
+      (s.roomLocation || "").toLowerCase().includes(q)
+    );
   }, [spaces, query]);
 
   return (
@@ -65,7 +65,10 @@ function Search() {
           placeholder="Search"
           onFilterClick={() =>
             navigate("/filters", {
-              state: { filters: existingFilters, from: location.state?.from || "/" },
+              state: {
+                filters: existingFilters,
+                from: location.state?.from || "/",
+              },
             })
           }
           onSubmit={() =>
