@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Badge, Nav, Collapse } from 'react-bootstrap';
+import useGoToCheckin from "../hooks/useGoToCheckin";
+import { SPACES } from "../spacesDummy";
 import './SpaceDetailPage.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -31,6 +33,7 @@ import OccupancyLineChart from './Line-trial';
 function SpaceDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const goToCheckin = useGoToCheckin();
   const reviews = [
     {
         id: 1,
@@ -103,6 +106,11 @@ function SpaceDetailPage() {
   const [hoursExpanded, setHoursExpanded] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
 
+  const space = useMemo(
+    () => SPACES.find((s) => String(s.id) === String(id)),
+    [id]
+  );
+
   // Get user location
   useEffect(() => {
     if (navigator.geolocation) {
@@ -121,19 +129,23 @@ function SpaceDetailPage() {
   }, []);
 
   const currentSpace = {
-    id: id,
-    name: "Pavilion Café",
-    building: "Management Building",
-    address: "Claverton Down",
+    id: space.id,
+    name: space.roomLocation,         // map name
+    building: space.building,
+    address: space.address ?? "Claverton Down",         // add dummy
     coordinates: {
-      latitude: 51.3811,
-      longitude: -2.3310
+      latitude: space.lat,            // map coords
+      longitude: space.lng,
     },
-    rating: 4.5,
-    reviewCount: 128,
-    distance: "1.6 km",
-    walkTime: "5 mins",
-    about: "Newly opened Pavilion is a sleek café bar for all students and staff to meet. The café serves artisan sandwiches, dumplings and seasonal dishes.",
+    rating: space.rating,
+    reviewCount: space.reviewCount,
+    distance: space.distance,
+    walkTime: space.walkTime,
+    about:
+      space.about ?? "No description yet.", // dummy for now
+    occupancy: space.occupancy,
+    amenities: space.amenities,
+    imageUrl: space.imageUrl,
   };
 
   return (
@@ -156,12 +168,12 @@ function SpaceDetailPage() {
         </div>
         
         {/* HEADER IMAGE - using space ID to load corresponding image, with fallback to default */}
-        <img 
-          src={`/images/spaces/${id}.jpg`}
+        <img
+          src={currentSpace.imageUrl || `/images/spaces/${id}.jpg`}
           alt={currentSpace.name}
           className="header-image"
           onError={(e) => {
-            e.target.src = '/images/spaces/default-space.jpg';
+            e.currentTarget.src = "/images/spaces/default-space.jpg";
           }}
         />
       </div>
@@ -179,7 +191,7 @@ function SpaceDetailPage() {
             <span className="review-count">({currentSpace.reviewCount} reviews)</span>
           </div>
           <div className="badges-row">
-            <Badge bg="primary">Available</Badge>
+            <Badge bg="primary">{currentSpace.occupancy || "Available"}</Badge>
             <span className="stat-item">
               <IoLocationOutline size={16} />
               {currentSpace.distance}
@@ -364,7 +376,12 @@ function SpaceDetailPage() {
       </Container>
 
       <div className="fixed-bottom-button">
-        <button className="check-in-button">Check-in now</button>
+        <button
+          className="check-in-button"
+          onClick={() => goToCheckin(currentSpace)}
+        >
+          Check-in now
+        </button>
       </div>
     </div>
   );
@@ -413,7 +430,7 @@ function SingleLocationMap({ space, userLocation }) {
         mapInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [space.coordinates.latitude, space.coordinates.longitude, space.name]);
 
   useEffect(() => {
     if (mapInstanceRef.current && userLocation) {
@@ -440,7 +457,7 @@ function SingleLocationMap({ space, userLocation }) {
       ]);
       mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [userLocation]);
+  }, [userLocation, space.coordinates.latitude, space.coordinates.longitude]);
 
   return (
     <div 

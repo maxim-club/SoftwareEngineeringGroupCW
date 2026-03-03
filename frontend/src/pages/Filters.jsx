@@ -38,7 +38,7 @@ function Filters() {
     setSelectedAmenities((prev) => ({ ...prev, [key]: !prev?.[key] }));
   };
 
-  // --- Number of people (default: NONE) ---
+  // Number of people 
   const peopleLabels = ["1", "2-3", "4-5", "6-8", "8-10", "10+"];
 
   const [peopleIndex, setPeopleIndex] = useState(
@@ -76,10 +76,9 @@ function Filters() {
 
       next[key] = !next[key];
 
-      // if any specific policy is selected, ensure Any is off
+     
       if (next[key]) delete next.Any;
 
-      // if key was turned off and nothing left, keep as {}
       const hasAny = Object.values(next).some(Boolean);
       return hasAny ? next : {};
     });
@@ -120,7 +119,10 @@ function Filters() {
       accessibility,
     };
 
-    navigate("/filtered-results", { state: { filters: filtersToSend } });
+    navigate("/filtered-results", { 
+      state: { filters: filtersToSend },
+      replace: true, 
+    });
   };
 
   const handleSubmit = (e) => {
@@ -148,7 +150,7 @@ function Filters() {
             type="button"
             variant="link"
             className="p-0 text-decoration-none"
-            onClick={() => navigate("/search")}
+            onClick={() => navigate(location.state?.from || "/search")}
             aria-label="Close"
             style={{ fontSize: 28, lineHeight: "28px" }}
           >
@@ -160,7 +162,6 @@ function Filters() {
           </h1>
         </div>
 
-        {/* Top pills row (visual only) */}
         <div className="d-flex gap-2 mb-3 flex-wrap">
           <Pill active>Location</Pill>
           <Pill>Filter building</Pill>
@@ -249,7 +250,7 @@ function Filters() {
           </Card.Body>
         </Card>
 
-        {/* Atmosphere (multi-select)*/}
+        {/* Atmosphere */}
         <Card className="mb-3" style={{ borderRadius: 18 }}>
           <Card.Body className="py-3">
             <div className="fw-semibold">Atmosphere</div>
@@ -268,7 +269,7 @@ function Filters() {
           </Card.Body>
         </Card>
 
-        {/* Food Policy (multi-select) */}
+        {/* Food Policy */}
         <Card className="mb-3" style={{ borderRadius: 18 }}>
           <Card.Body className="py-3">
             <div className="fw-semibold">Food Policy</div>
@@ -287,7 +288,7 @@ function Filters() {
           </Card.Body>
         </Card>
 
-        {/* Reviews (✅ multi-select) */}
+        {/* Reviews */}
         <Card className="mb-3" style={{ borderRadius: 18 }}>
           <Card.Body className="py-3">
             <div className="fw-semibold">Reviews</div>
@@ -314,7 +315,7 @@ function Filters() {
           </Card.Body>
         </Card>
 
-        {/* Accessibility (multi-select) */}
+        {/* Accessibility */}
         <Card className="mb-4" style={{ borderRadius: 18 }}>
           <Card.Body className="py-3">
             <div className="fw-semibold">Accessibility</div>
