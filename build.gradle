@@ -52,7 +52,6 @@ dependencies {
 
 	// Smile library
 	implementation("com.github.haifengl:smile-core:5.2.0")
-	implementation("com.github.haifengl:smile-deep:5.2.0")
 }
 
 tasks.named('test') {
