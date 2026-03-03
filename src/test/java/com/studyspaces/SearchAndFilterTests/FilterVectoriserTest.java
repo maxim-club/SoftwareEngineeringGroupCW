@@ -180,10 +180,23 @@ class FilterVectoriserTest {
     @Test
     void amenitiesPresent_iteratesAllBooleans() {
 
-        Amenities a = new Amenities(
-                true,false,true,false,
-                true,false,true,false
-        );
+
+        Amenities a = Amenities.builder()
+                .desks(true)
+                .computers(true)
+                .foodAllowed(true)
+                .heaters(true)
+                .monitors(true)
+                .naturalLight(false)
+                .plugSockets(true)
+                .printers(true)
+                .projectors(true)
+                .silent(true)
+                .toiletNearby(true)
+                .waterFountainNearby(true)
+                .wheelchairAccessible(true)
+                .whiteboard(true)
+                .build();
 
         FilterQuery q = new FilterQuery();
         q.preferredAmenities = a;
@@ -192,7 +205,7 @@ class FilterVectoriserTest {
 
         // first amenity starts at index 3
         assertEquals(1f, v.get(3).getSecond());
-        assertEquals(0f, v.get(4).getSecond());
+        assertEquals(1f, v.get(4).getSecond());
     }
 
     /* --------------------------------------------------
