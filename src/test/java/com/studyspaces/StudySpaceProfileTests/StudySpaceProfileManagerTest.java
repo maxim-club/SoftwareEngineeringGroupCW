@@ -42,7 +42,22 @@ class StudySpaceProfileManagerMockTest {
         profile1.setSuitableForGroups(true);
         profile1.setMaxGroupSize(5);
         profile1.setNotes("Quiet room for study");
-        profile1.setAmenities(new Amenities(true, true, false, false, false, false, false, true));
+        profile1.setAmenities(Amenities.builder()
+                .desks(true)
+                .computers(true)
+                .foodAllowed(true)
+                .heaters(true)
+                .monitors(true)
+                .naturalLight(false)
+                .plugSockets(true)
+                .printers(true)
+                .projectors(true)
+                .silent(true)
+                .toiletNearby(true)
+                .waterFountainNearby(true)
+                .wheelchairAccessible(true)
+                .whiteboard(true)
+                .build());
         profile1.setSchedule(new ArrayList<>());
 
         // Profile 2
@@ -54,7 +69,22 @@ class StudySpaceProfileManagerMockTest {
         profile2.setSuitableForGroups(false);
         profile2.setMaxGroupSize(1);
         profile2.setNotes("Busy room");
-        profile2.setAmenities(new Amenities(false, false, true, false, true, false, false, true));
+        profile2.setAmenities(Amenities.builder()
+                .desks(true)
+                .computers(true)
+                .foodAllowed(true)
+                .heaters(true)
+                .monitors(true)
+                .naturalLight(false)
+                .plugSockets(true)
+                .printers(true)
+                .projectors(true)
+                .silent(true)
+                .toiletNearby(true)
+                .waterFountainNearby(true)
+                .wheelchairAccessible(true)
+                .whiteboard(true)
+                .build());
         profile2.setSchedule(new ArrayList<>());
     }
 
@@ -82,7 +112,22 @@ class StudySpaceProfileManagerMockTest {
 		replacement.setSuitableForGroups(true);
 		replacement.setMaxGroupSize(10);
 		replacement.setNotes("Updated notes");
-		replacement.setAmenities(new Amenities(true, true, true, true, true, true, true, false));
+		replacement.setAmenities(Amenities.builder()
+                .desks(true)
+                .computers(true)
+                .foodAllowed(true)
+                .heaters(true)
+                .monitors(true)
+                .naturalLight(false)
+                .plugSockets(true)
+                .printers(true)
+                .projectors(true)
+                .silent(true)
+                .toiletNearby(true)
+                .waterFountainNearby(true)
+                .wheelchairAccessible(true)
+                .whiteboard(true)
+                .build());
 		replacement.setSchedule(new ArrayList<>());
 
 		// Mock existing profile in repository
@@ -119,7 +164,7 @@ class StudySpaceProfileManagerMockTest {
 		assertTrue(saved.getAmenities().isFoodAllowed());
 		assertTrue(saved.getAmenities().isWaterFountainNearby());
 		assertTrue(saved.getAmenities().isToiletNearby());
-		assertFalse(saved.getAmenities().isWheelchairAccessible());
+		assertTrue(saved.getAmenities().isWheelchairAccessible());
 
 		// Verify repository interactions
 		verify(repository).findById("1");
