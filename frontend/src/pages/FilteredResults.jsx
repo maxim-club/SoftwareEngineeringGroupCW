@@ -3,6 +3,7 @@ import { Container, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./FilteredResults.css";
+import useGoToCheckin from "../hooks/useGoToCheckin";
 
 import imgLibrary from "../assets/studyspaces/library.jpg";
 import imgPavilion from "../assets/studyspaces/PavilionCafe.jpg";
@@ -76,6 +77,7 @@ export default function FilteredResults() {
   const location = useLocation();
   const navigate = useNavigate();
   const activeFilters = location.state?.filters || null;
+  const goToCheckin = useGoToCheckin();
 
   const { results, suggestions, countLabel } = useMemo(() => {
     const spaces = SAMPLE_SPACES;
@@ -223,6 +225,7 @@ export default function FilteredResults() {
             key={space.id}
             space={space}
             onViewInfo={() => onViewInfo(space)}
+            onCheckIn={() => goToCheckin(space)}
           />
         ))}
 

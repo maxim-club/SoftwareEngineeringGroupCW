@@ -19,7 +19,7 @@ import UserProfile from "./pages/UserProfile";
 
 import SearchResults from "./pages/SearchResults";
 
-import CheckedInScreen from "./pages/CheckinTimer";
+import CheckinPage from "./pages/CheckinPage";
 
 function App() {
   return (
@@ -43,7 +43,7 @@ function App() {
           <Route path="/filters" element={<Filters />} />
           <Route path="/filtered-results" element={<FilteredResults />} />
           <Route path="/profile" element={<UserProfile />} />
-          <Route path="/checkedin" element={<CheckedInScreen />} />
+          <Route path="/checkedin" element={<CheckinPage />} />
         </Route>
 
 

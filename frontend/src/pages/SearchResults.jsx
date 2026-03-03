@@ -1,10 +1,13 @@
 import { Container } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
+import useGoToCheckin from "../hooks/useGoToCheckin";
+import { SPACES } from "../spacesDummy";
 
 function SearchResults() {
+  const goToCheckin = useGoToCheckin();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -12,38 +15,17 @@ function SearchResults() {
     location.state?.initialQuery || ""
   );
 
-  const [spaces, setSpaces] = useState([]);
+  const spaces = SPACES;
 
-  useEffect(() => {
-    setSpaces([
-      {
-        id: "1",
-        roomLocation: "Library 5th floor",
-        building: "Claverton Down",
-        rating: 4.3,
-        reviewCount: 47,
-        occupancy: "Busy",
-        distance: "4 m",
-        walkTime: "3 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
-        amenities: ["wheelchairAccess", "monitor", "powerOutlets"],
-      },
-      {
-        id: "2",
-        roomLocation: "Pavilion cafe",
-        building: "Management building",
-        rating: 4.3,
-        reviewCount: 47,
-        occupancy: "Busy",
-        distance: "4 m",
-        walkTime: "3 mins",
-        imageUrl:
-          "https://images.unsplash.com/photo-1523240795612-9a054b0db644",
-        amenities: ["wheelchairAccess", "monitor", "powerOutlets"],
-      },
-    ]);
-  }, []);
+  const filteredSpaces = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return spaces;
+
+    return spaces.filter((s) => {
+      const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
+      return text.includes(q);
+    });
+  }, [spaces, query]);
 
   const handleFilterClick = () => {
     navigate("/filters");
@@ -78,11 +60,12 @@ function SearchResults() {
 
       {/* Results */}
       <div className="d-flex flex-column gap-4">
-        {spaces.map((space) => (
+        {filteredSpaces.map((space) => (
           <StudySpaceCard
             key={space.id}
             space={space}
             onViewInfo={() => navigate(`/space/${space.id}`)}
+            onCheckIn={() => goToCheckin(space)}
           />
         ))}
       </div>
