@@ -5,10 +5,13 @@ import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./Search.css";
 import { SPACES } from "../spacesDummy";
+import useGoToCheckin from "../hooks/useGoToCheckin";
 
 function Search() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const goToCheckin = useGoToCheckin();
 
   const goBack = () => {
     navigate(location.state?.from || "/");
@@ -85,7 +88,16 @@ function Search() {
       ) : (
         <div className="ui-searchpage-results">
           {results.map((space) => (
-            <StudySpaceCard key={space.id} space={space} />
+            <div className="ui-searchpage-results">
+              {results.map((space) => (
+                <StudySpaceCard
+                  key={space.id}
+                  space={space}
+                  onViewInfo={() => navigate(`/space/${space.id}`)}
+                  onCheckIn={() => goToCheckin(space)}
+                />
+              ))}
+            </div>
           ))}
         </div>
       )}
