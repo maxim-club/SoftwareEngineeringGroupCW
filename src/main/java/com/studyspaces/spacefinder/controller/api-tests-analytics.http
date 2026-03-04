@@ -1,0 +1,34 @@
+### 1. Get Room Utilisation Summary (Table Data)
+# Returns a list of all rooms with their occupancy and capacity stats
+GET http://localhost:8080/api/analytics/rooms/summary
+Accept: application/json
+
+
+### 2. Get Building Stats
+# Returns utilization percentages grouped by building
+GET http://localhost:8080/api/analytics/buildings
+Accept: application/json
+
+
+### 3. Get Peak Usage for a Specific Room
+# Replace 'library-level2-quiet' with a valid ID from your database
+GET http://localhost:8080/api/analytics/rooms/library-level2-quiet/peak
+Accept: application/json
+
+
+### 4. Get Most Used Rooms (Insights)
+# Returns rooms with the highest occupancy rates
+GET http://localhost:8080/api/analytics/rooms/most-used
+Accept: application/json
+
+
+### 5. Get Least Used Rooms (Insights)
+# Returns rooms with the lowest occupancy rates
+GET http://localhost:8080/api/analytics/rooms/least-used
+Accept: application/json
+
+
+### 6. Get Under-Utilised Rooms (Insights)
+# Returns rooms specifically flagged as being below efficient capacity
+GET http://localhost:8080/api/analytics/rooms/under-utilised
+Accept: application/json

@@ -6,8 +6,8 @@ import lombok.Data;
 public class ScheduleEntry {
 
     private String day;        // 1 = Monday, 7 = Sunday
-    private String openHour;   // 0–23
-    private String closeHour;  // 0–23
+    private String startTime;   // 0–23
+    private String endTime;  // 0–23
 
     public ScheduleEntry() {}
 }
