@@ -5,10 +5,13 @@ import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./Search.css";
 import { SPACES } from "../spacesDummy";
+import useGoToCheckin from "../hooks/useGoToCheckin";
 
 function Search() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const goToCheckin = useGoToCheckin();
 
   const goBack = () => {
     navigate(location.state?.from || "/");
