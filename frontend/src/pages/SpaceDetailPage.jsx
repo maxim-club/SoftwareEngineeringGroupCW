@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Badge, Nav, Collapse } from 'react-bootstrap';
+import { Container, Badge, Nav, Collapse, Spinner } from 'react-bootstrap';
 import useGoToCheckin from "../hooks/useGoToCheckin";
 import { SPACES } from "../spacesDummy";
 import './SpaceDetailPage.css';
@@ -101,15 +101,25 @@ function SpaceDetailPage() {
     }
     ];
 
-  
+  const [spaces, setSpaces] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('info');
   const [hoursExpanded, setHoursExpanded] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
 
-  const space = useMemo(
-    () => SPACES.find((s) => String(s.id) === String(id)),
-    [id]
-  );
+    useEffect(() => {
+        setLoading(true);
+        fetch('http://localhost:8080/api/spaces')
+            .then((res) => res.json())
+            .then((data) => {
+                setSpaces(data);
+            })
+            .catch((err) => console.error("Error fetching detail:", err))
+            .finally(() => setLoading(false));
+    }, []);  const space = useMemo(
+        () => spaces.find((s) => String(s.id) === String(id) || String(s._id) === String(id)),
+        [id, spaces]
+    );
 
   // Get user location
   useEffect(() => {
@@ -128,25 +138,37 @@ function SpaceDetailPage() {
     }
   }, []);
 
-  const currentSpace = {
-    id: space.id,
-    name: space.roomLocation,         // map name
-    building: space.building,
-    address: space.address ?? "Claverton Down",         // add dummy
-    coordinates: {
-      latitude: space.lat,            // map coords
-      longitude: space.lng,
-    },
-    rating: space.rating,
-    reviewCount: space.reviewCount,
-    distance: space.distance,
-    walkTime: space.walkTime,
-    about:
-      space.about ?? "No description yet.", // dummy for now
-    occupancy: space.occupancy,
-    amenities: space.amenities,
-    imageUrl: space.imageUrl,
-  };
+    if (loading) {
+        return (
+            <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <Spinner animation="border" variant="primary" />
+            </Container>
+        );
+    }
+
+    if (!space) {
+        return <Container><h1>Space not found</h1></Container>;
+    }
+    const currentSpace = {
+        id: space._id || space.id,
+        name: space.roomLocation,
+        building: space.building || "Campus Building",
+        address: space.address ?? "Claverton Down",
+        // FIX: Map from the nested coordinates object
+        coordinates: {
+            latitude: space.coordinates?.latitude || 51.3782,
+            longitude: space.coordinates?.longitude || -2.3264,
+        },
+        rating: space.rating || 4.5,
+        reviewCount: space.reviewCount || 12,
+        distance: space.distance || "5 min",
+        walkTime: space.walkTime || "400m",
+        about: space.notes || space.about || "No description yet.",
+        occupancy: space.occupancy,
+        amenities: space.amenities,
+        // FIX: Match the casing from your JSON (imageURL)
+        imageUrl: space.imageURL,
+    };
 
   return (
     <div className="space-detail-page">

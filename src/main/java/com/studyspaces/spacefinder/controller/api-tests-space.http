@@ -1,0 +1,77 @@
+### 1. Test GET All Spaces
+# This checks if the controller can fetch basic data
+GET http://localhost:8080/api/spaces
+Accept: application/json
+
+---
+
+### 2. Test POST Recommended Search
+# tests Advanced Search
+POST http://localhost:8080/api/spaces/recommendedSearch
+Content-Type: application/json
+
+{
+  "searchBarBuildingQuery": "library",
+  "filters": {
+    "preferredNoiseLevel": "QUIET",
+    "preferredOccupancy": "EMPTY",
+    "preferredGroupSpace": true,
+    "preferredGroupSize": 4
+  }
+}
+
+
+### 2. Test Recommendation: Quiet Individual Study
+# Logic: Should prioritize 'Library Level 2' because it is QUIET and NOT for groups
+POST http://localhost:8080/api/spaces/recommended
+Content-Type: application/json
+
+{
+  "filters": {
+    "preferredNoiseLevel": "QUIET",
+    "preferredGroupSpace": false
+  }
+}
+
+
+
+### 3. Test Recommendation: Large Group Work
+# Logic: Should prioritize 'Engineering 1.12' because it allows groups of 6
+# SU Café allows groups but maxGroupSize is only 4
+POST http://localhost:8080/api/spaces/recommended
+Content-Type: application/json
+
+{
+  "filters": {
+    "preferredGroupSpace": true,
+    "preferredGroupSize": 6
+  }
+}
+
+
+### 4. Test Advanced Search: Keyword 'Library'
+# Logic: 'exactMatches' should contain the Library
+# 'recommendations' should contain Engineering and SU Cafe (sorted by noise)
+POST http://localhost:8080/api/spaces/recommendedSearch
+Content-Type: application/json
+
+{
+  "searchBarBuildingQuery": "library",
+  "filters": {
+    "preferredNoiseLevel": "QUIET"
+  }
+}
+
+
+### 5. Test Advanced Search: Keyword 'Engineering'
+# Logic: Checks if 'exactMatches' pulls the Engineering room
+# and ensures no duplicates in the recommendation list
+POST http://localhost:8080/api/spaces/recommendedSearch
+Content-Type: application/json
+
+{
+  "searchBarBuildingQuery": "Engineering",
+  "filters": {
+    "preferredNoiseLevel": "MODERATE"
+  }
+}

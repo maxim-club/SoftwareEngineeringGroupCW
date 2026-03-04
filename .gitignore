@@ -39,3 +39,6 @@ out/
 
 #prevents sensitive local config files
 .env
+
+#mongoconfig
+src/main/java/com/studyspaces/spacefinder/config/
