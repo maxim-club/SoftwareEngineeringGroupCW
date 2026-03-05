@@ -6,7 +6,12 @@ import { SPACES } from "../spacesDummy";
 import './SpaceDetailPage.css';
 import 'leaflet/dist/leaflet.css';
 
-import { 
+import { IoIosOutlet } from "react-icons/io";
+
+import {
+    IoFastFoodOutline,
+    IoWaterOutline,
+    IoDesktopOutline,
   IoChevronBack,
   IoBookmarkOutline, 
   IoShareSocialOutline, 
@@ -27,8 +32,28 @@ import {
 import { 
   MdMeetingRoom 
 } from 'react-icons/md';
-
 import OccupancyLineChart from './Line-trial';
+
+const AMENITY_META = [
+    { key: "toiletNearby", label: "Restrooms", Icon: MdMeetingRoom },
+    { key: "plugSockets", label: "Power outlets", Icon: IoIosOutlet },
+    { key: "desks", label: "Desks", Icon: IoGridOutline },
+    { key: "computers", label: "Computers", Icon: IoDesktopOutline },
+    { key: "printers", label: "Printer", Icon: IoPrintOutline },
+    { key: "foodAllowed", label: "Food allowed", Icon: IoFastFoodOutline },
+    { key: "waterFountainNearby", label: "Water fountain", Icon: IoWaterOutline },
+    { key: "wheelchairAccessible", label: "Wheelchair access", Icon: IoAccessibilityOutline },
+];
+
+const DAY_MAP = {
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday",
+    "7": "Sunday"
+};
 
 function SpaceDetailPage() {
   const { id } = useParams();
@@ -150,7 +175,7 @@ function SpaceDetailPage() {
         return <Container><h1>Space not found</h1></Container>;
     }
     const currentSpace = {
-        id: space._id || space.id,
+        id: space.id || space.id,
         name: space.roomLocation,
         building: space.building || "Campus Building",
         address: space.address ?? "Claverton Down",
@@ -165,7 +190,8 @@ function SpaceDetailPage() {
         walkTime: space.walkTime || "400m",
         about: space.notes || space.about || "No description yet.",
         occupancy: space.occupancy,
-        amenities: space.amenities,
+        amenities: space.amenities || {},
+        schedule: space.schedule || [],
         // FIX: Match the casing from your JSON (imageURL)
         imageUrl: space.imageURL,
     };
@@ -267,61 +293,48 @@ function SpaceDetailPage() {
                 </div>
                 <span>{hoursExpanded ? '▲' : '▼'}</span>
               </div>
-              <Collapse in={hoursExpanded}>
-                <div className="hours-list">
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => (
-                    <div className="hour-row" key={day}>
-                      <span className="day">{day}</span>
-                      <span className="time">08:00 - 17:00</span>
+                <Collapse in={hoursExpanded}>
+                    <div className="hours-list">
+                        {currentSpace.schedule && currentSpace.schedule.length > 0 ? (
+                            // Sort them 1 to 7 to ensure they appear in order Monday -> Sunday
+                            [...currentSpace.schedule]
+                                .sort((a, b) => parseInt(a.day) - parseInt(b.day))
+                                .map((entry, index) => {
+                                    const isClosed = entry.startTime === "-1" || entry.endTime === "-1";
+
+                                    return (
+                                        <div className="hour-row" key={index}>
+                                            <span className="day">{DAY_MAP[entry.day] || `Day ${entry.day}`}</span>
+                                            <span className={`time ${isClosed ? 'closed' : ''}`}>
+                {isClosed
+                    ? 'Closed'
+                    : `${entry.startTime.padStart(2, '0')}:00 - ${entry.endTime.padStart(2, '0')}:00`
+                }
+              </span>
+                                        </div>
+                                    );
+                                })
+                        ) : (
+                            <p className="text-muted p-3">Schedule not available</p>
+                        )}
                     </div>
-                  ))}
-                  {['Saturday', 'Sunday'].map(day => (
-                    <div className="hour-row" key={day}>
-                      <span className="day">{day}</span>
-                      <span className="time closed">closed</span>
-                    </div>
-                  ))}
-                </div>
-              </Collapse>
+                </Collapse>
             </section>
 
-            <section className="amenities-section">
-              <h3>Amenities</h3>
-              <div className="amenities-grid">
-                <div className="amenity-item">
-                  <MdMeetingRoom className="amenity-icon" size={24} />
-                  <span>Restrooms</span>
-                </div>
-                <div className="amenity-item">
-                  <IoPeopleOutline className="amenity-icon" size={24} />
-                  <span>Group area</span>
-                </div>
-                <div className="amenity-item">
-                  <IoRestaurantOutline className="amenity-icon" size={24} />
-                  <span>Restaurant</span>
-                </div>
-                <div className="amenity-item">
-                  <IoWifiOutline className="amenity-icon blue" size={24} />
-                  <span>Wi-Fi</span>
-                </div>
-                <div className="amenity-item">
-                  <IoPrintOutline className="amenity-icon" size={24} />
-                  <span>Printer</span>
-                </div>
-                <div className="amenity-item">
-                  <IoSunnyOutline className="amenity-icon blue" size={24} />
-                  <span>Natural light</span>
-                </div>
-                <div className="amenity-item">
-                    <IoGridOutline className="amenity-icon" size={24} />
-                    <span>Whiteboard</span>
-                </div>
-                <div className="amenity-item">
-                  <IoAccessibilityOutline className="amenity-icon blue" size={24} />
-                  <span>Wheelchair</span>
-                </div>
-              </div>
-            </section>
+              <section className="amenities-section">
+                  <h3>Amenities</h3>
+
+                  <div className="amenities-grid">
+                      {AMENITY_META.filter((a) => currentSpace.amenities?.[a.key]).map(
+                          ({ key, label, Icon }) => (
+                              <div className="amenity-item" key={key}>
+                                  <Icon className="amenity-icon" size={24} />
+                                  <span>{label}</span>
+                              </div>
+                          )
+                      )}
+                  </div>
+              </section>
 
             <section className="location-section">
               <h3>Location</h3>
