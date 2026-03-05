@@ -19,12 +19,32 @@ export default function MapPage() {
   const [spaces, setSpaces] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const blurTimer = useRef(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  useEffect(() => {
-    setSpaces(SPACES);
-  }, []);
+    useEffect(() => {
+        setLoading(true); // Ensure loading starts when fetch starts
+
+        fetch('http://localhost:8080/api/spaces')
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Data received from backend:", data); // Check your console!
+                setSpaces(data);
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err); // This will tell you if it's CORS or Network
+            })
+            .finally(() => {
+                setLoading(false); // THIS FIXES THE INFINITE LOADING
+            });
+    }, []);
 
   const suggestions = useMemo(() => {
   const q = query.trim().toLowerCase();
