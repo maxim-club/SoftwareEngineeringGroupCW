@@ -37,8 +37,8 @@ function ProfileSetup() {
     e.preventDefault();
     // TODO: Connect to backend API
     console.log('Profile Setup:', formData);
-    // Navigate to home after profile setup
-    navigate('/');
+    // Navigate to profile page after profile setup
+    navigate('/profile');
   };
 
   return (

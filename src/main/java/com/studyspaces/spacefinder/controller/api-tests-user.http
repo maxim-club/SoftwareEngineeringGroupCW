@@ -1,0 +1,34 @@
+### 1. Test Login - Successful
+# Logic: Matches the hardcoded 'admin' and 'password' in your Controller
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password"
+}
+
+###
+
+### 2. Test Login - Failure (Invalid Credentials)
+# Logic: Should return a 401 Unauthorized status
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "wrongUser",
+  "password": "wrongPassword"
+}
+
+###
+
+### 3. Test Signup
+# Logic: Currently just returns a success message (Mocked)
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "newStudent",
+  "password": "securePassword123",
+  "email": "student@university.ac.uk"
+}

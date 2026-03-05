@@ -5,10 +5,13 @@ import SearchBar from "../components/SearchBar";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./Search.css";
 import { SPACES } from "../spacesDummy";
+import useGoToCheckin from "../hooks/useGoToCheckin";
 
 function Search() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const goToCheckin = useGoToCheckin();
 
   const goBack = () => {
     navigate(location.state?.from || "/");
@@ -20,18 +23,34 @@ function Search() {
 
   const existingFilters = location.state?.filters ?? null;
 
-  useEffect(() => {
-    setSpaces(SPACES);
-    setLoading(false);
-  }, []);
+    useEffect(() => {
+        setLoading(true); // Ensure loading starts when fetch starts
 
+        fetch('http://localhost:8080/api/spaces')
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Data received from backend:", data); // Check your console!
+                setSpaces(data);
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err); // This will tell you if it's CORS or Network
+            })
+            .finally(() => {
+                setLoading(false); // THIS FIXES THE INFINITE LOADING
+            });
+    }, []);
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return spaces;
-    return spaces.filter((s) => {
-      const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
-      return text.includes(q);
-    });
+
+    return spaces.filter((s) =>
+      (s.roomLocation || "").toLowerCase().includes(q)
+    );
   }, [spaces, query]);
 
   return (
@@ -65,7 +84,10 @@ function Search() {
           placeholder="Search"
           onFilterClick={() =>
             navigate("/filters", {
-              state: { filters: existingFilters, from: location.state?.from || "/" },
+              state: {
+                filters: existingFilters,
+                from: location.state?.from || "/",
+              },
             })
           }
           onSubmit={() =>
@@ -85,7 +107,14 @@ function Search() {
       ) : (
         <div className="ui-searchpage-results">
           {results.map((space) => (
-            <StudySpaceCard key={space.id} space={space} />
+              <StudySpaceCard
+                  key={space._id || space.id}
+                  space={space}
+                  // Pass the navigation functions here
+                  onViewInfo={() => navigate(`/space/${space.id || space.id}`)}
+                  onCheckIn={() => navigate('/checkin', { state: { space: space } })}
+                  onBookRoom={() => navigate(`/space/${space.id || space.id}`)} // Or your booking link
+              />
           ))}
         </div>
       )}
