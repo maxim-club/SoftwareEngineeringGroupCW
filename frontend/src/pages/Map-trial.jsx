@@ -19,23 +19,53 @@ export default function MapPage() {
   const [spaces, setSpaces] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const blurTimer = useRef(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  useEffect(() => {
-    setSpaces(SPACES);
-  }, []);
+    useEffect(() => {
+        setLoading(true); // Ensure loading starts when fetch starts
+
+        fetch('http://localhost:8080/api/spaces')
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log("Data received from backend:", data); // Check your console!
+                setSpaces(data);
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err); // This will tell you if it's CORS or Network
+            })
+            .finally(() => {
+                setLoading(false); // THIS FIXES THE INFINITE LOADING
+            });
+    }, []);
 
   const suggestions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return spaces.slice(0, 6);
+  const q = query.trim().toLowerCase();
+  if (!q) return spaces.slice(0, 6);
 
-    return spaces
-      .filter((s) => {
-        const text = `${s.roomLocation} ${s.building || ""}`.toLowerCase();
-        return text.includes(q);
-      })
-      .slice(0, 6);
+  return spaces
+    // #1: search only by room name (not building) 
+    .filter((s) => (s.roomLocation || "").toLowerCase().includes(q))
+    // #2: sort results so that the “most relevant” appears first based on what the user types out then alphabetically
+    .sort((a, b) => {
+      const an = (a.roomLocation || "").toLowerCase();
+      const bn = (b.roomLocation || "").toLowerCase();
+
+      const aStarts = an.startsWith(q);
+      const bStarts = bn.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return an.localeCompare(bn);
+    })
+    .slice(0, 6);
   }, [spaces, query]);
 
   function choose(space) {

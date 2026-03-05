@@ -17,11 +17,15 @@ public class StudySpaceProfileDTO {
 
     // Core info
     private String roomLocation;
+    private String address;
     private String notes;
 
     // Status
     private Occupancy occupancy;
     private NoiseLevel noiseLevel;
+
+    // image
+    private String imageURL;
 
     // Groups
     private boolean suitableForGroups;
