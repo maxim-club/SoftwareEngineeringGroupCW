@@ -50,9 +50,11 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.10.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
 
-	// Smile library
-	implementation("com.github.haifengl:smile-core:5.2.0")
-	implementation("com.github.haifengl:smile-deep:5.2.0")
+	// Tribuo for ML
+	implementation 'org.tribuo:tribuo-core:4.3.1'
+	implementation 'org.tribuo:tribuo-regression:4.3.1'
+	implementation 'org.tribuo:tribuo-regression-tree:4.3.1'
+	//implementation 'org.tribuo:tribuo-ensemble:4.3.1'
 }
 
 tasks.named('test') {
