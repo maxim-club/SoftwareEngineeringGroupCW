@@ -1,14 +1,16 @@
-import React, { useMemo } from "react";
-import { Container, Button } from "react-bootstrap";
+import React, {useEffect, useMemo, useState} from "react";
+import { Container, Button, Spinner} from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import StudySpaceCard from "../components/StudySpaceCard";
 import "./FilteredResults.css";
 import useGoToCheckin from "../hooks/useGoToCheckin";
 
+
 import imgLibrary from "../assets/studyspaces/library.jpg";
 import imgPavilion from "../assets/studyspaces/PavilionCafe.jpg";
 import img4W from "../assets/studyspaces/4W.jpg";
 
+/*
 const SAMPLE_SPACES = [
   {
     id: "1",
@@ -56,7 +58,7 @@ const SAMPLE_SPACES = [
     imageUrl: imgPavilion,
   },
 ];
-
+*/
 const peopleLabels = ["1", "2-3", "4-5", "6-8", "8-10", "10+"];
 
 function minRatingFromReviewsKey(key) {
@@ -79,8 +81,23 @@ export default function FilteredResults() {
   const activeFilters = location.state?.filters || null;
   const goToCheckin = useGoToCheckin();
 
+  const [spaces, setSpaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      setLoading(true);
+      fetch("http://localhost:8080/api/spaces")
+          .then((res) => {
+              if (!res.ok) throw new Error("Network response was not ok");
+              return res.json();
+          })
+          .then((data) => setSpaces(data))
+          .catch((err) => console.error("Error fetching spaces:", err))
+          .finally(() => setLoading(false));
+      }, []);
+
   const { results, suggestions, countLabel } = useMemo(() => {
-    const spaces = SAMPLE_SPACES;
+      if (spaces.length === 0) return { results: [], suggestions: [], countLabel: "Loading..." };
 
     const selectedAmenityKeys = activeFilters?.amenities
       ? Object.keys(activeFilters.amenities).filter((k) => activeFilters.amenities[k])
@@ -100,11 +117,18 @@ export default function FilteredResults() {
       .filter((x) => typeof x === "number");
 
     const strictMatchesAll = (space) => {
-      if (selectedAtmospheres.length > 0 && !selectedAtmospheres.includes(space.atmosphere))
-        return false;
+        if (selectedAtmospheres.length > 0) {
+            const matchesNoise = selectedAtmospheres.some(attr =>
+                (space.noiseLevel || "").toLowerCase() === attr.toLowerCase()
+            );
+            if (!matchesNoise) return false;
+        }
 
-      if (selectedPeople && space.people !== selectedPeople) return false;
-
+        if (selectedPeople && space.maxGroupSize) {
+            // Basic check: if filter is "2-3", ensure maxGroupSize >= 2
+            const minRequired = parseInt(selectedPeople.charAt(0));
+            if (space.maxGroupSize < minRequired) return false;
+        }
       if (selectedFoodPolicies.length > 0 && !selectedFoodPolicies.includes("Any")) {
         if (!selectedFoodPolicies.includes(space.foodPolicy)) return false;
       }
@@ -114,140 +138,85 @@ export default function FilteredResults() {
         if (Number(space.rating) < minRequired) return false;
       }
 
-      if (selectedAmenityKeys.length > 0) {
-        const ok = selectedAmenityKeys.every((a) => (space.amenities ?? []).includes(a));
-        if (!ok) return false;
-      }
+        if (selectedAmenityKeys.length > 0) {
+            const ok = selectedAmenityKeys.every((a) => space.amenities && space.amenities[a] === true);
+            if (!ok) return false;
+        }
 
       return true;
     };
 
-    const score = (space) => {
-      let matched = 0;
-      let total = 0;
+      let strict = spaces.filter(strictMatchesAll);
 
-      if (selectedAtmospheres.length > 0) {
-        total++;
-        if (selectedAtmospheres.includes(space.atmosphere)) matched++;
-      }
+      // Filter out suggestions that are already in the strict results
+      const suggestionsList = [...spaces]
+          .filter((s) => !strict.some((r) => r.id === s.id))
+          .slice(0, 4);
 
-      if (selectedPeople) {
-        total++;
-        if (space.people === selectedPeople) matched++;
-      }
+      const label = strict.length === 1 ? "1 space" : `${strict.length} spaces`;
 
-      if (selectedFoodPolicies.length > 0 && !selectedFoodPolicies.includes("Any")) {
-        total++;
-        if (selectedFoodPolicies.includes(space.foodPolicy)) matched++;
-      } else if (selectedFoodPolicies.includes("Any")) {
-        total++;
-        matched++;
-      }
+      return { results: strict, suggestions: suggestionsList, countLabel: label };
+  }, [activeFilters, spaces]); // <-- Added 'spaces' here so it re-runs when data loads!
 
-      if (minRatings.length > 0) {
-        total++;
-        const minRequired = Math.min(...minRatings);
-        if (Number(space.rating) >= minRequired) matched++;
-      }
+    const goBack = () => navigate(-1);
+    const clearAll = () => navigate("/filters", { state: { filters: null } });
 
-      if (selectedAmenityKeys.length > 0) {
-        total++;
-        const ok = selectedAmenityKeys.every((a) => (space.amenities ?? []).includes(a));
-        if (ok) matched++;
-      }
+    // Use _id for MongoDB support
+    const onViewInfo = (space) => navigate(`/space/${space._id || space.id}`, { state: { space } });
 
-      return { matched, ratio: matched / (total || 1) };
-    };
-
-    let strict = spaces.filter(strictMatchesAll);
-
-    // fallback: if no strict matches, show best match
-    if (strict.length === 0 && activeFilters) {
-      const best = [...spaces]
-        .map((s) => ({ s, sc: score(s) }))
-        .sort((a, b) => b.sc.ratio - a.sc.ratio)[0]?.s;
-
-      strict = best ? [best] : [];
+    if (loading) {
+        return (
+            <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+                <Spinner animation="border" variant="primary" />
+            </Container>
+        );
     }
 
-    // suggestions = other spaces not in strict
-    const suggestionsList = [...spaces]
-      .filter((s) => !strict.some((r) => r.id === s.id))
-      .map((s) => ({ s, sc: score(s) }))
-      .sort((a, b) => b.sc.ratio - a.sc.ratio)
-      .map(({ s }) => s);
+    return (
+        <div className="results-wrap">
+            <Container style={{ maxWidth: 980 }}>
+                <div className="d-flex justify-content-between mb-3">
+                    <button
+                        type="button"
+                        onClick={goBack}
+                        style={{ border: "none", background: "transparent", padding: 0, cursor: "pointer" }}
+                        aria-label="Back"
+                    >
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="#0B5ED7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </button>
+                    <Button variant="link" onClick={clearAll}>Clear all</Button>
+                </div>
 
-    const label = strict.length === 1 ? "1 space" : `${strict.length} spaces`;
+                <h2 className="mb-4">{countLabel}</h2>
 
-    return { results: strict, suggestions: suggestionsList, countLabel: label };
-  }, [activeFilters]);
+                {(results || []).map((space) => (
+                    <StudySpaceCard
+                        key={space?.id || space?.id || Math.random()}
+                        space={space}
+                        onViewInfo={() => onViewInfo(space)}
+                        onCheckIn={() => goToCheckin(space)}
+                    />
+                ))}
 
-  const goBack = () => navigate(-1);
-  const clearAll = () => navigate("/filters", { state: { filters: null } });
+                {(suggestions?.length > 0) && (
+                    <div className="my-4 text-center text-muted" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+                        <span>More suggestions</span>
+                        <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
+                    </div>
+                )}
 
-  const onViewInfo = (space) => navigate(`/space/${space.id}`, { state: { space } });
-
-  return (
-    <div className="results-wrap">
-      <Container style={{ maxWidth: 980 }}>
-        <div className="d-flex justify-content-between mb-3">
-          <button
-            type="button"
-            onClick={goBack}
-            style={{
-              border: "none",
-              background: "transparent",
-              padding: 0,
-              cursor: "pointer",
-            }}
-            aria-label="Back"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 18L9 12L15 6"
-                stroke="#0B5ED7"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          <Button variant="link" onClick={clearAll}>
-            Clear all
-          </Button>
+                {(suggestions || []).map((space) => (
+                    <StudySpaceCard
+                        key={space?.id || space?.id || Math.random()}
+                        space={space}
+                        onViewInfo={() => onViewInfo(space)}
+                        onCheckIn={() => goToCheckin(space)}
+                    />
+                ))}
+            </Container>
         </div>
-
-        <h2 className="mb-4">{countLabel}</h2>
-
-        {results.map((space) => (
-          <StudySpaceCard
-            key={space.id}
-            space={space}
-            onViewInfo={() => onViewInfo(space)}
-            onCheckIn={() => goToCheckin(space)}
-          />
-        ))}
-
-        {suggestions.length > 0 && (
-          <div
-            className="my-4 text-center text-muted"
-            style={{ display: "flex", alignItems: "center", gap: "12px" }}
-          >
-            <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
-            <span>More suggestions</span>
-            <div style={{ flex: 1, height: "1px", background: "#e9ecef" }} />
-          </div>
-        )}
-
-        {suggestions.map((space) => (
-          <StudySpaceCard
-            key={space.id}
-            space={space}
-            onViewInfo={() => onViewInfo(space)}
-          />
-        ))}
-      </Container>
-    </div>
-  );
+    );
 }
