@@ -17,6 +17,7 @@ import org.tribuo.regression.rtree.*;
 import org.tribuo.impl.ArrayExample;
 import org.tribuo.regression.Regressor;
 import org.tribuo.common.tree.RandomForestTrainer;
+import org.tribuo.regression.rtree.impurity.MeanSquaredError;
 
 import java.time.*;
 import java.util.*;
@@ -31,7 +32,6 @@ public class PredictiveOccupancy {
 
     private final HistoricOccupancyRepository historicRepo;
     private final RealTimeOccupancyRepository repo;
-    private Model<Regressor> model;
     private Map<String, Model<Regressor>> models = new HashMap<>();
 
     public PredictiveOccupancy(RealTimeOccupancyRepository repo, HistoricOccupancyRepository historicRepo){
@@ -135,15 +135,38 @@ public class PredictiveOccupancy {
         MutableDataset<Regressor> dataset = new MutableDataset<>(source);
 
         // 5. Train model
-        CARTRegressionTrainer treeTrainer = new CARTRegressionTrainer();
+        // Create a regression tree trainer for RandomForest
+        int maxDepth = 5;                     // max depth of each tree
+        RandomForestTrainer<Regressor> rfTrainer = getRegressorRandomForestTrainer(maxDepth);
+
+        return rfTrainer.train(dataset);
+    }
+
+    private static RandomForestTrainer<Regressor> getRegressorRandomForestTrainer(int maxDepth) {
+        float minChildWeight = 1.0f;          // minimum weight for child node
+        float minImpurityDecrease = 0.0f;     // no minimum impurity decrease
+        CARTRegressionTrainer treeTrainer = getCartRegressionTrainer(maxDepth, minChildWeight, minImpurityDecrease);
 
         AveragingCombiner combiner = new AveragingCombiner();
         int numTrees = 50;
 
-        RandomForestTrainer<Regressor> rfTrainer = new RandomForestTrainer<>(treeTrainer, combiner, numTrees);
+        return new RandomForestTrainer<>(treeTrainer, combiner, numTrees);
+    }
 
-        Model<Regressor> model = rfTrainer.train(dataset);
-        return model;
+    private static CARTRegressionTrainer getCartRegressionTrainer(int maxDepth, float minChildWeight, float minImpurityDecrease) {
+        float fractionFeaturesInSplit = 0.5f; // <- crucial for RandomForest
+        boolean useRandomSplitPoints = false;  // use random split points
+        long seed = 123L;
+        MeanSquaredError mse = new MeanSquaredError();
+        return new CARTRegressionTrainer(
+                maxDepth,
+                minChildWeight,
+                minImpurityDecrease,
+                fractionFeaturesInSplit,
+                useRandomSplitPoints,
+                mse,
+                seed
+        );
     }
 
     public Map<Integer, Map<Integer, Double>> forecastNext7Days(String roomId) {
@@ -202,7 +225,7 @@ public class PredictiveOccupancy {
             double predictedOccupancy = prediction.getValues()[0]; // only target "occupancy"
 
             // 5. Store prediction by day -> hour
-            forecast.computeIfAbsent(dayOfWeek, k -> new LinkedHashMap<>())
+            forecast.computeIfAbsent(dayOfWeek, _ -> new LinkedHashMap<>())
                     .put(hour, predictedOccupancy);
         }
 
