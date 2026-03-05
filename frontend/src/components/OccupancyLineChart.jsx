@@ -62,7 +62,7 @@ export default function LineChartComponent() {
     return (
         <div>
             <div className="chart-container">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height= "100%">
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 30 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
