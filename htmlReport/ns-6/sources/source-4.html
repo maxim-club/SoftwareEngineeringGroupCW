@@ -1,0 +1,130 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RealTimeOccupancyRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.studyspaces.spacefinder.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: RealTimeOccupancyRepository (com.studyspaces.spacefinder.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">RealTimeOccupancyRepository$MockitoMock$eVGdIwxb</td>
+  </tr>
+  <tr>
+    <td class="name">RealTimeOccupancyRepository$MockitoMock$eVGdIwxb$auxiliary$7MZAY7EI</td>
+  </tr>
+  <tr>
+    <td class="name">RealTimeOccupancyRepository$MockitoMock$eVGdIwxb$auxiliary$dWksAcxu</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.studyspaces.spacefinder.repository;
+&nbsp;
+&nbsp;import com.studyspaces.spacefinder.model.*;
+&nbsp;import org.springframework.data.mongodb.repository.MongoRepository;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;import org.springframework.data.mongodb.repository.Query;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface RealTimeOccupancyRepository
+&nbsp;        extends MongoRepository&lt;RoomOccupancyRecord, String&gt; {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find a record document by its id.
+&nbsp;     */
+&nbsp;    Optional&lt;RoomOccupancyRecord&gt; findById(String id);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve all occupancy entries for a given occupancy level.
+&nbsp;     */
+&nbsp;    @Query(&quot;{ &#39;records.occupancyLevel&#39;: ?0 }&quot;)
+&nbsp;    List&lt;RoomOccupancyRecord&gt; findByOccupancyLevel(Occupancy occupancyLevel);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve all documents that contain records after a given timestamp.
+&nbsp;     */
+&nbsp;    @Query(&quot;{ &#39;records.timestamp&#39;: { $gt: ?0 } }&quot;)
+&nbsp;    List&lt;RoomOccupancyRecord&gt; findWithRecordsAfterTimestamp(long timestamp);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find all rooms that have at least one record older than the given timestamp
+&nbsp;     */
+&nbsp;    @Query(&quot;{ &#39;records.timestamp&#39;: { $lt: ?0 } }&quot;)
+&nbsp;    List&lt;RoomOccupancyRecord&gt; findRoomsWithRecordsOlderThan(long timestamp);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve a specific document and filter its records by timestamp.
+&nbsp;     */
+&nbsp;    @Query(value = &quot;{ &#39;_id&#39;: ?0 }&quot;,
+&nbsp;           fields = &quot;{ &#39;records&#39;: { $elemMatch: { &#39;timestamp&#39;: { $gt: ?1 } } } }&quot;)
+&nbsp;    Optional&lt;RoomOccupancyRecord&gt; findRecordsAfterTimestamp(String id, int timestamp);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves an occupancy record from a specified room document with the most recent timestamp
+&nbsp;     */
+&nbsp;    @Query(value = &quot;{&#39;_id&#39;: ?0}&quot;, fields = &quot;{ &#39;records&#39;: { $slice: -1}}&quot;)
+&nbsp;    Optional&lt;OccupancyRecord&gt; findLastRoomOccupancy(String id);
+&nbsp;}
+&nbsp;
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 14:24</div>
+</div>
+</body>
+</html>

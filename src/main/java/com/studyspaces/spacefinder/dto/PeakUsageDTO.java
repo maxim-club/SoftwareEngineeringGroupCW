@@ -1,7 +1,10 @@
 package com.studyspaces.spacefinder.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class PeakUsageDTO {
     
     private String roomId;

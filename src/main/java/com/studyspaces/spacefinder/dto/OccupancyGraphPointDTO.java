@@ -1,6 +1,8 @@
 package com.studyspaces.spacefinder.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class OccupancyGraphPointDTO {
     
     private String day;  // will be used for weekly graphs

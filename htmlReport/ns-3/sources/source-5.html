@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RoomUtilisationDTO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.studyspaces.spacefinder.dto</a>
+</div>
+
+<h1>Coverage Summary for Class: RoomUtilisationDTO (com.studyspaces.spacefinder.dto)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RoomUtilisationDTO</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.studyspaces.spacefinder.dto;
+&nbsp;
+&nbsp;public class RoomUtilisationDTO {
+&nbsp;    
+&nbsp;    private String roomId;
+&nbsp;    private String roomLocation;
+&nbsp;    private double averageDemand;
+&nbsp;    private double utilisationPercent;
+&nbsp;    private boolean underUtilised;
+&nbsp;    private AnalyticsDataWarning warning;
+&nbsp;
+&nbsp;    public RoomUtilisationDTO(
+&nbsp;        String roomId,
+&nbsp;        String roomLocation,
+&nbsp;        double averageDemand,
+&nbsp;        boolean underUtilised,
+&nbsp;        AnalyticsDataWarning warning
+<b class="fc">&nbsp;    ) {</b>
+<b class="fc">&nbsp;        this.roomId = roomId;</b>
+<b class="fc">&nbsp;        this.roomLocation = roomLocation;</b>
+<b class="fc">&nbsp;        this.averageDemand = averageDemand;</b>
+<b class="fc">&nbsp;        this.utilisationPercent = averageDemand * 100.0;</b>
+<b class="fc">&nbsp;        this.underUtilised = underUtilised;</b>
+<b class="fc">&nbsp;        this.warning = warning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRoomId(){
+<b class="fc">&nbsp;        return roomId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRoomLocation(){
+<b class="nc">&nbsp;        return roomLocation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getAverageDemand(){
+<b class="fc">&nbsp;        return averageDemand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getUtilisationPercent(){
+<b class="nc">&nbsp;        return utilisationPercent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isUnderUtilised() {
+<b class="fc">&nbsp;        return underUtilised;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AnalyticsDataWarning getWarning(){
+<b class="fc">&nbsp;        return warning;</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 14:24</div>
+</div>
+</body>
+</html>
