@@ -17,6 +17,7 @@ public class UserRecord {
 
     private String username;
     private String password;
+    private String email;
 
     private List<StudySession> studySessionList = new ArrayList<>();
 }

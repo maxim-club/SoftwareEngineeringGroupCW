@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.ZonedDateTime;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -11,7 +13,6 @@ public class OccupancyRecord {
 
     private long timestamp;
     private Occupancy occupancyLevel;
-
     private Boolean closed;
     private Boolean wifiIssue;
     private Boolean reserved;
@@ -25,5 +26,7 @@ public class OccupancyRecord {
         this.reserved = reserved;
         this.fullyOccupied = fullyOccupied;
     }
+
+
 
 }

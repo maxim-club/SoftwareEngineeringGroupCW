@@ -4,10 +4,12 @@ import com.studyspaces.spacefinder.model.StudySession;
 import com.studyspaces.spacefinder.model.UserRecord;
 import com.studyspaces.spacefinder.repository.UserRepository;
 import org.springframework.data.util.Pair;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserManager {
@@ -51,6 +53,27 @@ public class UserManager {
 
         userRepository.save(user);
 
+    }
+
+    public boolean signUp(Map<String, String> signupData){
+        String username = signupData.get("username");
+        String password = signupData.get("password"); // You should hash this in real apps
+        String email = signupData.get("email");
+
+        // Check if user already exists
+        if (userRepository.findUserRecordByUsername(username).isPresent()) {
+            return false;
+        }
+
+        // Create a new UserRecord
+        UserRecord newUser = new UserRecord();
+        newUser.setUsername(username);
+        newUser.setPassword(password); // Hash in production!
+        newUser.setEmail(email);
+
+        // Save to DB
+        userRepository.save(newUser);
+        return true;
     }
 
 }
