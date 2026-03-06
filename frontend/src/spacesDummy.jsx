@@ -1,4 +1,4 @@
-export const SPACES = [
+5export const SPACES = [
   {
     id: "1",
     roomLocation: "Library Study Room",
