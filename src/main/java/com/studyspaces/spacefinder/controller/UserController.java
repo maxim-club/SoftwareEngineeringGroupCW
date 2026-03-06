@@ -1,5 +1,7 @@
 package com.studyspaces.spacefinder.controller;
 
+import com.studyspaces.spacefinder.model.UserRecord;
+import com.studyspaces.spacefinder.service.UserManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
@@ -9,7 +11,12 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    // TODO: create UserService
+    UserManager userManager;
+
+    public UserController(UserManager userManager) {
+        this.userManager = userManager;
+    }
+
 
     // Endpoint: POST /api/auth/login
     @PostMapping("/login")
@@ -17,10 +24,15 @@ public class UserController {
         String username = loginData.get("username");
         String password = loginData.get("password");
 
-        // MOCK LOGIC: Replace this with real database checks
-        if ("admin".equals(username) && "password".equals(password)) {
-            return ResponseEntity.ok(Map.of("message", "Login successful", "role", "admin"));
-        } else {
+        try {
+            boolean valid = userManager.checkLogin(username, password);
+            if (valid) {
+                return ResponseEntity.ok(Map.of("message", "Login successful"));
+            } else {
+                return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+            }
+        } catch (Exception e) {
+            // User not found, DB error, etc.
             return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
         }
     }
@@ -28,7 +40,18 @@ public class UserController {
     // Endpoint: POST /api/auth/signup
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody Map<String, String> signupData) {
-        // TODO: Send this data to your database
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+
+        try {
+            if (userManager.signUp(signupData)) {
+                return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of("message", "Username already taken"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Unexpected Error"));
+        }
+
+
+
     }
 }

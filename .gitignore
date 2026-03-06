@@ -42,3 +42,10 @@ out/
 
 #mongoconfig
 src/main/java/com/studyspaces/spacefinder/config/
+
+#Reports
+/build/
+/out/
+/reports/
+/*.html
+/htmlReport
