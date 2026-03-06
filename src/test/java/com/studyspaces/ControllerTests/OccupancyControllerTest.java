@@ -112,8 +112,8 @@ class OccupancyControllerTest {
     // ===========================
     @Test
     void shouldAcceptUserCheckIn() throws Exception {
-        CheckInDTO dto = new CheckInDTO(true, false, false, false, "HIGH");
-        CheckInReport report = new CheckInReport(true, false, false, false, Occupancy.HIGH);
+        CheckInDTO dto = new CheckInDTO("HIGH");
+        CheckInReport report = new CheckInReport(Occupancy.HIGH);
 
         when(occupancyManager.toModel(dto)).thenReturn(report);
         when(occupancyManager.userCheckIn("R101", report)).thenReturn(true);
@@ -130,8 +130,8 @@ class OccupancyControllerTest {
 
     @Test
     void shouldRejectInvalidCheckIn() throws Exception {
-        CheckInDTO dto = new CheckInDTO(false, false, true, false, "LOW");
-        CheckInReport report = new CheckInReport(false, false, true, false, Occupancy.LOW);
+        CheckInDTO dto = new CheckInDTO("LOW");
+        CheckInReport report = new CheckInReport(Occupancy.LOW);
 
         when(occupancyManager.toModel(dto)).thenReturn(report);
         when(occupancyManager.userCheckIn("R999", report)).thenReturn(false);
