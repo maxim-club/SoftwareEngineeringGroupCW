@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StudySpaceRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.studyspaces.spacefinder.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: StudySpaceRepository (com.studyspaces.spacefinder.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">StudySpaceRepository$MockitoMock$xdQ18u27</td>
+  </tr>
+  <tr>
+    <td class="name">StudySpaceRepository$MockitoMock$xdQ18u27$auxiliary$cBZmvusj</td>
+  </tr>
+  <tr>
+    <td class="name">StudySpaceRepository$MockitoMock$xdQ18u27$auxiliary$JX1xZABZ</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.studyspaces.spacefinder.repository;
+&nbsp;
+&nbsp;import org.springframework.data.mongodb.repository.MongoRepository;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;
+&nbsp;import org.springframework.data.mongodb.repository.Query;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import com.studyspaces.spacefinder.model.*;
+&nbsp;/**
+&nbsp; * StudySpaceRepository
+&nbsp; * 
+&nbsp; * This repository provides auto-generated query methods for StudySpaceProfile.
+&nbsp; * Spring Data MongoDB automatically implements these methods based on method names.
+&nbsp; */
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface StudySpaceRepository extends MongoRepository&lt;StudySpaceProfile, String&gt; {
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // CRUD / Core
+&nbsp;    // ===========================
+&nbsp;    Optional&lt;StudySpaceProfile&gt; findById(String id);
+&nbsp;    List&lt;StudySpaceProfile&gt; findAll();
+&nbsp;    @Query(&quot;{&#39;_id&#39;: {$in: ?0}}&quot;)
+&nbsp;    List&lt;StudySpaceProfile&gt; findByIds(List&lt;String&gt; ids);
+&nbsp;    void deleteById(String id);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Room Location
+&nbsp;    // ===========================
+&nbsp;    Optional&lt;StudySpaceProfile&gt; findFirstByRoomLocation(String roomLocation);
+&nbsp;    List&lt;StudySpaceProfile&gt; findByRoomLocation(String roomLocation);
+&nbsp;    List&lt;StudySpaceProfile&gt; findByRoomLocationContaining(String keyword);
+&nbsp;    void deleteByRoomLocation(String roomLocation);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Occupancy
+&nbsp;    // ===========================
+&nbsp;    List&lt;StudySpaceProfile&gt; findByOccupancy(Occupancy occupancy);
+&nbsp;    List&lt;StudySpaceProfile&gt; findByOccupancyIn(List&lt;Occupancy&gt; occupancies);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Noise Level
+&nbsp;    // ===========================
+&nbsp;    List&lt;StudySpaceProfile&gt; findByNoiseLevel(NoiseLevel noiseLevel);
+&nbsp;    List&lt;StudySpaceProfile&gt; findByNoiseLevelIn(List&lt;NoiseLevel&gt; noiseLevels);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Group suitability
+&nbsp;    // ===========================
+&nbsp;    List&lt;StudySpaceProfile&gt; findBySuitableForGroupsTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findBySuitableForGroupsFalse();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByMaxGroupSizeGreaterThan(int size);
+&nbsp;    List&lt;StudySpaceProfile&gt; findByMaxGroupSizeLessThanEqual(int size);
+&nbsp;    List&lt;StudySpaceProfile&gt; findBySuitableForGroupsTrueAndMaxGroupSizeGreaterThanEqual(int size);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Amenities (booleans)
+&nbsp;    // ===========================
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesPlugSocketsTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesDesksTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesComputersTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesPrintersTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesFoodAllowedTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesToiletNearbyTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesWheelchairAccessibleTrue();
+&nbsp;    List&lt;StudySpaceProfile&gt; findByAmenitiesPlugSocketsTrueAndAmenitiesDesksTrue();
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Schedule
+&nbsp;    // ===========================
+&nbsp;	@Query(&quot;{ &#39;schedule.day&#39;: ?0 }&quot;)
+&nbsp;    List&lt;StudySpaceProfile&gt; findByScheduleDay(int day);
+&nbsp;	@Query(&quot;{ &#39;schedule.day&#39;: ?0, &#39;schedule.time&#39;: { $gt: ?1 } }&quot;)
+&nbsp;    List&lt;StudySpaceProfile&gt; findByScheduleDayAndScheduleTimeGreaterThan(int day, int time);
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Notes / Text search
+&nbsp;    // ===========================
+&nbsp;    List&lt;StudySpaceProfile&gt; findByNotesContaining(String keyword);
+&nbsp;
+&nbsp;
+&nbsp;    // ===========================
+&nbsp;    // Delete helpers
+&nbsp;    // ===========================
+&nbsp;    void deleteByRoomLocationContaining(String keyword);
+&nbsp;
+&nbsp;    //============================
+&nbsp;    //Search &amp; Filters
+&nbsp;    //============================
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 14:24</div>
+</div>
+</body>
+</html>
