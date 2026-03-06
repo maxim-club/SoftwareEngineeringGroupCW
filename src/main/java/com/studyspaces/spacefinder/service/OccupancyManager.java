@@ -38,10 +38,6 @@ public class OccupancyManager {
     // Converts DTO into model
     public CheckInReport toModel(CheckInDTO dto) {
         return new CheckInReport(
-                dto.getClosed(),
-                dto.getWifiIssue(),
-                dto.getReserved(),
-                dto.getFullyOccupied(),
                 Occupancy.valueOf(dto.getOccupancy())
         );
     }
@@ -122,11 +118,7 @@ public class OccupancyManager {
 
         OccupancyRecord newRecord = new OccupancyRecord(
                 System.currentTimeMillis(),
-                report.getOccupancy(),
-                report.getClosed(),
-                report.getWifiIssue(),
-                report.getReserved(),
-                report.getFullyOccupied()
+                report.getOccupancy()
         );
 
         records.add(newRecord);
