@@ -18,7 +18,7 @@ public class OccupancyRecord {
     private Boolean reserved;
     private Boolean fullyOccupied;
 
-    
+
     public OccupancyRecord(long timestamp, Occupancy occupancyLevel, Boolean closed, Boolean wifiIssue, Boolean reserved, Boolean fullyOccupied) {
         this.timestamp = timestamp;
         this.occupancyLevel = occupancyLevel;
