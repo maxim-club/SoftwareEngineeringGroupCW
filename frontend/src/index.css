@@ -70,7 +70,7 @@ body {
 
 .chart-container {
   width: 100%;
-  height: clamp(300px, 42vh, 460px);
+  height: clamp(240px, 35vh, 420px);
 }
 
 .map-container {
