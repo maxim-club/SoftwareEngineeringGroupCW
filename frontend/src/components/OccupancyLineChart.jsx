@@ -1,4 +1,4 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { useMemo, useState } from "react";
 
 export default function LineChartComponent() {
@@ -9,46 +9,46 @@ export default function LineChartComponent() {
 
     // dummy data - replaced with simulated/ real
     const dailyData = useMemo(
-        () => [
-        { day: "Mon", "Average Occupancy": 64 },
-        { day: "Tue", "Average Occupancy": 34 },
-        { day: "Wed", "Average Occupancy": 25 },
-        { day: "Thu", "Average Occupancy": 45 },
-        { day: "Fri", "Average Occupancy": 82 },
-        { day: "Sat", "Average Occupancy": 60 },
-        { day: "Sun", "Average Occupancy": 50 },
-        ],
-        []
+    () => [
+        { day: "Mon", actual: 64, predicted: null },
+        { day: "Tue", actual: 34, predicted: null },
+        { day: "Wed", actual: 25, predicted: null },
+        { day: "Thu", actual: null, predicted: 48 },
+        { day: "Fri", actual: null, predicted: 76 },
+        { day: "Sat", actual: null, predicted: 66 },
+        { day: "Sun", actual: null, predicted: 58 },
+    ],
+    []
     );
 
     const hourlyData = useMemo(
-        () => [
-        { hour: 0,  "Average Occupancy": 8 },
-        { hour: 1,  "Average Occupancy": 6 },
-        { hour: 2,  "Average Occupancy": 5 },
-        { hour: 3,  "Average Occupancy": 4 },
-        { hour: 4,  "Average Occupancy": 6 },
-        { hour: 5,  "Average Occupancy": 10 },
-        { hour: 6,  "Average Occupancy": 16 },
-        { hour: 7,  "Average Occupancy": 28 },
-        { hour: 8,  "Average Occupancy": 45 },
-        { hour: 9,  "Average Occupancy": 52 },
-        { hour: 10, "Average Occupancy": 60 },
-        { hour: 11, "Average Occupancy": 70 },
-        { hour: 12, "Average Occupancy": 78 },
-        { hour: 13, "Average Occupancy": 72 },
-        { hour: 14, "Average Occupancy": 68 },
-        { hour: 15, "Average Occupancy": 60 },
-        { hour: 16, "Average Occupancy": 55 },
-        { hour: 17, "Average Occupancy": 60 },
-        { hour: 18, "Average Occupancy": 65 },
-        { hour: 19, "Average Occupancy": 58 },
-        { hour: 20, "Average Occupancy": 42 },
-        { hour: 21, "Average Occupancy": 30 },
-        { hour: 22, "Average Occupancy": 20 },
-        { hour: 23, "Average Occupancy": 15 },
-        ],
-        []
+    () => [
+        { hour: 0, actual: 8, predicted: null },
+        { hour: 1, actual: 6, predicted: null },
+        { hour: 2, actual: 5, predicted: null },
+        { hour: 3, actual: 4, predicted: null },
+        { hour: 4, actual: 6, predicted: null },
+        { hour: 5, actual: 10, predicted: null },
+        { hour: 6, actual: 16, predicted: null },
+        { hour: 7, actual: 28, predicted: null },
+        { hour: 8, actual: 45, predicted: null },
+        { hour: 9, actual: 52, predicted: null },
+        { hour: 10, actual: 60, predicted: null },
+        { hour: 11, actual: 70, predicted: null },
+        { hour: 12, actual: 78, predicted: null },
+        { hour: 13, actual: 72, predicted: null },
+        { hour: 14, actual: 68, predicted: null },
+        { hour: 15, actual: null, predicted: 62 },
+        { hour: 16, actual: null, predicted: 58 },
+        { hour: 17, actual: null, predicted: 64 },
+        { hour: 18, actual: null, predicted: 69 },
+        { hour: 19, actual: null, predicted: 61 },
+        { hour: 20, actual: null, predicted: 47 },
+        { hour: 21, actual: null, predicted: 35 },
+        { hour: 22, actual: null, predicted: 24 },
+        { hour: 23, actual: null, predicted: 18 },
+    ],
+    []
     );
 
     
@@ -62,9 +62,9 @@ export default function LineChartComponent() {
     return (
         <div>
             <div className="chart-container">
-                <ResponsiveContainer width="100%" height= "100%">
-                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 30 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 20, bottom: 80 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#bfc5cc"/>
                     <XAxis
                         dataKey={xKey}
                         type={mode === "hour" ? "number" : "category"}
@@ -75,7 +75,9 @@ export default function LineChartComponent() {
                             : undefined
                         }
                         tickFormatter={xTickFormatter}
-                        label={{ value: xLabel, position: "insideBottom", offset: -5 }}
+                        label={{ value: xLabel, position: "insideBottom", offset: 0 }}
+                        axisLine={{ stroke: "#666", strokeWidth: 1 }}
+                        tickLine={{ stroke: "#666", strokeWidth: 1 }}
                     />
                     <YAxis
                         domain={[0, 100]}
@@ -85,13 +87,47 @@ export default function LineChartComponent() {
                             angle: -90, 
                             dx: -20,
                             position: "outsideLeft" 
-                        }}/>
+                        }}
+                        axisLine={{ stroke: "#666", strokeWidth: 1.5 }}
+                        tickLine={{ stroke: "#666", strokeWidth: 1 }}
+                    />
                     <Tooltip
                         labelFormatter={(label) =>
                             mode === "day" ? label : `Hour: ${label}:00`
                         }
                     />
-                    <Line type="monotone" dataKey="Average Occupancy" stroke="#82ca9d" />
+                    <Legend />
+                    <Line
+                        type="monotone"
+                        dataKey="actual"
+                        name="Actual Occupancy"
+                        stroke="#82ca9d"
+                        strokeWidth={3}
+                        dot={{ r: 5, fill: "#fff", stroke: "#82ca9d", strokeWidth: 3 }}
+                        activeDot={{ r: 6, fill: "#fff", stroke: "#82ca9d", strokeWidth: 3 }}
+                        />
+
+                    <Line
+                        type="monotone"
+                        dataKey="predicted"
+                        name="Predicted Occupancy"
+                        stroke="#ff7300"
+                        strokeWidth={3}
+                        strokeDasharray="7 5"
+                        connectNulls={false}
+                        dot={{
+                            r: 6,
+                            fill: "#ff7300",
+                            stroke: "#f5f5f5",   // same as chart/card background
+                            strokeWidth: 4
+                        }}
+                        activeDot={{
+                            r: 7,
+                            fill: "#ff7300",
+                            stroke: "#f5f5f5",
+                            strokeWidth: 4
+                        }}
+                        />
                     </LineChart>
             </ResponsiveContainer>
             </div>
@@ -102,7 +138,7 @@ export default function LineChartComponent() {
                     onClick={() => setMode("day")}
                     className={`ui-button ${mode === "day" ? "active" : ""}`}
                     >
-                    By Day
+                    By Week
                     </button>
 
                     <button
@@ -110,7 +146,7 @@ export default function LineChartComponent() {
                     onClick={() => setMode("hour")}
                     className={`ui-button ${mode === "hour" ? "active" : ""}`}
                     >
-                    By Time
+                    By Day
                     </button>
             </div>
 
