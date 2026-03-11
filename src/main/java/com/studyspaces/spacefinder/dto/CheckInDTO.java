@@ -8,5 +8,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckInDTO {
+    private Boolean closed;
+    private Boolean wifiIssue;
+    private Boolean reserved;
+    private Boolean fullyOccupied;
     private String occupancy;
 }

@@ -81,14 +81,10 @@ public class SpaceController {
         List<String> ids = RoomSearcher.getSortedByRecommended(request.getFilters());
         List<StudySpaceProfile> recommendations = profileManager.getByIds(ids);
 
-
-        // remove duplicates by id
-        final List<String> exactIds = exactMatches.stream()
-                .map(StudySpaceProfile::getId)
-                .toList();
-
+        // remove duplicates
+        final List<StudySpaceProfile> finalExactMatches = exactMatches;
         recommendations = recommendations.stream()
-                .filter(rec -> !exactIds.contains(rec.getId()))
+                .filter(rec -> !finalExactMatches.contains(rec))
                 .toList();
 
         return new SearchResponseDTO(exactMatches, recommendations);

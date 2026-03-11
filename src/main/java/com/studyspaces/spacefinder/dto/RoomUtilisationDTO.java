@@ -1,10 +1,5 @@
 package com.studyspaces.spacefinder.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class RoomUtilisationDTO {
     
     private String roomId;

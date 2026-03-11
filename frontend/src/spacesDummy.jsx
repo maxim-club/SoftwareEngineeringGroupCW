@@ -1,4 +1,4 @@
-5export const SPACES = [
+export const SPACES = [
   {
     id: "1",
     roomLocation: "Library Study Room",

@@ -127,6 +127,10 @@ public class OccupancyManagerTests {
         String roomId = "room1";
 
         CheckInReport report = new CheckInReport(
+                false,
+                true,
+                false,
+                false,
                 Occupancy.LOW
         );
 
@@ -140,9 +144,11 @@ public class OccupancyManagerTests {
         assertTrue(result);
         assertEquals(1, room.getRecords().size());
 
-        OccupancyRecord savedRecord = room.getRecords().getFirst();
+        OccupancyRecord savedRecord = room.getRecords().get(0);
 
         assertEquals(Occupancy.LOW, savedRecord.getOccupancyLevel());
+        assertEquals(true, savedRecord.getWifiIssue());
+        assertEquals(false, savedRecord.getClosed());
 
         verify(repo).save(room);
     }
@@ -165,6 +171,10 @@ public class OccupancyManagerTests {
     void userCheckIn_nulLRoom(){
         String roomId = null;
         CheckInReport report = new CheckInReport(
+                false,
+                true,
+                false,
+                false,
                 Occupancy.LOW
         );
 
@@ -305,7 +315,7 @@ public class OccupancyManagerTests {
 
         assertEquals(roomId, savedHistoricRoom.getId());
         assertEquals(1, savedHistoricRoom.getRecords().size());
-        assertEquals(oldRecord, savedHistoricRoom.getRecords().getFirst());
+        assertEquals(oldRecord, savedHistoricRoom.getRecords().get(0));
 
         // Verify Mongo pull was executed
         verify(mongoTemplate, times(1))
